@@ -1,0 +1,30 @@
+[package]
+name = "api"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+common.workspace = true
+db.workspace = true
+domain.workspace = true
+jobs.workspace = true
+tokio.workspace = true
+axum.workspace = true
+axum-extra.workspace = true
+tower.workspace = true
+tower-http.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+uuid.workspace = true
+chrono.workspace = true
+utoipa.workspace = true
+utoipa-axum.workspace = true
+utoipa-scalar.workspace = true
+redis.workspace = true
+sqlx.workspace = true
+tracing.workspace = true
+time = "0.3"
+metrics.workspace = true
+metrics-exporter-prometheus.workspace = true
+anyhow.workspace = true

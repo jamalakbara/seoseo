@@ -1,0 +1,26 @@
+# Development: only Postgres + Valkey on localhost. Run the API with
+#   DATABASE_URL=postgres://seoseo:seoseo@localhost:5432/seoseo cargo run -p app -- serve --migrate
+# and the web app with `pnpm dev` in frontend/ (API_INTERNAL_URL defaults to http://localhost:8080).
+#   docker compose -f deploy/compose.dev.yaml up -d
+
+name: seoseo-dev
+
+services:
+  db:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: seoseo
+      POSTGRES_PASSWORD: seoseo
+      POSTGRES_DB: seoseo
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - devpgdata:/var/lib/postgresql
+
+  cache:
+    image: valkey/valkey:9-alpine
+    ports:
+      - "127.0.0.1:6379:6379"
+
+volumes:
+  devpgdata:

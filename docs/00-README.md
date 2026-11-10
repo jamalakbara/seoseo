@@ -1,0 +1,16 @@
+# SeoSeo — Documentation Index
+
+Free, open-source, self-hostable SEO platform. Rust (axum) backend · Next.js 16 frontend · Docker Compose. Reverse-engineered from OpenSEO (every-app/open-seo v0.1.26) and extended.
+
+| # | Doc | What it answers |
+|---|---|---|
+| 01 | [Reverse-engineering analysis](01-reverse-engineering-analysis.md) | What OpenSEO is, stack, code map, full data model, every feature & flow, external APIs, invariants, gaps |
+| 02 | [PRD](02-PRD.md) | Vision, goals, personas, functional & non-functional requirements, beyond-parity features, open questions |
+| 03 | [Feature catalog](03-feature-catalog.md) | Every feature with ID, priority, data source, milestone, status (living backlog) |
+| 04 | [Architecture](04-architecture.md) | Rust + Next.js stack with versions, system diagram, repo layout, DB, jobs, crawler, providers, security, Docker |
+| 05 | [Free data sources](05-free-data-sources.md) | How each paid DataForSEO capability is replaced by free/computed data; confidence labels; risks |
+| 06 | [API & MCP spec](06-api-and-mcp-spec.md) | REST endpoints, MCP tool list (OpenSEO-compatible names), skills |
+| 07 | [Roadmap](07-roadmap.md) | Milestones M0–M8 with scope and exit criteria |
+
+Reference source: `reference/open-seo/` (git-ignored clone; re-clone with `git clone https://github.com/every-app/open-seo reference/open-seo`).
+Upstream design records worth re-reading before building a feature: `reference/open-seo/docs/maintainers/specs/00xx-*.md`.

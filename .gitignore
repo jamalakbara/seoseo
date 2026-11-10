@@ -1,0 +1,8 @@
+reference/
+node_modules/
+target/
+.env
+.env.*
+!.env.example
+.next/
+.aimem/.cache/

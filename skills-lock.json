@@ -1,0 +1,11 @@
+{
+  "version": 1,
+  "skills": {
+    "system-design": {
+      "source": "wondelai/skills",
+      "sourceType": "github",
+      "skillPath": "system-design/SKILL.md",
+      "computedHash": "6b952b824a92dbda8eb7e47902c25e844f9dbfa52cb2a6c59a970918aa6d26b9"
+    }
+  }
+}
