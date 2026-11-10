@@ -10,11 +10,12 @@ Project: `seoseo` · mode: solo · sync: none
 3. END: run `aimem handoff` (Done / Not done / Next / Blocked). Supersede records, never delete them.
 
 ## Counts
-- decision: 14 (proposed 14)
+- decision: 15 (proposed 15)
 - memory: 10 (active 10)
-- handoff: 4 (final 4)
+- handoff: 5 (final 5)
 
 ## Recent handoffs
+- hnd-rp4fx7bx 2026-11-10 (human:akbar) — Done: Reviewed M2 handoff, roadmap, feature catalog and git status; reported remaining scope. No implementation changes. · Next: Implement remaining M2 items when requested; retain prior M2 implement…
 - hnd-qk8dx91v 2026-11-10 (agent:claude-code:fable-5.2) — Done: M2 core on branch feat/m2-keyword-serp (not committed): new crates `providers` (Google/Bing autocomplete, SearXNG/Brave/Serper SERP, Wikipedia pageviews, Common Crawl rank stream, catalog, regi…
 - hnd-0taw8end 2026-11-10 (agent:claude-code:opus-5.5) — Done: M1 site audit on branch feat/m1-site-audit: crawler crate (SSRF policy+guarded DNS, fetcher, robots, sitemaps, lol_html extractor, 38-issue catalog, page+site rules, health score), migration 00…
 - hnd-x37j0ajm 2026-11-10 (agent:claude-code:opus-5.5) — Done: M0 built and verified: Rust workspace (common/db/domain/jobs/api/app), migration 0001, auth password+none, sessions+CSRF, org-bound API keys, projects CRUD/archive/delete, Postgres job queue+wo…
