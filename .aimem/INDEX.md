@@ -10,9 +10,10 @@ Project: `seoseo` · mode: solo · sync: none
 3. END: run `aimem handoff` (Done / Not done / Next / Blocked). Supersede records, never delete them.
 
 ## Counts
-- decision: 4 (proposed 4)
-- memory: 4 (active 4)
-- handoff: 1 (final 1)
+- decision: 8 (proposed 8)
+- memory: 7 (active 7)
+- handoff: 2 (final 2)
 
 ## Recent handoffs
+- hnd-x37j0ajm 2026-11-10 (agent:claude-code:opus-5.5) — Done: M0 built and verified: Rust workspace (common/db/domain/jobs/api/app), migration 0001, auth password+none, sessions+CSRF, org-bound API keys, projects CRUD/archive/delete, Postgres job queue+wo…
 - hnd-2tj4enna 2026-11-10 (agent:claude-code:opus-5.5) — Done: Reverse-engineered OpenSEO (docs/01), PRD (02), feature catalog w/ IDs (03), architecture Rust/Next/Docker (04), free data strategy (05), API+MCP spec (06), roadmap M0-M8 (07); CLAUDE.md; git i…
