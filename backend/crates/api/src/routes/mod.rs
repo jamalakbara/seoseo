@@ -1,8 +1,10 @@
 mod api_keys;
+mod audits;
 mod auth;
 mod jobs;
 mod projects;
 mod system;
+mod team;
 
 use crate::state::AppState;
 use utoipa_axum::router::OpenApiRouter;
@@ -16,4 +18,6 @@ pub fn v1() -> OpenApiRouter<AppState> {
         .merge(api_keys::router())
         .merge(projects::router())
         .merge(jobs::router())
+        .merge(audits::router())
+        .merge(team::router())
 }

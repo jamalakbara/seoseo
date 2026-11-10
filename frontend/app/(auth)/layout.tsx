@@ -1,3 +1,5 @@
+import { Suspense } from "react";
+
 export default function AuthLayout({ children }: LayoutProps<"/">) {
   return (
     <main className="flex min-h-screen flex-1 items-center justify-center bg-muted/40 p-4">
@@ -6,7 +8,7 @@ export default function AuthLayout({ children }: LayoutProps<"/">) {
           <div className="text-2xl font-semibold tracking-tight">SeoSeo</div>
           <p className="text-sm text-muted-foreground">Free, open-source SEO platform</p>
         </div>
-        {children}
+        <Suspense>{children}</Suspense>
       </div>
     </main>
   );

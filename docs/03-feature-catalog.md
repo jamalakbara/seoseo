@@ -2,7 +2,7 @@
 
 Every feature with an ID, OpenSEO parity reference, priority, data source, and milestone.
 Priority: **P0** MVP · **P1** parity · **P2** beyond parity · **P3** later.
-Status column is updated as we build (`todo` / `wip` / `done`). Last update: 2026-11-10 (M0).
+Status column is updated as we build (`todo` / `wip` / `done`). Last update: 2026-11-10 (M1).
 
 ## Workspace & identity
 | ID | Feature | OpenSEO ref | Pri | Data | MS | Status |
@@ -10,16 +10,16 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | WS-01 | Email/password sign-up/in, first user = admin | Better Auth `password` mode | P0 | — | M0 | done |
 | WS-02 | Auth modes: `password`, `none` (trusted network), optional OIDC/Google | AUTH_MODE | P0 | — | M0 | wip (password+none done; OIDC later) |
 | WS-03 | Password reset & email verify (SMTP) | forgot/reset routes | P1 | SMTP | M1 | todo |
-| WS-04 | Organizations, roles owner/admin/member | spec 0011 | P1 | — | M1 | todo |
-| WS-05 | Invitations via link/email | accept-invitation | P1 | — | M1 | todo |
+| WS-04 | Organizations, roles owner/admin/member | spec 0011 | P1 | — | M1 | done |
+| WS-05 | Invitations via link/email | accept-invitation | P1 | — | M1 | done (link-based; email delivery needs SMTP, WS-03) |
 | WS-06 | API keys (org-bound) | @better-auth/api-key, spec 0017 | P0 | — | M0 | done |
 | WS-07 | Account deletion w/ grace period | account-deletion | P2 | — | M7 | todo |
 | WS-08 | Projects CRUD, archive/restore | projects.ts | P0 | — | M0 | done |
 | WS-09 | Project market (country/lang/city) | projects.location_code | P0 | GeoNames | M0 | wip (country+lang done; city picker M3) |
 | WS-10 | Project memory (sections, competitors, key pages, research log) | spec 0010 | P1 | — | M4 | todo |
 | WS-11 | Onboarding wizard + website research | spec 0005, researchProjectWebsite | P1 | crawler + LLM | M4 | todo |
-| WS-12 | Team page, transfer ownership, switch org | organization.ts | P1 | — | M1 | todo |
-| WS-13 | Settings: provider adapters & keys UI | (new) | P0 | — | M1 | todo |
+| WS-12 | Team page, transfer ownership, switch org | organization.ts | P1 | — | M1 | wip (team page + remove member done; transfer ownership & org switcher UI todo) |
+| WS-13 | Settings: provider adapters & keys UI | (new) | P0 | — | M1 | todo (moved to M2: no data providers exist until then) |
 
 ## Dashboard
 | DB-01 | Setup checklist | spec 0015 | P1 | — | M4 | todo |
@@ -73,17 +73,17 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | RT-09 | SERP volatility index | (new) | P3 | own data | M8 | todo |
 
 ## Site audit
-| SA-01 | Start audit (config) | startAudit | P0 | crawler | M1 | todo |
-| SA-02 | Discovery robots/sitemaps | discovery.ts | P0 | — | M1 | todo |
-| SA-03 | SSRF url-policy, throttle, 429 cooldown | url-policy, crawl-throttle | P0 | — | M1 | todo |
-| SA-04 | Page analyzer (all audit_pages fields) | page-analyzer | P0 | — | M1 | todo |
-| SA-05 | OpenSEO issue rules (27) | issues/* | P0 | — | M1 | todo |
-| SA-06 | Extended rules (H1, hreflang, mixed content, orphans, broken links, schema validation, soft-404, …) | (new) | P1 | — | M2 | todo |
+| SA-01 | Start audit (config) | startAudit | P0 | crawler | M1 | done |
+| SA-02 | Discovery robots/sitemaps | discovery.ts | P0 | — | M1 | done |
+| SA-03 | SSRF url-policy, throttle, 429 cooldown | url-policy, crawl-throttle | P0 | — | M1 | done |
+| SA-04 | Page analyzer (all audit_pages fields) | page-analyzer | P0 | — | M1 | done |
+| SA-05 | OpenSEO issue rules (27) | issues/* | P0 | — | M1 | done |
+| SA-06 | Extended rules (H1, hreflang, mixed content, orphans, broken links, schema validation, soft-404, …) | (new) | P1 | — | M2 | wip (H1, mixed content, JSON-LD validity, orphans, broken/redirected links, sitemap checks done; hreflang, soft-404, URL hygiene, asset checks todo) |
 | SA-07 | JS rendering (headless Chromium) | rendered-page | P1 | renderer | M2 | todo |
 | SA-08 | Lighthouse (CLI or PSI API) | lighthouse.ts | P1 | renderer/PSI | M2 | todo |
 | SA-09 | CrUX field data | (new) | P2 | CrUX API | M6 | todo |
-| SA-10 | Progress (live SSE), history, delete | getCrawlProgress | P0 | — | M1 | todo |
-| SA-11 | Results UI: summary, pages, issues, page detail, export | results/* | P0 | — | M1 | todo |
+| SA-10 | Progress (live SSE), history, delete | getCrawlProgress | P0 | — | M1 | done |
+| SA-11 | Results UI: summary, pages, issues, page detail, export | results/* | P0 | — | M1 | done |
 | SA-12 | Internal link graph + suggestions | (new) | P2 | — | M6 | todo |
 | SA-13 | Audit comparison + scheduled re-audit | (new) | P2 | — | M6 | todo |
 | SA-14 | Signed crawler credentials (Shopify web-bot-auth) | crawlerCredentials | P3 | — | M8 | todo |
@@ -139,7 +139,7 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | FT-01..11 | Keyword generator, SERP simulator, backlink checker, DA checker, domain age, robots tester, sitemap validator, meta checker, schema validator, redirect checker, hreflang checker | web/ free tools | P2 | — | M8 | todo |
 
 ## Ops
-| OP-01 | Docker Compose (api, worker, web, db, valkey, renderer, searxng, [ollama]) | deploy/ | P0 | — | M0 | wip |
+| OP-01 | Docker Compose (api, worker, web, db, valkey, renderer, searxng, [ollama]) | deploy/ | P0 | — | M0 | wip (db, cache, api, worker, web, test overlay; renderer/searxng/ollama/caddy todo) |
 | OP-02 | Health, Prometheus metrics, JSON logs | /health | P0 | — | M0 | done |
 | OP-03 | Job dashboard (queued/running/failed, retry) | (new) | P1 | — | M3 | todo |
 | OP-04 | Backup/restore script | (new) | P1 | — | M7 | todo |

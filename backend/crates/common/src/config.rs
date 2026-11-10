@@ -41,4 +41,12 @@ pub struct Config {
 
     #[arg(long, env = "DB_MAX_CONNECTIONS", default_value_t = 20)]
     pub db_max_connections: u32,
+
+    /// Allow audits of private/loopback hosts. Only for local testing.
+    #[arg(long, env = "CRAWLER_ALLOW_PRIVATE", default_value_t = false)]
+    pub crawler_allow_private: bool,
+
+    /// Override the crawler User-Agent header.
+    #[arg(long, env = "CRAWLER_USER_AGENT")]
+    pub crawler_user_agent: Option<String>,
 }

@@ -37,6 +37,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/audit-issue-types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The issue catalog: ids, severities, explanations and fixes. */
+        get: operations["list_issue_types"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/sign-in": {
         parameters: {
             query?: never;
@@ -114,6 +131,40 @@ export interface paths {
         get: operations["get_info"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/invitations/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Public: details of an open invitation (for the invite landing page). */
+        get: operations["preview_invitation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/invitations/{token}/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Accept an invitation as the signed-in user and switch to that workspace. */
+        post: operations["accept_invitation"];
         delete?: never;
         options?: never;
         head?: never;
@@ -253,6 +304,161 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/audits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_audits"];
+        put?: never;
+        /**
+         * Start a crawl of the project's website. Runs in the background; follow progress via
+         *     `GET …/audits/{audit_id}` or the `…/events` stream.
+         */
+        post: operations["start_audit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/audits/{audit_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_audit"];
+        put?: never;
+        post?: never;
+        delete: operations["delete_audit"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/audits/{audit_id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["cancel_audit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/audits/{audit_id}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Server-sent events: an `audit` event with the audit JSON every second while it runs,
+         *     then one final event and the stream closes.
+         */
+        get: operations["audit_events"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/audits/{audit_id}/issues": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_audit_issues"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/audits/{audit_id}/issues.csv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** All issues as CSV (url, issue, severity, title, details). */
+        get: operations["export_audit_issues"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/audits/{audit_id}/issues/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Issue types found, with the number of affected pages. */
+        get: operations["audit_issue_summary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/audits/{audit_id}/pages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_audit_pages"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/audits/{audit_id}/pages/{page_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One crawled page with its issues, outgoing links and inlinks. */
+        get: operations["get_audit_page"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/restore": {
         parameters: {
             query?: never;
@@ -269,10 +475,83 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/team/invitations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_invitations"];
+        put?: never;
+        /**
+         * Invite someone by email. Returns a one-time token for the link `/invite/{token}`;
+         *     share it with them (email delivery arrives with SMTP support).
+         */
+        post: operations["create_invitation"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/team/invitations/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["revoke_invitation"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/team/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_members"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/team/members/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Remove a member (admins), or leave the workspace (yourself). Owners cannot be removed. */
+        delete: operations["remove_member"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        AcceptedInvitation: {
+            /** Format: uuid */
+            organization_id: string;
+        };
         /** @enum {string} */
         ActorVia: "session" | "api_key" | "no_auth";
         ApiKey: {
@@ -289,6 +568,40 @@ export interface components {
             prefix: string;
             /** Format: uuid */
             user_id: string;
+        };
+        Audit: {
+            config: unknown;
+            /** Format: date-time */
+            created_at: string;
+            error?: string | null;
+            /** Format: date-time */
+            finished_at?: string | null;
+            /** Format: int32 */
+            health_score?: number | null;
+            /** Format: uuid */
+            id: string;
+            /** @description `{ "critical": n, "warning": n, "info": n, "by_type": { id: pages } }` */
+            issue_counts: unknown;
+            /** Format: uuid */
+            job_id?: string | null;
+            /** Format: int32 */
+            pages_crawled: number;
+            /** Format: int32 */
+            pages_failed: number;
+            /** Format: int32 */
+            pages_total: number;
+            /** @description queued | probe | discover | crawl | analyze | done */
+            phase: string;
+            /** Format: uuid */
+            project_id: string;
+            start_url: string;
+            /** Format: date-time */
+            started_at?: string | null;
+            /** Format: uuid */
+            started_by?: string | null;
+            /** @description queued | running | completed | failed | cancelled */
+            status: string;
+            stop_reason?: string | null;
         };
         CreateApiKeyInput: {
             name: string;
@@ -309,9 +622,73 @@ export interface components {
             /** @description The full secret. Shown once; store it now. */
             secret: string;
         };
+        CreatedInvitation: {
+            invitation: components["schemas"]["Invitation"];
+            /** @description Secret token for the invite link (`/invite/{token}`). Shown once. */
+            token: string;
+        };
         InstanceInfo: {
             auth_mode: string;
             version: string;
+        };
+        Invitation: {
+            /** Format: date-time */
+            accepted_at?: string | null;
+            /** Format: date-time */
+            created_at: string;
+            email: string;
+            /** Format: date-time */
+            expires_at: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            invited_by?: string | null;
+            /** Format: uuid */
+            organization_id: string;
+            role: string;
+        };
+        InvitationPreview: {
+            email: string;
+            /** Format: date-time */
+            expires_at: string;
+            organization_name: string;
+            role: string;
+        };
+        InviteInput: {
+            email: string;
+            /** @description `admin` (default) or `member`. */
+            role?: string | null;
+        };
+        IssueCount: {
+            issue_type: string;
+            /**
+             * Format: int64
+             * @description Distinct pages affected.
+             */
+            pages: number;
+            severity: string;
+        };
+        IssueRow: {
+            details: unknown;
+            /** Format: uuid */
+            id: string;
+            issue_type: string;
+            /** Format: uuid */
+            page_id?: string | null;
+            page_url?: string | null;
+            severity: string;
+        };
+        IssueSummary: components["schemas"]["IssueCount"] & {
+            category: string;
+            title: string;
+        };
+        IssueType: {
+            category: string;
+            explanation: string;
+            how_to_fix: string;
+            id: string;
+            severity: components["schemas"]["Severity"];
+            title: string;
         };
         Job: {
             /** Format: int32 */
@@ -336,6 +713,13 @@ export interface components {
             run_at: string;
             status: string;
         };
+        LinkRow: {
+            anchor?: string | null;
+            nofollow: boolean;
+            /** Format: int32 */
+            status_code?: number | null;
+            url: string;
+        };
         MeView: {
             memberships: components["schemas"]["Membership"][];
             /** Format: uuid */
@@ -344,11 +728,157 @@ export interface components {
             user: components["schemas"]["UserView"];
             via: components["schemas"]["ActorVia"];
         };
+        Member: {
+            email: string;
+            /** Format: date-time */
+            joined_at: string;
+            name: string;
+            role: string;
+            /** Format: uuid */
+            user_id: string;
+        };
         Membership: {
             /** Format: uuid */
             organization_id: string;
             organization_name: string;
             role: string;
+        };
+        PageDetail: {
+            canonical_url?: string | null;
+            content_type?: string | null;
+            /** Format: int32 */
+            depth: number;
+            error?: string | null;
+            /** Format: int32 */
+            external_links: number;
+            fetch_class: string;
+            /** Format: date-time */
+            fetched_at: string;
+            final_url?: string | null;
+            h1?: string | null;
+            /** Format: int32 */
+            h1_count: number;
+            has_viewport: boolean;
+            header_canonical_url?: string | null;
+            hreflang: unknown;
+            /** Format: uuid */
+            id: string;
+            /** Format: int32 */
+            images_missing_alt: number;
+            /** Format: int32 */
+            images_total: number;
+            in_sitemap: boolean;
+            /** Format: int32 */
+            inlinks: number;
+            /** Format: int32 */
+            internal_links: number;
+            is_indexable: boolean;
+            lang?: string | null;
+            meta_description?: string | null;
+            meta_robots?: string | null;
+            og_description?: string | null;
+            og_image?: string | null;
+            og_title?: string | null;
+            redirect_chain: unknown;
+            /** Format: int32 */
+            response_time_ms?: number | null;
+            /** Format: int32 */
+            size_bytes?: number | null;
+            /** Format: int32 */
+            status_code?: number | null;
+            /** Format: int32 */
+            structured_data_count: number;
+            title?: string | null;
+            url: string;
+            /** Format: int32 */
+            word_count: number;
+            x_robots_tag?: string | null;
+        };
+        PageRow: {
+            canonical_url?: string | null;
+            /** Format: int32 */
+            depth: number;
+            /** Format: int32 */
+            external_links: number;
+            fetch_class: string;
+            final_url?: string | null;
+            h1?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: int32 */
+            images_missing_alt: number;
+            in_sitemap: boolean;
+            /** Format: int32 */
+            inlinks: number;
+            /** Format: int32 */
+            internal_links: number;
+            is_indexable: boolean;
+            /** Format: int64 */
+            issue_count: number;
+            meta_description?: string | null;
+            /** Format: int32 */
+            response_time_ms?: number | null;
+            /** Format: int32 */
+            status_code?: number | null;
+            title?: string | null;
+            url: string;
+            /** Format: int32 */
+            word_count: number;
+        };
+        PageView: {
+            inlinks: components["schemas"]["LinkRow"][];
+            issues: components["schemas"]["IssueRow"][];
+            outlinks: components["schemas"]["LinkRow"][];
+            page: components["schemas"]["PageDetail"];
+        };
+        Paged_IssueRow: {
+            items: {
+                details: unknown;
+                /** Format: uuid */
+                id: string;
+                issue_type: string;
+                /** Format: uuid */
+                page_id?: string | null;
+                page_url?: string | null;
+                severity: string;
+            }[];
+            /** Format: int64 */
+            total: number;
+        };
+        Paged_PageRow: {
+            items: {
+                canonical_url?: string | null;
+                /** Format: int32 */
+                depth: number;
+                /** Format: int32 */
+                external_links: number;
+                fetch_class: string;
+                final_url?: string | null;
+                h1?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: int32 */
+                images_missing_alt: number;
+                in_sitemap: boolean;
+                /** Format: int32 */
+                inlinks: number;
+                /** Format: int32 */
+                internal_links: number;
+                is_indexable: boolean;
+                /** Format: int64 */
+                issue_count: number;
+                meta_description?: string | null;
+                /** Format: int32 */
+                response_time_ms?: number | null;
+                /** Format: int32 */
+                status_code?: number | null;
+                title?: string | null;
+                url: string;
+                /** Format: int32 */
+                word_count: number;
+            }[];
+            /** Format: int64 */
+            total: number;
         };
         /** @description RFC 9457 problem details. */
         Problem: {
@@ -382,12 +912,16 @@ export interface components {
         };
         /** @enum {string} */
         Role: "member" | "admin" | "owner";
+        /** @enum {string} */
+        Severity: "critical" | "warning" | "info";
         SignInInput: {
             email: string;
             password: string;
         };
         SignUpInput: {
             email: string;
+            /** @description Token from an invitation link: joins that workspace even when sign-up is closed. */
+            invite_token?: string | null;
             name: string;
             password: string;
         };
@@ -395,6 +929,29 @@ export interface components {
             /** @description True when no account exists yet: the next sign-up becomes the instance admin. */
             needs_setup: boolean;
             signup_open: boolean;
+        };
+        StartAuditInput: {
+            /**
+             * Format: int32
+             * @description Parallel requests (1–8, default 4).
+             */
+            concurrency?: number | null;
+            /**
+             * Format: int64
+             * @description Delay between requests per slot in ms (0–10000, default 250).
+             */
+            delay_ms?: number | null;
+            /** @description Path prefixes to skip, e.g. `/tag/`. */
+            exclude_paths?: string[] | null;
+            /**
+             * Format: int32
+             * @description Pages to crawl (1–10000, default 500).
+             */
+            max_pages?: number | null;
+            /** @description Obey robots.txt (default true). Turn off only for sites you own. */
+            respect_robots?: boolean | null;
+            /** @description Defaults to `https://{project domain}/`. */
+            start_url?: string | null;
         };
         SwitchOrgInput: {
             /** Format: uuid */
@@ -498,6 +1055,25 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    list_issue_types: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IssueType"][];
                 };
             };
         };
@@ -623,6 +1199,64 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["InstanceInfo"];
+                };
+            };
+        };
+    };
+    preview_invitation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InvitationPreview"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    accept_invitation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AcceptedInvitation"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
                 };
             };
         };
@@ -913,6 +1547,311 @@ export interface operations {
             };
         };
     };
+    list_audits: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Audit"][];
+                };
+            };
+        };
+    };
+    start_audit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartAuditInput"];
+            };
+        };
+        responses: {
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Audit"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    get_audit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                audit_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Audit"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    delete_audit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                audit_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    cancel_audit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                audit_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Audit"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    audit_events: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                audit_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/event-stream": string;
+                };
+            };
+        };
+    };
+    list_audit_issues: {
+        parameters: {
+            query?: {
+                issue_type?: string | null;
+                limit?: number | null;
+                offset?: number | null;
+            };
+            header?: never;
+            path: {
+                project_id: string;
+                audit_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Paged_IssueRow"];
+                };
+            };
+        };
+    };
+    export_audit_issues: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                audit_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": string;
+                };
+            };
+        };
+    };
+    audit_issue_summary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                audit_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IssueSummary"][];
+                };
+            };
+        };
+    };
+    list_audit_pages: {
+        parameters: {
+            query?: {
+                /** @description Substring of URL or title. */
+                search?: string | null;
+                /** @description 2xx | 3xx | 4xx | 5xx | error */
+                status?: string | null;
+                /** @description Only pages with this issue type. */
+                issue_type?: string | null;
+                indexable?: boolean | null;
+                limit?: number | null;
+                offset?: number | null;
+            };
+            header?: never;
+            path: {
+                project_id: string;
+                audit_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Paged_PageRow"];
+                };
+            };
+        };
+    };
+    get_audit_page: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                audit_id: string;
+                page_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PageView"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
     restore_project: {
         parameters: {
             query?: never;
@@ -930,6 +1869,129 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Project"];
+                };
+            };
+        };
+    };
+    list_invitations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Invitation"][];
+                };
+            };
+        };
+    };
+    create_invitation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InviteInput"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreatedInvitation"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    revoke_invitation: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    list_members: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Member"][];
+                };
+            };
+        };
+    };
+    remove_member: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
                 };
             };
         };

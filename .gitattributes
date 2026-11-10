@@ -1,1 +1,6 @@
 .aimem/INDEX.md merge=ours
+# Keep LF everywhere: sqlx checksums migration files byte-for-byte, and shell scripts
+# run inside Linux containers. Windows checkouts with core.autocrlf=true would break both.
+* text=auto eol=lf
+*.png binary
+*.ico binary

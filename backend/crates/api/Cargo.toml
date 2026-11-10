@@ -28,3 +28,6 @@ time = "0.3"
 metrics.workspace = true
 metrics-exporter-prometheus.workspace = true
 anyhow.workspace = true
+crawler.workspace = true
+futures.workspace = true
+async-stream.workspace = true

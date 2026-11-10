@@ -8,12 +8,14 @@ Free, open-source, self-hostable SEO platform (OpenSEO / Semrush / Ahrefs altern
 - Reference implementation: `reference/open-seo/` (read-only clone of every-app/open-seo, git-ignored). Its `docs/maintainers/specs/` are good design records.
 
 ## Status
-Phase: **M0 foundation done** (2026-11-10): auth (password/none), workspaces, API keys, projects, Postgres job queue + worker, OpenAPI, Next.js app (sign-in/up, projects, API keys), Docker Compose, CI. Next: **M1 site audit** (crawler, SSE progress, issues UI, invitations).
+Phase: **M1 site audit done** (2026-11-10): crawler crate (SSRF-safe fetcher, robots, sitemaps, lol_html extraction, 38 issue types), resumable `site_audit` job, audit API + SSE, audit UI, team invitations. Before M1: M0 foundation (auth, API keys, projects, job queue, Docker). Next: **M2 keyword research + SERP** (+ provider settings UI, JS rendering, Lighthouse). Site audit design: `docs/08-site-audit.md`.
 
 ## Commands
 - No local Rust: `scripts/cargo-docker.sh "<cargo args>"` (e.g. `"clippy --workspace --all-targets -- -D warnings"`, `"test --workspace"`).
-- Stack: `docker compose -f deploy/compose.yaml --env-file .env up -d --build`; e2e: `scripts/smoke.sh` (needs a fresh DB: `down -v` first).
-- API types: `scripts/cargo-docker.sh "run -q -p app -- openapi" > frontend/openapi.json` then `cd frontend && pnpm gen:api`. CI fails if either is stale.
+- Stack: `docker compose -f deploy/compose.yaml --env-file .env up -d --build`.
+- E2E on a throwaway stack (keeps your data): `WEB_PORT=3100 docker compose -p seoseo-ci -f deploy/compose.yaml -f deploy/compose.test.yaml --env-file .env up -d --build`, then `scripts/smoke.sh http://localhost:3100`, `scripts/e2e-audit.sh <email> <pw> http://localhost:3100`, `scripts/e2e-team.sh <email> <pw> http://localhost:3100`, then `down -v` that project. Never use the test overlay in production (it disables the SSRF guard).
+- API types: `scripts/gen-api.sh` (regenerates `frontend/openapi.json` + `lib/api/schema.d.ts`). CI fails if either is stale.
+- Line endings: `.gitattributes` forces LF; sqlx checksums migrations byte-for-byte, never edit an applied migration.
 - Frontend: `pnpm lint && pnpm typecheck && pnpm build`. Next 16 docs live in `frontend/node_modules/next/dist/docs` (middleware is `proxy.ts`; cacheComponents needs Suspense around URL hooks).
 
 ## Stack (always latest stable; re-verify versions at scaffold time)

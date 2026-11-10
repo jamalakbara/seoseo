@@ -2,6 +2,8 @@
 //! Repositories take explicit tenant ids (organization / project) on every call.
 
 pub mod api_keys;
+pub mod audits;
+pub mod invitations;
 pub mod jobs;
 pub mod models;
 pub mod orgs;

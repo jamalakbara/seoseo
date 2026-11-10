@@ -2,7 +2,7 @@
 
 Free, open-source, self-hostable SEO platform — an alternative to Semrush, Ahrefs and OpenSEO that works **without paid API keys**.
 
-> Status: **M0 foundation** — accounts, workspaces, projects, API keys, job queue, OpenAPI, Docker. SEO tools land milestone by milestone ([roadmap](docs/07-roadmap.md)).
+> Status: **M1** — site audit (crawler with 38 issue checks, live progress, issues/pages explorer, CSV export), team invitations, plus the M0 foundation (accounts, workspaces, projects, API keys, job queue, OpenAPI, Docker). More SEO tools land milestone by milestone ([roadmap](docs/07-roadmap.md)).
 
 ## Quick start (Docker)
 
@@ -36,9 +36,11 @@ scripts/cargo-docker.sh "run -p app -- serve --migrate"         # or cargo direc
 cd frontend && pnpm install && pnpm dev
 ```
 
-Checks: `scripts/cargo-docker.sh "clippy --workspace --all-targets -- -D warnings"`, `scripts/cargo-docker.sh "test --workspace"`, `pnpm lint && pnpm typecheck && pnpm build`, and `scripts/smoke.sh` against a fresh stack.
+Checks: `scripts/cargo-docker.sh "clippy --workspace --all-targets -- -D warnings"`, `scripts/cargo-docker.sh "test --workspace"`, `pnpm lint && pnpm typecheck && pnpm build`.
 
-After changing API types: regenerate `frontend/openapi.json` (`seoseo openapi`) and run `pnpm gen:api`.
+End-to-end tests run on a throwaway stack with the deliberately broken `badseo` site (see `CLAUDE.md` for the exact commands): `scripts/smoke.sh`, `scripts/e2e-audit.sh`, `scripts/e2e-team.sh`.
+
+After changing API types: `scripts/gen-api.sh`.
 
 ## Documentation
 

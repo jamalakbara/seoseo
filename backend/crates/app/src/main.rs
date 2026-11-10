@@ -87,7 +87,14 @@ async fn main() -> anyhow::Result<()> {
                 shutdown_signal().await;
                 let _ = tx.send(true);
             });
-            jobs::run_worker(pool, jobs::default_registry(), concurrency, rx).await?;
+            let registry = jobs::site_audit::register(
+                jobs::default_registry(),
+                jobs::site_audit::CrawlSettings {
+                    user_agent: cfg.crawler_user_agent.clone(),
+                    allow_private: cfg.crawler_allow_private,
+                },
+            );
+            jobs::run_worker(pool, registry, concurrency, rx).await?;
         }
         Command::Migrate { database_url } => {
             let pool = db::connect(&database_url, 2).await?;

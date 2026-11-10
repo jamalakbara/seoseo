@@ -9,7 +9,7 @@ import { NextResponse, type NextRequest } from "next/server";
 const API_URL = process.env.API_INTERNAL_URL ?? "http://localhost:8080";
 const AUTH_MODE = process.env.AUTH_MODE ?? "password";
 const SESSION_COOKIE = "seoseo_session";
-const PUBLIC_PAGES = ["/sign-in", "/sign-up"];
+const PUBLIC_PAGES = ["/sign-in", "/sign-up", "/invite/"];
 
 export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;

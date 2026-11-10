@@ -123,6 +123,29 @@
         ]
       }
     },
+    "/api/v1/audit-issue-types": {
+      "get": {
+        "tags": [
+          "audits"
+        ],
+        "summary": "The issue catalog: ids, severities, explanations and fixes.",
+        "operationId": "list_issue_types",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/IssueType"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/auth/sign-in": {
       "post": {
         "tags": [
@@ -258,6 +281,89 @@
             }
           }
         }
+      }
+    },
+    "/api/v1/invitations/{token}": {
+      "get": {
+        "tags": [
+          "team"
+        ],
+        "summary": "Public: details of an open invitation (for the invite landing page).",
+        "operationId": "preview_invitation",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InvitationPreview"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/invitations/{token}/accept": {
+      "post": {
+        "tags": [
+          "team"
+        ],
+        "summary": "Accept an invitation as the signed-in user and switch to that workspace.",
+        "operationId": "accept_invitation",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptedInvitation"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
       }
     },
     "/api/v1/jobs": {
@@ -702,6 +808,683 @@
         ]
       }
     },
+    "/api/v1/projects/{project_id}/audits": {
+      "get": {
+        "tags": [
+          "audits"
+        ],
+        "operationId": "list_audits",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Audit"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "audits"
+        ],
+        "summary": "Start a crawl of the project's website. Runs in the background; follow progress via\n`GET …/audits/{audit_id}` or the `…/events` stream.",
+        "operationId": "start_audit",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartAuditInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Audit"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/audits/{audit_id}": {
+      "get": {
+        "tags": [
+          "audits"
+        ],
+        "operationId": "get_audit",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "audit_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Audit"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "audits"
+        ],
+        "operationId": "delete_audit",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "audit_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {},
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/audits/{audit_id}/cancel": {
+      "post": {
+        "tags": [
+          "audits"
+        ],
+        "operationId": "cancel_audit",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "audit_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Audit"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/audits/{audit_id}/events": {
+      "get": {
+        "tags": [
+          "audits"
+        ],
+        "summary": "Server-sent events: an `audit` event with the audit JSON every second while it runs,\nthen one final event and the stream closes.",
+        "operationId": "audit_events",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "audit_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/audits/{audit_id}/issues": {
+      "get": {
+        "tags": [
+          "audits"
+        ],
+        "operationId": "list_audit_issues",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "audit_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "issue_type",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Paged_IssueRow"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/audits/{audit_id}/issues.csv": {
+      "get": {
+        "tags": [
+          "audits"
+        ],
+        "summary": "All issues as CSV (url, issue, severity, title, details).",
+        "operationId": "export_audit_issues",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "audit_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/audits/{audit_id}/issues/summary": {
+      "get": {
+        "tags": [
+          "audits"
+        ],
+        "summary": "Issue types found, with the number of affected pages.",
+        "operationId": "audit_issue_summary",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "audit_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/IssueSummary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/audits/{audit_id}/pages": {
+      "get": {
+        "tags": [
+          "audits"
+        ],
+        "operationId": "list_audit_pages",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "audit_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Substring of URL or title.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "status",
+            "in": "query",
+            "description": "2xx | 3xx | 4xx | 5xx | error",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "issue_type",
+            "in": "query",
+            "description": "Only pages with this issue type.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "indexable",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Paged_PageRow"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/audits/{audit_id}/pages/{page_id}": {
+      "get": {
+        "tags": [
+          "audits"
+        ],
+        "summary": "One crawled page with its issues, outgoing links and inlinks.",
+        "operationId": "get_audit_page",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "audit_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PageView"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/projects/{project_id}/restore": {
       "post": {
         "tags": [
@@ -739,10 +1522,206 @@
           }
         ]
       }
+    },
+    "/api/v1/team/invitations": {
+      "get": {
+        "tags": [
+          "team"
+        ],
+        "operationId": "list_invitations",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Invitation"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "team"
+        ],
+        "summary": "Invite someone by email. Returns a one-time token for the link `/invite/{token}`;\nshare it with them (email delivery arrives with SMTP support).",
+        "operationId": "create_invitation",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InviteInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreatedInvitation"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/team/invitations/{id}": {
+      "delete": {
+        "tags": [
+          "team"
+        ],
+        "operationId": "revoke_invitation",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {},
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/team/members": {
+      "get": {
+        "tags": [
+          "team"
+        ],
+        "operationId": "list_members",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Member"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/team/members/{user_id}": {
+      "delete": {
+        "tags": [
+          "team"
+        ],
+        "summary": "Remove a member (admins), or leave the workspace (yourself). Owners cannot be removed.",
+        "operationId": "remove_member",
+        "parameters": [
+          {
+            "name": "user_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {},
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
     }
   },
   "components": {
     "schemas": {
+      "AcceptedInvitation": {
+        "type": "object",
+        "required": [
+          "organization_id"
+        ],
+        "properties": {
+          "organization_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
       "ActorVia": {
         "type": "string",
         "enum": [
@@ -791,6 +1770,110 @@
           "user_id": {
             "type": "string",
             "format": "uuid"
+          }
+        }
+      },
+      "Audit": {
+        "type": "object",
+        "required": [
+          "id",
+          "project_id",
+          "start_url",
+          "status",
+          "phase",
+          "config",
+          "pages_crawled",
+          "pages_total",
+          "pages_failed",
+          "issue_counts",
+          "created_at"
+        ],
+        "properties": {
+          "config": {},
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "finished_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "health_score": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "issue_counts": {
+            "description": "`{ \"critical\": n, \"warning\": n, \"info\": n, \"by_type\": { id: pages } }`"
+          },
+          "job_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "pages_crawled": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pages_failed": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pages_total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "phase": {
+            "type": "string",
+            "description": "queued | probe | discover | crawl | analyze | done"
+          },
+          "project_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "start_url": {
+            "type": "string"
+          },
+          "started_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "started_by": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "description": "queued | running | completed | failed | cancelled"
+          },
+          "stop_reason": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
@@ -865,6 +1948,22 @@
           }
         }
       },
+      "CreatedInvitation": {
+        "type": "object",
+        "required": [
+          "invitation",
+          "token"
+        ],
+        "properties": {
+          "invitation": {
+            "$ref": "#/components/schemas/Invitation"
+          },
+          "token": {
+            "type": "string",
+            "description": "Secret token for the invite link (`/invite/{token}`). Shown once."
+          }
+        }
+      },
       "InstanceInfo": {
         "type": "object",
         "required": [
@@ -876,6 +1975,206 @@
             "type": "string"
           },
           "version": {
+            "type": "string"
+          }
+        }
+      },
+      "Invitation": {
+        "type": "object",
+        "required": [
+          "id",
+          "organization_id",
+          "email",
+          "role",
+          "expires_at",
+          "created_at"
+        ],
+        "properties": {
+          "accepted_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "email": {
+            "type": "string"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "invited_by": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "organization_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "role": {
+            "type": "string"
+          }
+        }
+      },
+      "InvitationPreview": {
+        "type": "object",
+        "required": [
+          "email",
+          "role",
+          "organization_name",
+          "expires_at"
+        ],
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "expires_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "organization_name": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          }
+        }
+      },
+      "InviteInput": {
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "role": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "`admin` (default) or `member`."
+          }
+        }
+      },
+      "IssueCount": {
+        "type": "object",
+        "required": [
+          "issue_type",
+          "severity",
+          "pages"
+        ],
+        "properties": {
+          "issue_type": {
+            "type": "string"
+          },
+          "pages": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Distinct pages affected."
+          },
+          "severity": {
+            "type": "string"
+          }
+        }
+      },
+      "IssueRow": {
+        "type": "object",
+        "required": [
+          "id",
+          "issue_type",
+          "severity",
+          "details"
+        ],
+        "properties": {
+          "details": {},
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "issue_type": {
+            "type": "string"
+          },
+          "page_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "page_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "severity": {
+            "type": "string"
+          }
+        }
+      },
+      "IssueSummary": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/IssueCount"
+          },
+          {
+            "type": "object",
+            "required": [
+              "title",
+              "category"
+            ],
+            "properties": {
+              "category": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "IssueType": {
+        "type": "object",
+        "required": [
+          "id",
+          "severity",
+          "category",
+          "title",
+          "explanation",
+          "how_to_fix"
+        ],
+        "properties": {
+          "category": {
+            "type": "string"
+          },
+          "explanation": {
+            "type": "string"
+          },
+          "how_to_fix": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "severity": {
+            "$ref": "#/components/schemas/Severity"
+          },
+          "title": {
             "type": "string"
           }
         }
@@ -951,6 +2250,34 @@
           }
         }
       },
+      "LinkRow": {
+        "type": "object",
+        "required": [
+          "url",
+          "nofollow"
+        ],
+        "properties": {
+          "anchor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "nofollow": {
+            "type": "boolean"
+          },
+          "status_code": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
       "MeView": {
         "type": "object",
         "required": [
@@ -982,6 +2309,35 @@
           }
         }
       },
+      "Member": {
+        "type": "object",
+        "required": [
+          "user_id",
+          "email",
+          "name",
+          "role",
+          "joined_at"
+        ],
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "joined_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
       "Membership": {
         "type": "object",
         "required": [
@@ -999,6 +2355,510 @@
           },
           "role": {
             "type": "string"
+          }
+        }
+      },
+      "PageDetail": {
+        "type": "object",
+        "required": [
+          "id",
+          "url",
+          "fetch_class",
+          "redirect_chain",
+          "depth",
+          "in_sitemap",
+          "is_indexable",
+          "has_viewport",
+          "h1_count",
+          "word_count",
+          "images_total",
+          "images_missing_alt",
+          "internal_links",
+          "external_links",
+          "inlinks",
+          "structured_data_count",
+          "hreflang",
+          "fetched_at"
+        ],
+        "properties": {
+          "canonical_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "content_type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "depth": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "external_links": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fetch_class": {
+            "type": "string"
+          },
+          "fetched_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "final_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "h1": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "h1_count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "has_viewport": {
+            "type": "boolean"
+          },
+          "header_canonical_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "hreflang": {},
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "images_missing_alt": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "images_total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "in_sitemap": {
+            "type": "boolean"
+          },
+          "inlinks": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "internal_links": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "is_indexable": {
+            "type": "boolean"
+          },
+          "lang": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "meta_description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "meta_robots": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "og_description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "og_image": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "og_title": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "redirect_chain": {},
+          "response_time_ms": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "size_bytes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "status_code": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "structured_data_count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "title": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "url": {
+            "type": "string"
+          },
+          "word_count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "x_robots_tag": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "PageRow": {
+        "type": "object",
+        "required": [
+          "id",
+          "url",
+          "fetch_class",
+          "depth",
+          "in_sitemap",
+          "word_count",
+          "is_indexable",
+          "inlinks",
+          "internal_links",
+          "external_links",
+          "images_missing_alt",
+          "issue_count"
+        ],
+        "properties": {
+          "canonical_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "depth": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "external_links": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fetch_class": {
+            "type": "string"
+          },
+          "final_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "h1": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "images_missing_alt": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "in_sitemap": {
+            "type": "boolean"
+          },
+          "inlinks": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "internal_links": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "is_indexable": {
+            "type": "boolean"
+          },
+          "issue_count": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "meta_description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "response_time_ms": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "status_code": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "title": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "url": {
+            "type": "string"
+          },
+          "word_count": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PageView": {
+        "type": "object",
+        "required": [
+          "page",
+          "issues",
+          "outlinks",
+          "inlinks"
+        ],
+        "properties": {
+          "inlinks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LinkRow"
+            }
+          },
+          "issues": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IssueRow"
+            }
+          },
+          "outlinks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LinkRow"
+            }
+          },
+          "page": {
+            "$ref": "#/components/schemas/PageDetail"
+          }
+        }
+      },
+      "Paged_IssueRow": {
+        "type": "object",
+        "required": [
+          "items",
+          "total"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "issue_type",
+                "severity",
+                "details"
+              ],
+              "properties": {
+                "details": {},
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "issue_type": {
+                  "type": "string"
+                },
+                "page_id": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "uuid"
+                },
+                "page_url": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "severity": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "Paged_PageRow": {
+        "type": "object",
+        "required": [
+          "items",
+          "total"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "url",
+                "fetch_class",
+                "depth",
+                "in_sitemap",
+                "word_count",
+                "is_indexable",
+                "inlinks",
+                "internal_links",
+                "external_links",
+                "images_missing_alt",
+                "issue_count"
+              ],
+              "properties": {
+                "canonical_url": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "depth": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "external_links": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "fetch_class": {
+                  "type": "string"
+                },
+                "final_url": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "h1": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "images_missing_alt": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "in_sitemap": {
+                  "type": "boolean"
+                },
+                "inlinks": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "internal_links": {
+                  "type": "integer",
+                  "format": "int32"
+                },
+                "is_indexable": {
+                  "type": "boolean"
+                },
+                "issue_count": {
+                  "type": "integer",
+                  "format": "int64"
+                },
+                "meta_description": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "response_time_ms": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
+                  "format": "int32"
+                },
+                "status_code": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
+                  "format": "int32"
+                },
+                "title": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "url": {
+                  "type": "string"
+                },
+                "word_count": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },
@@ -1104,6 +2964,14 @@
           "owner"
         ]
       },
+      "Severity": {
+        "type": "string",
+        "enum": [
+          "critical",
+          "warning",
+          "info"
+        ]
+      },
       "SignInInput": {
         "type": "object",
         "required": [
@@ -1130,6 +2998,13 @@
           "email": {
             "type": "string"
           },
+          "invite_token": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Token from an invitation link: joins that workspace even when sign-up is closed."
+          },
           "name": {
             "type": "string"
           },
@@ -1151,6 +3026,62 @@
           },
           "signup_open": {
             "type": "boolean"
+          }
+        }
+      },
+      "StartAuditInput": {
+        "type": "object",
+        "properties": {
+          "concurrency": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Parallel requests (1–8, default 4).",
+            "minimum": 0
+          },
+          "delay_ms": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "Delay between requests per slot in ms (0–10000, default 250).",
+            "minimum": 0
+          },
+          "exclude_paths": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "description": "Path prefixes to skip, e.g. `/tag/`."
+          },
+          "max_pages": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Pages to crawl (1–10000, default 500).",
+            "minimum": 0
+          },
+          "respect_robots": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Obey robots.txt (default true). Turn off only for sites you own."
+          },
+          "start_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Defaults to `https://{project domain}/`."
           }
         }
       },
@@ -1265,6 +3196,14 @@
     {
       "name": "jobs",
       "description": "Background jobs"
+    },
+    {
+      "name": "audits",
+      "description": "Site audits: crawl, issues, pages"
+    },
+    {
+      "name": "team",
+      "description": "Workspace members and invitations"
     }
   ]
 }

@@ -21,6 +21,8 @@ pub struct SignUpInput {
     pub email: String,
     pub name: String,
     pub password: String,
+    /// Token from an invitation link: joins that workspace even when sign-up is closed.
+    pub invite_token: Option<String>,
 }
 
 #[derive(Debug, Deserialize, ToSchema)]
@@ -86,6 +88,17 @@ pub async fn sign_up(pool: &PgPool, allow_signup: bool, input: SignUpInput) -> A
     let name = validate::non_empty("name", &input.name, 120)?;
     validate::password(&input.password)?;
     let hash = hash_password(&input.password)?;
+
+    if let Some(token) = input.invite_token.as_deref().filter(|t| !t.is_empty()) {
+        let (user_id, _org) =
+            crate::team::sign_up_invited(pool, token, &email, &name, &hash).await?;
+        return Ok(UserView {
+            id: user_id,
+            email,
+            name,
+            is_instance_admin: false,
+        });
+    }
 
     let mut tx = pool.begin().await.map_err(AppError::internal)?;
     // Serialize sign-ups so exactly one account can claim the admin seat.

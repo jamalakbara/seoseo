@@ -16,3 +16,6 @@ utoipa.workspace = true
 argon2.workspace = true
 tracing.workspace = true
 anyhow.workspace = true
+jobs.workspace = true
+crawler.workspace = true
+url.workspace = true

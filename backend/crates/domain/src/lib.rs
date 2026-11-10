@@ -2,8 +2,10 @@
 
 pub mod actor;
 pub mod api_keys;
+pub mod audits;
 pub mod auth;
 pub mod projects;
+pub mod team;
 pub mod validate;
 
 pub use actor::{Actor, ActorVia, Role};

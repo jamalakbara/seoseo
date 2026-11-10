@@ -1,6 +1,8 @@
 //! Background worker: claims jobs from the Postgres queue, runs handlers, keeps leases alive,
 //! and reaps jobs whose worker died. Job kinds are registered in [`Registry`].
 
+pub mod site_audit;
+
 use common::{AppResult, new_id};
 use db::models::Job;
 use sqlx::PgPool;

@@ -15,6 +15,7 @@ db = { path = "crates/db" }
 domain = { path = "crates/domain" }
 jobs = { path = "crates/jobs" }
 api = { path = "crates/api" }
+crawler = { path = "crates/crawler" }
 
 # runtime / web
 tokio = { version = "1.54", features = ["full"] }
@@ -30,6 +31,17 @@ serde = { version = "1.0", features = ["derive"] }
 serde_json = "1.0"
 uuid = { version = "1.29", features = ["v7", "serde"] }
 chrono = { version = "0.4.45", features = ["serde"] }
+
+# crawling
+reqwest = { version = "0.13", default-features = false, features = ["rustls", "gzip", "brotli", "deflate", "stream", "charset", "http2", "json"] }
+url = { version = "2.5", features = ["serde"] }
+quick-xml = "0.42"
+lol_html = "3.0"
+texting_robots = "0.2"
+flate2 = "1"
+futures = "0.3"
+tokio-stream = { version = "0.1", features = ["sync"] }
+async-stream = "0.3"
 
 # openapi
 utoipa = { version = "6.0", features = ["axum_extras", "uuid", "chrono"] }
