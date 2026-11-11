@@ -5,6 +5,7 @@ mod jobs;
 mod keywords;
 mod projects;
 mod providers;
+mod rank;
 mod system;
 mod team;
 
@@ -24,4 +25,5 @@ pub fn v1() -> OpenApiRouter<AppState> {
         .merge(team::router())
         .merge(providers::router())
         .merge(keywords::router())
+        .merge(rank::router())
 }

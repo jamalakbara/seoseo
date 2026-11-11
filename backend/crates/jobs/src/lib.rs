@@ -4,6 +4,7 @@
 pub mod cc_ranks;
 pub mod keyword_research;
 pub mod provider_ctx;
+pub mod rank_check;
 pub mod saved_refresh;
 pub mod serp;
 pub mod site_audit;
@@ -116,6 +117,11 @@ pub async fn run_worker(
                 }
                 if let Err(e) = db::sessions::delete_expired(&pool).await {
                     tracing::error!(error = %e, "session cleanup failed");
+                }
+                match rank_check::schedule_due(&pool).await {
+                    Ok(n) if n > 0 => tracing::info!(count = n, "started scheduled rank checks"),
+                    Err(e) => tracing::error!(error = %e, "rank scheduler failed"),
+                    _ => {}
                 }
                 tokio::select! {
                     _ = tokio::time::sleep(REAP_EVERY) => {}

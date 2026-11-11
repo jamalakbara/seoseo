@@ -2,6 +2,7 @@
 
 mod auth;
 mod error;
+mod mcp_mount;
 mod middleware;
 mod routes;
 mod state;
@@ -38,7 +39,8 @@ use utoipa_scalar::{Scalar, Servable};
         (name = "audits", description = "Site audits: crawl, issues, pages"),
         (name = "team", description = "Workspace members and invitations"),
         (name = "providers", description = "Data providers, API keys and domain authority"),
-        (name = "keywords", description = "Keyword research, saved keywords and SERP analysis")
+        (name = "keywords", description = "Keyword research, saved keywords and SERP analysis"),
+        (name = "rank-tracking", description = "Rank trackers, scheduled checks and position history")
     )
 )]
 struct ApiDoc;
@@ -89,6 +91,7 @@ pub fn router(state: AppState) -> Router {
             axum::routing::get(move || async move { axum::Json(openapi_json) }),
         )
         .merge(routes::system())
+        .merge(mcp_mount::router(&state))
         .layer(axum::middleware::from_fn(middleware::track_metrics))
         .layer(TraceLayer::new_for_http())
         .layer(PropagateRequestIdLayer::x_request_id())

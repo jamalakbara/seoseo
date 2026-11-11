@@ -99,6 +99,7 @@ async fn main() -> anyhow::Result<()> {
             );
             let registry = jobs::keyword_research::register(registry, pctx.clone());
             let registry = jobs::saved_refresh::register(registry, pctx.clone());
+            let registry = jobs::rank_check::register(registry, pctx.clone());
             let registry = jobs::cc_ranks::register(registry, pctx);
             jobs::run_worker(pool, registry, concurrency, rx).await?;
         }

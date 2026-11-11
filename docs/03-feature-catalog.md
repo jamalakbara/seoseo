@@ -2,7 +2,7 @@
 
 Every feature with an ID, OpenSEO parity reference, priority, data source, and milestone.
 Priority: **P0** MVP · **P1** parity · **P2** beyond parity · **P3** later.
-Status column is updated as we build (`todo` / `wip` / `done`). Last update: 2026-11-11 (M2 keyword, SERP and browser audits).
+Status column is updated as we build (`todo` / `wip` / `done`). Last update: 2026-11-11 (M3 rank tracking, MCP, job dashboard).
 
 ## Workspace & identity
 | ID | Feature | OpenSEO ref | Pri | Data | MS | Status |
@@ -62,12 +62,12 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | BL-08 | Domain authority "SR" from CC host graph | Ahrefs DR lookup | P0 | CC host graph | M2 | done (top-N import of Common Crawl domain ranks, SR = log-scaled harmonic rank, lookup API + UI) |
 
 ## Rank tracking
-| RT-01 | Tracker config (domain, market, city, devices, depth, schedule) | rank_tracking_configs | P0 | — | M3 | todo |
-| RT-02 | Keyword add/remove/pin/tag/bulk import | add/remove/pin tools | P0 | — | M3 | todo |
-| RT-03 | Scheduler (daily/weekly/monthly at time+tz) | selfhost-scheduler | P0 | — | M3 | todo |
-| RT-04 | Run full/subset, per-device positions, URL, features | RankCheckWorkflow | P0 | SERP fetcher | M3 | todo |
-| RT-05 | Latest table + deltas, history chart, trend, matrix | getRank* | P0 | — | M3 | todo |
-| RT-06 | Cost/"request budget" estimate (requests not $) | estimateRankCheckCost | P1 | — | M3 | todo |
+| RT-01 | Tracker config (domain, market, city, devices, depth, schedule) | rank_tracking_configs | P0 | — | M3 | wip (domain, market, schedule done; city, device and depth settings todo: providers expose no device or geo dimension yet) |
+| RT-02 | Keyword add/remove/pin/tag/bulk import | add/remove/pin tools | P0 | — | M3 | wip (add/remove/pin, tags on add, bulk paste done; file import todo) |
+| RT-03 | Scheduler (daily/weekly/monthly at time+tz) | selfhost-scheduler | P0 | — | M3 | wip (daily/weekly/monthly at an hour in UTC; per-tracker timezone todo) |
+| RT-04 | Run full/subset, per-device positions, URL, features | RankCheckWorkflow | P0 | SERP fetcher | M3 | wip (full or subset runs, fresh SERP per keyword, position, URL, features, provider + exact flag; per-device todo) |
+| RT-05 | Latest table + deltas, history chart, trend, matrix | getRank* | P0 | — | M3 | wip (latest table with change/best, keyword history chart, per-run trend; keyword x run matrix todo) |
+| RT-06 | Cost/"request budget" estimate (requests not $) | estimateRankCheckCost | P1 | — | M3 | done (requests per run and month, provider, rough duration) |
 | RT-07 | Cannibalization flags | (new) | P2 | — | M6 | todo |
 | RT-08 | Movement alerts | (new) | P2 | — | M7 | todo |
 | RT-09 | SERP volatility index | (new) | P3 | own data | M8 | todo |
@@ -128,9 +128,9 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | AG-03 | On-page optimizer score | (new) | P2 | SERP terms | M7 | todo |
 
 ## MCP / API / skills
-| MC-01 | MCP streamable HTTP + API-key auth | mcp server | P0 | — | M3 | todo |
+| MC-01 | MCP streamable HTTP + API-key auth | mcp server | P0 | — | M3 | done (stateless Streamable HTTP at /mcp, API-key or session auth, Host allow-list) |
 | MC-02 | MCP OAuth 2.1 (DCR, PKCE, consent, org-bound) | workers-oauth-provider | P1 | — | M4 | todo |
-| MC-03 | Tool parity (~90 tools) | mcp/tools | P1 | — | M3–M6 | todo |
+| MC-03 | Tool parity (~90 tools) | mcp/tools | P1 | — | M3–M6 | wip (29 tools: projects, keywords, SERP, authority, site audit, rank tracking, jobs) |
 | MC-04 | MCP Apps widgets (SERP/GSC views) | widget-tools | P3 | — | M8 | todo |
 | MC-05 | Agent skills (12 ported + new) | plugins/openseo/skills | P1 | — | M5 | todo |
 | AP-01 | REST API + OpenAPI 3.1 (utoipa) | — | P0 | — | M0 | done |
@@ -141,6 +141,6 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 ## Ops
 | OP-01 | Docker Compose (api, worker, web, db, valkey, renderer, searxng, [ollama]) | deploy/ | P0 | — | M0 | wip (db, cache, api, worker, web, test overlay, searxng profile, renderer + egress proxy profile; ollama/caddy todo) |
 | OP-02 | Health, Prometheus metrics, JSON logs | /health | P0 | — | M0 | done |
-| OP-03 | Job dashboard (queued/running/failed, retry) | (new) | P1 | — | M3 | todo |
+| OP-03 | Job dashboard (queued/running/failed, retry) | (new) | P1 | — | M3 | wip (status counts, filter, progress, errors; retry from the dashboard todo, re-run from the feature page) |
 | OP-04 | Backup/restore script | (new) | P1 | — | M7 | todo |
 | OP-05 | Opt-in telemetry (off by default) | self-host-telemetry | P3 | — | M8 | todo |

@@ -129,5 +129,14 @@ Transport: Streamable HTTP at `/mcp`. Each tool: zod-like JSON Schema input, dis
 
 `*` = new beyond OpenSEO. Cost-estimate tools return request counts & provider quota impact instead of credits.
 
+### Implemented (M3)
+`whoami`, `list_projects`, `create_project`, `research_keywords`, `list_keyword_research`, `get_keyword_research`, `save_keywords`, `list_saved_keywords`, `remove_saved_keywords`, `get_serp_results`, `get_domain_authority`, `list_data_providers`, `run_site_audit`, `list_site_audits`, `get_audit_status`, `get_audit_issues`, `get_audit_pages`, `delete_site_audit`, `create_rank_tracker`, `list_rank_trackers`, `get_rank_tracker`, `add_rank_tracking_keywords`, `remove_rank_tracking_keywords`, `pin_rank_tracking_keywords`, `estimate_rank_tracker_cost`, `run_rank_tracker`, `get_rank_history`, `list_jobs`, `get_job`.
+
+- Endpoint: `POST /mcp` (also reachable through the web app origin). Stateless: no session ids, JSON responses, any API replica can answer.
+- Auth: `Authorization: Bearer seo_…` API key (or the built-in admin in `AUTH_MODE=none`). 401 carries `WWW-Authenticate: Bearer`.
+- Result: one text block holding `{"ok":true,"data":…}` or `{"ok":false,"error":{"code","message"}}` with `isError` set. Provenance (`provider`, `exact`, `*_source`, `*_confidence`) lives inside `data`, next to the value it describes.
+- `Host` must be the `WEB_BASE_URL` host, localhost or the compose service name (DNS-rebinding guard).
+- Connect: `claude mcp add --transport http seoseo https://your-host/mcp --header "Authorization: Bearer seo_…"`.
+
 ## 3. Agent skills to ship (`skills/`)
 Port & adapt (MIT-licensed upstream — keep attribution): seo-project-setup, keyword-research, keyword-clustering, competitor-analysis, competitive-landscape, link-prospecting, local-seo, seo-audit, ai-prompt-research, ai-visibility-audit, seo-report, seo-coach. New: content-brief, technical-fix-plan.

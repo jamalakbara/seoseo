@@ -10,6 +10,7 @@ pub mod models;
 pub mod orgs;
 pub mod projects;
 pub mod providers;
+pub mod rank;
 pub mod serp;
 pub mod sessions;
 pub mod settings;

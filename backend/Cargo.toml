@@ -18,6 +18,7 @@ api = { path = "crates/api" }
 crawler = { path = "crates/crawler" }
 providers = { path = "crates/providers" }
 scoring = { path = "crates/scoring" }
+mcp = { path = "crates/mcp" }
 
 # runtime / web
 tokio = { version = "1.54", features = ["full"] }
@@ -46,6 +47,10 @@ tokio-stream = { version = "0.1", features = ["sync"] }
 async-stream = "0.3"
 async-trait = "0.1.92"
 psl = "2.1"
+
+# mcp
+rmcp = { version = "3.9", features = ["server", "macros", "transport-streamable-http-server"] }
+schemars = "1.2"
 
 # openapi
 utoipa = { version = "6.0", features = ["axum_extras", "uuid", "chrono"] }

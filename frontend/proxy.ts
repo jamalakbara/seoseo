@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 /**
  * Runs on every request at runtime:
- * - `/api/*` is forwarded to the Rust API (same origin for the browser, so cookies just work).
+ * - `/api/*` and `/mcp` are forwarded to the Rust API (same origin for the browser, so cookies just work).
  * - App pages without a session cookie redirect to sign-in (optimistic check only; the API
  *   is the real authority and the client redirects on any 401).
  */
@@ -14,7 +14,8 @@ const PUBLIC_PAGES = ["/sign-in", "/sign-up", "/invite/"];
 export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
-  if (pathname.startsWith("/api/")) {
+  // `/mcp` is the MCP endpoint for AI clients (API-key authenticated by the API).
+  if (pathname.startsWith("/api/") || pathname === "/mcp") {
     return NextResponse.rewrite(new URL(pathname + search, API_URL));
   }
 

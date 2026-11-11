@@ -15,6 +15,7 @@ export function ProjectHeader() {
   const tabs = [
     { href: base, label: "Overview", exact: true },
     { href: `${base}/keywords`, label: "Keywords" },
+    { href: `${base}/rank`, label: "Rank tracking" },
     { href: `${base}/audit`, label: "Site audit" },
     { href: `${base}/settings`, label: "Settings" },
   ];

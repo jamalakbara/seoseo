@@ -494,8 +494,35 @@
         "tags": [
           "jobs"
         ],
-        "summary": "Recent jobs of the active workspace.",
+        "summary": "Recent jobs of the active workspace, newest first.",
         "operationId": "list_jobs",
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "description": "queued | running | completed | failed | cancelled",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Default 50, max 200.",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -533,6 +560,34 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Job"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/jobs/summary": {
+      "get": {
+        "tags": [
+          "jobs"
+        ],
+        "summary": "Job counts by status for the last 7 days.",
+        "operationId": "job_summary",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JobSummary"
                 }
               }
             }
@@ -2068,6 +2123,708 @@
         ]
       }
     },
+    "/api/v1/projects/{project_id}/rank-trackers": {
+      "get": {
+        "tags": [
+          "rank-tracking"
+        ],
+        "operationId": "list_rank_trackers",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RankTracker"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "rank-tracking"
+        ],
+        "summary": "Track where a domain ranks for a set of keywords in one market.",
+        "operationId": "create_rank_tracker",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTrackerInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RankTracker"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/rank-trackers/{tracker_id}": {
+      "get": {
+        "tags": [
+          "rank-tracking"
+        ],
+        "summary": "The tracker with the latest position of every keyword (plus previous and best) and its\nrecent runs. A null `position` with a `checked_at` means \"not in the first `depth`\nresults\"; a null `checked_at` means \"never checked\".",
+        "operationId": "get_rank_tracker",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tracker_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TrackerView"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "rank-tracking"
+        ],
+        "operationId": "delete_rank_tracker",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tracker_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {},
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "rank-tracking"
+        ],
+        "operationId": "update_rank_tracker",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tracker_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTrackerInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RankTracker"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/rank-trackers/{tracker_id}/estimate": {
+      "get": {
+        "tags": [
+          "rank-tracking"
+        ],
+        "summary": "Request budget of a run: provider requests per run and per month. SeoSeo has no credits;\nthis only tells you what the configured provider will be asked to do.",
+        "operationId": "estimate_rank_run",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tracker_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RunEstimate"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/rank-trackers/{tracker_id}/history": {
+      "get": {
+        "tags": [
+          "rank-tracking"
+        ],
+        "summary": "Position history of one keyword, newest first.",
+        "operationId": "get_rank_history",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tracker_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "keyword_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Most recent checks to return (default 90, max 365).",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RankPoint"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/rank-trackers/{tracker_id}/keywords": {
+      "post": {
+        "tags": [
+          "rank-tracking"
+        ],
+        "operationId": "add_rank_keywords",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tracker_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddKeywordsInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangeResult"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/rank-trackers/{tracker_id}/keywords/delete": {
+      "post": {
+        "tags": [
+          "rank-tracking"
+        ],
+        "summary": "Remove keywords and their position history.",
+        "operationId": "remove_rank_keywords",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tracker_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/KeywordIdsInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangeResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/rank-trackers/{tracker_id}/keywords/pin": {
+      "post": {
+        "tags": [
+          "rank-tracking"
+        ],
+        "operationId": "pin_rank_keywords",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tracker_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PinKeywordsInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChangeResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/rank-trackers/{tracker_id}/runs": {
+      "post": {
+        "tags": [
+          "rank-tracking"
+        ],
+        "summary": "Check positions now (all keywords or a subset). Runs in the background: poll the tracker\nor `GET /jobs/{job_id}`. Every keyword costs one request to the search results provider.",
+        "operationId": "start_rank_run",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tracker_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartRunInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RankRun"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/rank-trackers/{tracker_id}/trend": {
+      "get": {
+        "tags": [
+          "rank-tracking"
+        ],
+        "summary": "Per-run summary (ranking keywords, top 3, top 10, average position), oldest first.",
+        "operationId": "get_rank_trend",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tracker_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/RankTrendPoint"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/projects/{project_id}/restore": {
       "post": {
         "tags": [
@@ -2968,6 +3725,29 @@
           "no_auth"
         ]
       },
+      "AddKeywordsInput": {
+        "type": "object",
+        "required": [
+          "keywords"
+        ],
+        "properties": {
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "tags": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "ApiKey": {
         "type": "object",
         "required": [
@@ -3171,6 +3951,26 @@
           }
         }
       },
+      "ChangeResult": {
+        "type": "object",
+        "required": [
+          "changed",
+          "keyword_count"
+        ],
+        "properties": {
+          "changed": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Rows added, removed or updated.",
+            "minimum": 0
+          },
+          "keyword_count": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Keywords now on the tracker."
+          }
+        }
+      },
       "CreateApiKeyInput": {
         "type": "object",
         "required": [
@@ -3223,6 +4023,71 @@
           },
           "name": {
             "type": "string"
+          }
+        }
+      },
+      "CreateTrackerInput": {
+        "type": "object",
+        "properties": {
+          "country": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Defaults to the project's market."
+          },
+          "domain": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Domain to track; defaults to the project's website. Subdomains count as the domain."
+          },
+          "hour_utc": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Hour of day in UTC for scheduled runs (default 6)."
+          },
+          "keywords": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "description": "Keywords to start with."
+          },
+          "language": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Defaults to the tracked domain."
+          },
+          "schedule": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "manual (default) | daily | weekly | monthly"
+          },
+          "weekday": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "ISO weekday for weekly runs, 1 = Monday (default 1)."
           }
         }
       },
@@ -3636,6 +4501,39 @@
           }
         }
       },
+      "JobSummary": {
+        "type": "object",
+        "required": [
+          "queued",
+          "running",
+          "completed",
+          "failed",
+          "cancelled"
+        ],
+        "properties": {
+          "cancelled": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "completed": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "failed": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "queued": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Counts over the last 7 days."
+          },
+          "running": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
       "KeywordIdea": {
         "type": "object",
         "required": [
@@ -3732,6 +4630,21 @@
           "word_count": {
             "type": "integer",
             "format": "int32"
+          }
+        }
+      },
+      "KeywordIdsInput": {
+        "type": "object",
+        "required": [
+          "ids"
+        ],
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         }
       },
@@ -4675,6 +5588,28 @@
           }
         }
       },
+      "PinKeywordsInput": {
+        "type": "object",
+        "required": [
+          "ids"
+        ],
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "pinned": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Pinned keywords are listed first. Default true."
+          }
+        }
+      },
       "Problem": {
         "type": "object",
         "description": "RFC 9457 problem details.",
@@ -4900,6 +5835,326 @@
           }
         ]
       },
+      "RankPoint": {
+        "type": "object",
+        "required": [
+          "checked_at",
+          "depth",
+          "provider"
+        ],
+        "properties": {
+          "checked_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "depth": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "position": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Null = not in the first `depth` results at that time."
+          },
+          "provider": {
+            "type": "string"
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "RankRow": {
+        "type": "object",
+        "required": [
+          "keyword_id",
+          "keyword",
+          "pinned",
+          "tags"
+        ],
+        "properties": {
+          "best_position": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Best position ever measured."
+          },
+          "checked_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Null when the keyword was never checked."
+          },
+          "depth": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Results examined in the latest check."
+          },
+          "exact": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "True when the latest check used one search engine's real ranking."
+          },
+          "features": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "keyword": {
+            "type": "string"
+          },
+          "keyword_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "pinned": {
+            "type": "boolean"
+          },
+          "position": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Latest position; null = not in the first `depth` results, or never checked\n(see `checked_at`)."
+          },
+          "previous_checked_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "previous_position": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Position in the check before the latest one."
+          },
+          "provider": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Ranking URL in the latest check."
+          }
+        }
+      },
+      "RankRun": {
+        "type": "object",
+        "required": [
+          "id",
+          "tracker_id",
+          "status",
+          "trigger",
+          "keywords_total",
+          "keywords_done",
+          "created_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "finished_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "job_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "keywords_done": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "keywords_total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "status": {
+            "type": "string",
+            "description": "queued | running | completed | failed"
+          },
+          "tracker_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "trigger": {
+            "type": "string",
+            "description": "manual | schedule"
+          }
+        }
+      },
+      "RankTracker": {
+        "type": "object",
+        "required": [
+          "id",
+          "project_id",
+          "name",
+          "domain",
+          "country",
+          "language",
+          "schedule",
+          "hour_utc",
+          "weekday",
+          "created_at",
+          "keyword_count"
+        ],
+        "properties": {
+          "country": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "domain": {
+            "type": "string",
+            "description": "Registrable domain whose positions are tracked."
+          },
+          "hour_utc": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Hour of day (UTC) of scheduled runs."
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "keyword_count": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "language": {
+            "type": "string"
+          },
+          "last_run_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "name": {
+            "type": "string"
+          },
+          "next_run_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "project_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "schedule": {
+            "type": "string",
+            "description": "manual | daily | weekly | monthly"
+          },
+          "weekday": {
+            "type": "integer",
+            "format": "int32",
+            "description": "ISO weekday (1 = Monday) of weekly runs."
+          }
+        }
+      },
+      "RankTrendPoint": {
+        "type": "object",
+        "required": [
+          "run_id",
+          "created_at",
+          "checked",
+          "ranking",
+          "top3",
+          "top10"
+        ],
+        "properties": {
+          "avg_position": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double",
+            "description": "Average position of the keywords that rank; null when none do."
+          },
+          "checked": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "ranking": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "run_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "top10": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "top3": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
       "RefreshSavedInput": {
         "type": "object",
         "properties": {
@@ -4920,6 +6175,58 @@
           "admin",
           "owner"
         ]
+      },
+      "RunEstimate": {
+        "type": "object",
+        "description": "What a check costs in provider requests (there are no credits or fees in SeoSeo itself).",
+        "required": [
+          "keywords",
+          "requests_per_run",
+          "runs_per_month",
+          "requests_per_month"
+        ],
+        "properties": {
+          "est_seconds": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "Rough duration of one run given the provider's pacing; null without a provider."
+          },
+          "keywords": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "What to do before a run can work, if anything."
+          },
+          "provider": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Provider that would be used first; null when none is set up."
+          },
+          "requests_per_month": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "requests_per_run": {
+            "type": "integer",
+            "format": "int64",
+            "description": "One search request per keyword."
+          },
+          "runs_per_month": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Scheduled runs in a 30-day month (0 for manual)."
+          }
+        }
       },
       "SaveKeywordsInput": {
         "type": "object",
@@ -5438,6 +6745,22 @@
           }
         }
       },
+      "StartRunInput": {
+        "type": "object",
+        "properties": {
+          "keyword_ids": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Check only these keywords; omit for all."
+          }
+        }
+      },
       "SwitchOrgInput": {
         "type": "object",
         "required": [
@@ -5447,6 +6770,33 @@
           "organization_id": {
             "type": "string",
             "format": "uuid"
+          }
+        }
+      },
+      "TrackerView": {
+        "type": "object",
+        "required": [
+          "tracker",
+          "keywords",
+          "runs"
+        ],
+        "properties": {
+          "keywords": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RankRow"
+            },
+            "description": "Latest position per keyword, pinned keywords first."
+          },
+          "runs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RankRun"
+            },
+            "description": "Recent runs, newest first."
+          },
+          "tracker": {
+            "$ref": "#/components/schemas/RankTracker"
           }
         }
       },
@@ -5525,6 +6875,37 @@
           }
         }
       },
+      "UpdateTrackerInput": {
+        "type": "object",
+        "properties": {
+          "hour_utc": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "schedule": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "weekday": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          }
+        }
+      },
       "UserView": {
         "type": "object",
         "required": [
@@ -5598,6 +6979,10 @@
     {
       "name": "keywords",
       "description": "Keyword research, saved keywords and SERP analysis"
+    },
+    {
+      "name": "rank-tracking",
+      "description": "Rank trackers, scheduled checks and position history"
     }
   ]
 }

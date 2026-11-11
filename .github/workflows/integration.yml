@@ -36,6 +36,7 @@ jobs:
       - run: bash scripts/e2e-audit.sh admin@example.com 'correct horse battery' http://localhost:3100
       - run: bash scripts/e2e-team.sh admin@example.com 'correct horse battery' http://localhost:3100
       - run: python scripts/e2e-m2.py admin@example.com 'correct horse battery' http://localhost:3100
+      - run: python scripts/e2e-m3.py admin@example.com 'correct horse battery' http://localhost:3100
       - if: ${{ inputs.live_keywords }}
         run: bash scripts/e2e-keywords.sh admin@example.com 'correct horse battery' http://localhost:3100
       - if: failure()

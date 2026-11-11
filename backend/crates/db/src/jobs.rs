@@ -143,13 +143,43 @@ pub async fn get_for_org(pool: &PgPool, org_id: Uuid, id: Uuid) -> AppResult<Job
 }
 
 pub async fn list_for_org(pool: &PgPool, org_id: Uuid, limit: i64) -> AppResult<Vec<Job>> {
+    list_filtered(pool, org_id, None, limit).await
+}
+
+/// Jobs of an organization, newest first, optionally only one status.
+pub async fn list_filtered(
+    pool: &PgPool,
+    org_id: Uuid,
+    status: Option<&str>,
+    limit: i64,
+) -> AppResult<Vec<Job>> {
     sqlx::query_as(concat!(
         "SELECT ",
         job_columns!(),
-        " FROM jobs WHERE organization_id = $1 ORDER BY created_at DESC LIMIT $2"
+        " FROM jobs WHERE organization_id = $1 AND ($2::text IS NULL OR status = $2)
+          ORDER BY created_at DESC LIMIT $3"
     ))
     .bind(org_id)
+    .bind(status)
     .bind(limit)
+    .fetch_all(pool)
+    .await
+    .map_err(internal)
+}
+
+/// `(status, count)` of an organization's jobs created in the last `days` days.
+pub async fn status_counts(
+    pool: &PgPool,
+    org_id: Uuid,
+    days: i32,
+) -> AppResult<Vec<(String, i64)>> {
+    sqlx::query_as(
+        "SELECT status, count(*) FROM jobs
+         WHERE organization_id = $1 AND created_at > now() - make_interval(days => $2)
+         GROUP BY status",
+    )
+    .bind(org_id)
+    .bind(days)
     .fetch_all(pool)
     .await
     .map_err(internal)

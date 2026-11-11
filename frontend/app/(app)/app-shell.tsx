@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient } from "@tanstack/react-query";
-import { Database, FolderKanban, KeyRound, LogOut, Search, Users } from "lucide-react";
+import { Activity, Database, FolderKanban, KeyRound, LogOut, Search, Users } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -23,6 +23,7 @@ const NAV = [
   { href: "/projects", label: "Projects", icon: FolderKanban },
   { href: "/settings/team", label: "Team", icon: Users },
   { href: "/settings/providers", label: "Data providers", icon: Database },
+  { href: "/settings/jobs", label: "Jobs", icon: Activity },
   { href: "/settings/api-keys", label: "API keys", icon: KeyRound },
 ];
 

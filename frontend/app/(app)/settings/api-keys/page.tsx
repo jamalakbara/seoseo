@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Copy, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -25,6 +25,12 @@ export default function ApiKeysPage() {
   const qc = useQueryClient();
   const [name, setName] = useState("");
   const [secret, setSecret] = useState<string | null>(null);
+  // The server render cannot know the public URL; the browser fills it in after hydration.
+  const origin = useSyncExternalStore(
+    () => () => {},
+    () => window.location.origin,
+    () => "https://your-seoseo",
+  );
   const list = useQuery({
     queryKey: keys.apiKeys,
     queryFn: () => unwrap(api.GET("/api/v1/api-keys")),
@@ -101,6 +107,24 @@ export default function ApiKeysPage() {
               </AlertDescription>
             </Alert>
           )}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Connect an AI assistant (MCP)</CardTitle>
+          <CardDescription>
+            Claude, ChatGPT, Cursor and other MCP clients can run audits, keyword research and rank checks for you.
+            Add this server with a key from above as the bearer token.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-2 text-sm">
+          <div>
+            Server URL: <code className="rounded bg-muted px-1">{origin}/mcp</code> (Streamable HTTP)
+          </div>
+          <pre className="overflow-x-auto rounded bg-muted p-3 text-xs">
+            {`claude mcp add --transport http seoseo ${origin}/mcp --header "Authorization: Bearer seo_YOUR_KEY"`}
+          </pre>
         </CardContent>
       </Card>
 

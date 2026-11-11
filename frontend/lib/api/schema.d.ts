@@ -232,7 +232,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Recent jobs of the active workspace. */
+        /** Recent jobs of the active workspace, newest first. */
         get: operations["list_jobs"];
         put?: never;
         post?: never;
@@ -253,6 +253,23 @@ export interface paths {
         put?: never;
         /** Enqueue a no-op job to check the worker is running. */
         post: operations["ping_worker"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/jobs/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Job counts by status for the last 7 days. */
+        get: operations["job_summary"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -583,6 +600,167 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/rank-trackers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_rank_trackers"];
+        put?: never;
+        /** Track where a domain ranks for a set of keywords in one market. */
+        post: operations["create_rank_tracker"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/rank-trackers/{tracker_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The tracker with the latest position of every keyword (plus previous and best) and its
+         *     recent runs. A null `position` with a `checked_at` means "not in the first `depth`
+         *     results"; a null `checked_at` means "never checked".
+         */
+        get: operations["get_rank_tracker"];
+        put?: never;
+        post?: never;
+        delete: operations["delete_rank_tracker"];
+        options?: never;
+        head?: never;
+        patch: operations["update_rank_tracker"];
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/rank-trackers/{tracker_id}/estimate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Request budget of a run: provider requests per run and per month. SeoSeo has no credits;
+         *     this only tells you what the configured provider will be asked to do.
+         */
+        get: operations["estimate_rank_run"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/rank-trackers/{tracker_id}/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Position history of one keyword, newest first. */
+        get: operations["get_rank_history"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/rank-trackers/{tracker_id}/keywords": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["add_rank_keywords"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/rank-trackers/{tracker_id}/keywords/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Remove keywords and their position history. */
+        post: operations["remove_rank_keywords"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/rank-trackers/{tracker_id}/keywords/pin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["pin_rank_keywords"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/rank-trackers/{tracker_id}/runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Check positions now (all keywords or a subset). Runs in the background: poll the tracker
+         *     or `GET /jobs/{job_id}`. Every keyword costs one request to the search results provider.
+         */
+        post: operations["start_rank_run"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/rank-trackers/{tracker_id}/trend": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Per-run summary (ranking keywords, top 3, top 10, average position), oldest first. */
+        get: operations["get_rank_trend"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/restore": {
         parameters: {
             query?: never;
@@ -851,6 +1029,10 @@ export interface components {
         };
         /** @enum {string} */
         ActorVia: "session" | "api_key" | "no_auth";
+        AddKeywordsInput: {
+            keywords: string[];
+            tags?: string[] | null;
+        };
         ApiKey: {
             /** Format: date-time */
             created_at: string;
@@ -920,6 +1102,18 @@ export interface components {
             active_job?: components["schemas"]["Job"] | null;
             status?: components["schemas"]["AuthorityStatus"] | null;
         };
+        ChangeResult: {
+            /**
+             * Format: int64
+             * @description Rows added, removed or updated.
+             */
+            changed: number;
+            /**
+             * Format: int64
+             * @description Keywords now on the tracker.
+             */
+            keyword_count: number;
+        };
         CreateApiKeyInput: {
             name: string;
         };
@@ -933,6 +1127,29 @@ export interface components {
             language_code?: string | null;
             location_name?: string | null;
             name: string;
+        };
+        CreateTrackerInput: {
+            /** @description Defaults to the project's market. */
+            country?: string | null;
+            /** @description Domain to track; defaults to the project's website. Subdomains count as the domain. */
+            domain?: string | null;
+            /**
+             * Format: int32
+             * @description Hour of day in UTC for scheduled runs (default 6).
+             */
+            hour_utc?: number | null;
+            /** @description Keywords to start with. */
+            keywords?: string[] | null;
+            language?: string | null;
+            /** @description Defaults to the tracked domain. */
+            name?: string | null;
+            /** @description manual (default) | daily | weekly | monthly */
+            schedule?: string | null;
+            /**
+             * Format: int32
+             * @description ISO weekday for weekly runs, 1 = Monday (default 1).
+             */
+            weekday?: number | null;
         };
         CreatedApiKey: {
             key: components["schemas"]["ApiKey"];
@@ -1064,6 +1281,21 @@ export interface components {
             run_at: string;
             status: string;
         };
+        JobSummary: {
+            /** Format: int64 */
+            cancelled: number;
+            /** Format: int64 */
+            completed: number;
+            /** Format: int64 */
+            failed: number;
+            /**
+             * Format: int64
+             * @description Counts over the last 7 days.
+             */
+            queued: number;
+            /** Format: int64 */
+            running: number;
+        };
         KeywordIdea: {
             /**
              * Format: int64
@@ -1100,6 +1332,9 @@ export interface components {
             volume_source?: string | null;
             /** Format: int32 */
             word_count: number;
+        };
+        KeywordIdsInput: {
+            ids: string[];
         };
         KeywordResearch: {
             config: unknown;
@@ -1371,6 +1606,11 @@ export interface components {
             /** Format: int64 */
             total: number;
         };
+        PinKeywordsInput: {
+            ids: string[];
+            /** @description Pinned keywords are listed first. Default true. */
+            pinned?: boolean | null;
+        };
         /** @description RFC 9457 problem details. */
         Problem: {
             /** @description Human/agent readable explanation; often tells you what to do next. */
@@ -1438,12 +1678,163 @@ export interface components {
             /** Format: date-time */
             updated_at?: string | null;
         };
+        RankPoint: {
+            /** Format: date-time */
+            checked_at: string;
+            /** Format: int32 */
+            depth: number;
+            /**
+             * Format: int32
+             * @description Null = not in the first `depth` results at that time.
+             */
+            position?: number | null;
+            provider: string;
+            url?: string | null;
+        };
+        RankRow: {
+            /**
+             * Format: int32
+             * @description Best position ever measured.
+             */
+            best_position?: number | null;
+            /**
+             * Format: date-time
+             * @description Null when the keyword was never checked.
+             */
+            checked_at?: string | null;
+            /**
+             * Format: int32
+             * @description Results examined in the latest check.
+             */
+            depth?: number | null;
+            /** @description True when the latest check used one search engine's real ranking. */
+            exact?: boolean | null;
+            features?: string[] | null;
+            keyword: string;
+            /** Format: uuid */
+            keyword_id: string;
+            pinned: boolean;
+            /**
+             * Format: int32
+             * @description Latest position; null = not in the first `depth` results, or never checked
+             *     (see `checked_at`).
+             */
+            position?: number | null;
+            /** Format: date-time */
+            previous_checked_at?: string | null;
+            /**
+             * Format: int32
+             * @description Position in the check before the latest one.
+             */
+            previous_position?: number | null;
+            provider?: string | null;
+            tags: string[];
+            /** @description Ranking URL in the latest check. */
+            url?: string | null;
+        };
+        RankRun: {
+            /** Format: date-time */
+            created_at: string;
+            error?: string | null;
+            /** Format: date-time */
+            finished_at?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            job_id?: string | null;
+            /** Format: int32 */
+            keywords_done: number;
+            /** Format: int32 */
+            keywords_total: number;
+            /** @description queued | running | completed | failed */
+            status: string;
+            /** Format: uuid */
+            tracker_id: string;
+            /** @description manual | schedule */
+            trigger: string;
+        };
+        RankTracker: {
+            country: string;
+            /** Format: date-time */
+            created_at: string;
+            /** @description Registrable domain whose positions are tracked. */
+            domain: string;
+            /**
+             * Format: int32
+             * @description Hour of day (UTC) of scheduled runs.
+             */
+            hour_utc: number;
+            /** Format: uuid */
+            id: string;
+            /** Format: int64 */
+            keyword_count: number;
+            language: string;
+            /** Format: date-time */
+            last_run_at?: string | null;
+            name: string;
+            /** Format: date-time */
+            next_run_at?: string | null;
+            /** Format: uuid */
+            project_id: string;
+            /** @description manual | daily | weekly | monthly */
+            schedule: string;
+            /**
+             * Format: int32
+             * @description ISO weekday (1 = Monday) of weekly runs.
+             */
+            weekday: number;
+        };
+        RankTrendPoint: {
+            /**
+             * Format: double
+             * @description Average position of the keywords that rank; null when none do.
+             */
+            avg_position?: number | null;
+            /** Format: int64 */
+            checked: number;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: int64 */
+            ranking: number;
+            /** Format: uuid */
+            run_id: string;
+            /** Format: int64 */
+            top10: number;
+            /** Format: int64 */
+            top3: number;
+        };
         RefreshSavedInput: {
             /** @description Omit or pass an empty list to refresh all saved keywords. Otherwise 1–1000 IDs. */
             ids?: string[];
         };
         /** @enum {string} */
         Role: "member" | "admin" | "owner";
+        /** @description What a check costs in provider requests (there are no credits or fees in SeoSeo itself). */
+        RunEstimate: {
+            /**
+             * Format: int64
+             * @description Rough duration of one run given the provider's pacing; null without a provider.
+             */
+            est_seconds?: number | null;
+            /** Format: int64 */
+            keywords: number;
+            /** @description What to do before a run can work, if anything. */
+            note?: string | null;
+            /** @description Provider that would be used first; null when none is set up. */
+            provider?: string | null;
+            /** Format: int64 */
+            requests_per_month: number;
+            /**
+             * Format: int64
+             * @description One search request per keyword.
+             */
+            requests_per_run: number;
+            /**
+             * Format: int64
+             * @description Scheduled runs in a 30-day month (0 for manual).
+             */
+            runs_per_month: number;
+        };
         SaveKeywordsInput: {
             /** @description …these ones. */
             idea_ids?: string[] | null;
@@ -1609,9 +2000,20 @@ export interface components {
              */
             serp_top?: number | null;
         };
+        StartRunInput: {
+            /** @description Check only these keywords; omit for all. */
+            keyword_ids?: string[] | null;
+        };
         SwitchOrgInput: {
             /** Format: uuid */
             organization_id: string;
+        };
+        TrackerView: {
+            /** @description Latest position per keyword, pinned keywords first. */
+            keywords: components["schemas"]["RankRow"][];
+            /** @description Recent runs, newest first. */
+            runs: components["schemas"]["RankRun"][];
+            tracker: components["schemas"]["RankTracker"];
         };
         /** @description Partial update. Send `null` for nullable fields to clear them; omit to keep. */
         UpdateProjectInput: {
@@ -1630,6 +2032,14 @@ export interface components {
         UpdateSavedInput: {
             /** @description Replaces the keyword's tags. */
             tags: string[];
+        };
+        UpdateTrackerInput: {
+            /** Format: int32 */
+            hour_utc?: number | null;
+            name?: string | null;
+            schedule?: string | null;
+            /** Format: int32 */
+            weekday?: number | null;
         };
         UserView: {
             email: string;
@@ -2008,7 +2418,12 @@ export interface operations {
     };
     list_jobs: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description queued | running | completed | failed | cancelled */
+                status?: string | null;
+                /** @description Default 50, max 200. */
+                limit?: number | null;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -2040,6 +2455,25 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Job"];
+                };
+            };
+        };
+    };
+    job_summary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobSummary"];
                 };
             };
         };
@@ -2778,6 +3212,358 @@ export interface operations {
                 };
                 content: {
                     "text/csv": string;
+                };
+            };
+        };
+    };
+    list_rank_trackers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RankTracker"][];
+                };
+            };
+        };
+    };
+    create_rank_tracker: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateTrackerInput"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RankTracker"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    get_rank_tracker: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                tracker_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TrackerView"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    delete_rank_tracker: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                tracker_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    update_rank_tracker: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                tracker_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateTrackerInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RankTracker"];
+                };
+            };
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    estimate_rank_run: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                tracker_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RunEstimate"];
+                };
+            };
+        };
+    };
+    get_rank_history: {
+        parameters: {
+            query: {
+                keyword_id: string;
+                /** @description Most recent checks to return (default 90, max 365). */
+                limit?: number | null;
+            };
+            header?: never;
+            path: {
+                project_id: string;
+                tracker_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RankPoint"][];
+                };
+            };
+        };
+    };
+    add_rank_keywords: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                tracker_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddKeywordsInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChangeResult"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    remove_rank_keywords: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                tracker_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["KeywordIdsInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChangeResult"];
+                };
+            };
+        };
+    };
+    pin_rank_keywords: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                tracker_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PinKeywordsInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ChangeResult"];
+                };
+            };
+        };
+    };
+    start_rank_run: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                tracker_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartRunInput"];
+            };
+        };
+        responses: {
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RankRun"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    get_rank_trend: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                tracker_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RankTrendPoint"][];
                 };
             };
         };

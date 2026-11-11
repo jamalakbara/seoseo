@@ -57,7 +57,8 @@ fn strings(v: &serde_json::Value) -> Vec<String> {
     serde_json::from_value(v.clone()).unwrap_or_default()
 }
 
-async fn fetch_snapshot(
+/// Fetch a fresh results page from the first working provider and store it.
+pub(crate) async fn fetch_snapshot(
     pool: &PgPool,
     registry: &Registry,
     keyword: &str,

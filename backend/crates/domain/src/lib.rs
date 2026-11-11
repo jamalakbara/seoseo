@@ -7,6 +7,7 @@ pub mod auth;
 pub mod keywords;
 pub mod projects;
 pub mod providers;
+pub mod rank;
 pub mod team;
 pub mod validate;
 
