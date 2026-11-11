@@ -39,6 +39,7 @@ whether it is a real engine ranking). There are no credits: 'cost' means provide
 /// Everything a tool needs. Cheap to clone; one instance is built per request.
 #[derive(Clone)]
 pub struct SeoSeoMcp {
+    cfg: Arc<common::Config>,
     pool: PgPool,
     providers: Arc<ProviderCtx>,
     policy: UrlPolicy,
@@ -665,6 +666,101 @@ impl SeoSeoMcp {
     // ------------------------------------------------------------ jobs
 
     #[tool(
+        description = "List verified Google Search Console properties for a connected project. Admin role; connect Google in the dashboard first."
+    )]
+    async fn list_search_console_sites(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<ProjectRef>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        reply(
+            async {
+                domain::gsc::sites(
+                    &self.pool,
+                    &actor,
+                    id("project_id", &p.project_id)?,
+                    &self.cfg,
+                )
+                .await
+            }
+            .await,
+        )
+    }
+
+    #[tool(
+        description = "Select a verified Search Console property for this project. Admin role; use an exact URL from list_search_console_sites."
+    )]
+    async fn set_search_console_site(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<GscSite>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        reply(
+            async {
+                domain::gsc::set_site(
+                    &self.pool,
+                    &actor,
+                    id("project_id", &p.project_id)?,
+                    &self.cfg,
+                    conv(&p)?,
+                )
+                .await
+            }
+            .await,
+        )
+    }
+
+    #[tool(
+        description = "Read measured Google clicks, impressions, CTR and position. Dates within 16 months, excluding the recent three days; AND filters, up to 1000 rows per page. Empty rows mean no reported data."
+    )]
+    async fn get_search_console_performance(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<GscPerformance>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        reply(
+            async {
+                domain::gsc::performance(
+                    &self.pool,
+                    &actor,
+                    id("project_id", &p.project_id)?,
+                    &self.cfg,
+                    conv(&p)?,
+                )
+                .await
+            }
+            .await,
+        )
+    }
+
+    #[tool(
+        description = "Inspect 1–10 URLs using the connected Search Console property. Reports the indexed version, not a live test. Individual invalid URLs have partial errors; revoked access requires reconnecting."
+    )]
+    async fn inspect_urls(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<GscInspect>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        reply(
+            async {
+                domain::gsc::inspect(
+                    &self.pool,
+                    &actor,
+                    id("project_id", &p.project_id)?,
+                    &self.cfg,
+                    conv(&p)?,
+                )
+                .await
+            }
+            .await,
+        )
+    }
+
+    #[tool(
         description = "Recent background jobs of this workspace with status, progress and errors."
     )]
     async fn list_jobs(&self, ctx: RequestContext<RoleServer>) -> ToolResult {
@@ -701,6 +797,7 @@ impl ServerHandler for SeoSeoMcp {
 
 /// Settings for the MCP endpoint.
 pub struct McpOptions {
+    pub cfg: Arc<common::Config>,
     pub pool: PgPool,
     pub providers: Arc<ProviderCtx>,
     pub policy: UrlPolicy,
@@ -715,6 +812,7 @@ pub struct McpOptions {
 /// Stateless on purpose: no in-memory sessions, so any API replica can serve any request.
 pub fn service(opts: McpOptions) -> StreamableHttpService<SeoSeoMcp, NeverSessionManager> {
     let server = SeoSeoMcp {
+        cfg: opts.cfg,
         pool: opts.pool,
         providers: opts.providers,
         policy: opts.policy,

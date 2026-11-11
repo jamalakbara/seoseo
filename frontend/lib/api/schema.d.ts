@@ -174,6 +174,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/gsc/oauth/callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["gsc_callback"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/info": {
         parameters: {
             query?: never;
@@ -522,6 +538,118 @@ export interface paths {
         };
         /** One crawled page with its issues, outgoing links and inlinks. */
         get: operations["get_audit_page"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/gsc": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["gsc_status"];
+        put?: never;
+        post?: never;
+        delete: operations["gsc_disconnect"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/gsc/connect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["gsc_connect"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/gsc/inspect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["gsc_inspect"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/gsc/performance": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["gsc_performance"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/gsc/performance.csv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["gsc_export"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/gsc/site": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["gsc_set_site"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/gsc/sites": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["gsc_sites"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1114,6 +1242,16 @@ export interface components {
              */
             keyword_count: number;
         };
+        ConnectUrl: {
+            url: string;
+        };
+        ConnectionView: {
+            configured: boolean;
+            connected: boolean;
+            /** Format: uuid */
+            connected_by?: string | null;
+            site_url?: string | null;
+        };
         CreateApiKeyInput: {
             name: string;
         };
@@ -1194,6 +1332,14 @@ export interface components {
              * @description How many top domains to import (1,000–20,000,000; default 1,000,000 ≈ 30 MB download).
              */
             limit?: number | null;
+        };
+        InspectInput: {
+            urls: string[];
+        };
+        InspectionRow: {
+            error?: string | null;
+            result?: unknown;
+            url: string;
         };
         InstanceInfo: {
             auth_mode: string;
@@ -1606,6 +1752,42 @@ export interface components {
             /** Format: int64 */
             total: number;
         };
+        PerformanceFilter: {
+            dimension: string;
+            expression: string;
+            operator: string;
+        };
+        PerformanceInput: {
+            dimensions?: string[];
+            end_date: string;
+            filters?: components["schemas"]["PerformanceFilter"][];
+            /** Format: int32 */
+            row_limit?: number | null;
+            search_type?: string | null;
+            start_date: string;
+            /** Format: int32 */
+            start_row?: number | null;
+        };
+        PerformanceRow: {
+            /** Format: double */
+            clicks: number;
+            /** Format: double */
+            ctr: number;
+            /** Format: double */
+            impressions: number;
+            keys?: string[];
+            /** Format: double */
+            position: number;
+        };
+        PerformanceView: {
+            dimensions: string[];
+            /** Format: int32 */
+            next_start_row?: number | null;
+            note: string;
+            rows: components["schemas"]["PerformanceRow"][];
+            site_url: string;
+            source: string;
+        };
         PinKeywordsInput: {
             ids: string[];
             /** @description Pinned keywords are listed first. Default true. */
@@ -1954,6 +2136,13 @@ export interface components {
             /** @description True when no account exists yet: the next sign-up becomes the instance admin. */
             needs_setup: boolean;
             signup_open: boolean;
+        };
+        Site: {
+            permissionLevel: string;
+            siteUrl: string;
+        };
+        SiteInput: {
+            site_url: string;
         };
         StartAuditInput: {
             /**
@@ -2336,6 +2525,27 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["Problem"];
                 };
+            };
+        };
+    };
+    gsc_callback: {
+        parameters: {
+            query: {
+                state: string;
+                code?: string | null;
+                error?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            303: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -3027,6 +3237,188 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    gsc_status: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectionView"];
+                };
+            };
+        };
+    };
+    gsc_disconnect: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    gsc_connect: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectUrl"];
+                };
+            };
+        };
+    };
+    gsc_inspect: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["InspectInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InspectionRow"][];
+                };
+            };
+        };
+    };
+    gsc_performance: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PerformanceInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PerformanceView"];
+                };
+            };
+        };
+    };
+    gsc_export: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PerformanceInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": string;
+                };
+            };
+        };
+    };
+    gsc_set_site: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SiteInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConnectionView"];
+                };
+            };
+        };
+    };
+    gsc_sites: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Site"][];
                 };
             };
         };

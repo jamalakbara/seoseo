@@ -4,6 +4,7 @@ pub mod actor;
 pub mod api_keys;
 pub mod audits;
 pub mod auth;
+pub mod gsc;
 pub mod keywords;
 pub mod projects;
 pub mod providers;

@@ -11,9 +11,6 @@ import { HealthScore } from "@/components/audit/health-score";
 import { api, unwrap } from "@/lib/api/client";
 
 const UPCOMING = [
-  { name: "Keyword research", milestone: "M2" },
-  { name: "Rank tracking", milestone: "M3" },
-  { name: "Search Console", milestone: "M3" },
   { name: "Backlinks & competitors", milestone: "M5" },
   { name: "AI visibility", milestone: "M5" },
   { name: "Local SEO", milestone: "M6" },

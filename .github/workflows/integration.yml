@@ -25,21 +25,22 @@ jobs:
       - name: Start isolated test stack
         run: |
           touch .env
-          docker compose -p seoseo-ci -f deploy/compose.yaml -f deploy/compose.test.yaml --profile renderer up -d --build
+          docker compose -p seoseo-ci -f deploy/compose.yaml -f deploy/compose.test.yaml -f deploy/compose.gsc-test.yaml --profile renderer up -d --build
           for i in $(seq 1 90); do
             curl -fsS http://localhost:3100/api/v1/info && exit 0
             sleep 2
           done
           exit 1
-      - run: docker compose -p seoseo-ci -f deploy/compose.yaml -f deploy/compose.test.yaml --profile renderer exec -T renderer npm test
+      - run: docker compose -p seoseo-ci -f deploy/compose.yaml -f deploy/compose.test.yaml -f deploy/compose.gsc-test.yaml --profile renderer exec -T renderer npm test
       - run: bash scripts/smoke.sh http://localhost:3100
       - run: bash scripts/e2e-audit.sh admin@example.com 'correct horse battery' http://localhost:3100
       - run: bash scripts/e2e-team.sh admin@example.com 'correct horse battery' http://localhost:3100
       - run: python scripts/e2e-m2.py admin@example.com 'correct horse battery' http://localhost:3100
       - run: python scripts/e2e-m3.py admin@example.com 'correct horse battery' http://localhost:3100
+      - run: python scripts/e2e-gsc.py admin@example.com 'correct horse battery' http://127.0.0.1:3100
       - if: ${{ inputs.live_keywords }}
         run: bash scripts/e2e-keywords.sh admin@example.com 'correct horse battery' http://localhost:3100
       - if: failure()
-        run: docker compose -p seoseo-ci -f deploy/compose.yaml -f deploy/compose.test.yaml --profile renderer logs --tail 100
+        run: docker compose -p seoseo-ci -f deploy/compose.yaml -f deploy/compose.test.yaml -f deploy/compose.gsc-test.yaml --profile renderer logs --tail 100
       - if: always()
-        run: docker compose -p seoseo-ci -f deploy/compose.yaml -f deploy/compose.test.yaml --profile renderer down -v
+        run: docker compose -p seoseo-ci -f deploy/compose.yaml -f deploy/compose.test.yaml -f deploy/compose.gsc-test.yaml --profile renderer down -v

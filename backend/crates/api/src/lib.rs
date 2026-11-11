@@ -93,7 +93,10 @@ pub fn router(state: AppState) -> Router {
         .merge(routes::system())
         .merge(mcp_mount::router(&state))
         .layer(axum::middleware::from_fn(middleware::track_metrics))
-        .layer(TraceLayer::new_for_http())
+        // OAuth callback queries contain authorization codes; never put them in spans.
+        .layer(TraceLayer::new_for_http().make_span_with(|request: &axum::http::Request<axum::body::Body>| {
+            tracing::info_span!("http_request", method = %request.method(), path = %request.uri().path())
+        }))
         .layer(PropagateRequestIdLayer::x_request_id())
         .layer(SetRequestIdLayer::x_request_id(MakeRequestUuid))
         .layer(CompressionLayer::new())

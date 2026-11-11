@@ -386,6 +386,54 @@
         ]
       }
     },
+    "/api/v1/gsc/oauth/callback": {
+      "get": {
+        "tags": [
+          "search-console"
+        ],
+        "operationId": "gsc_callback",
+        "parameters": [
+          {
+            "name": "state",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "error",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "303": {}
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
     "/api/v1/info": {
       "get": {
         "tags": [
@@ -1648,6 +1696,346 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/gsc": {
+      "get": {
+        "tags": [
+          "search-console"
+        ],
+        "operationId": "gsc_status",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "search-console"
+        ],
+        "operationId": "gsc_disconnect",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {}
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/gsc/connect": {
+      "post": {
+        "tags": [
+          "search-console"
+        ],
+        "operationId": "gsc_connect",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectUrl"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/gsc/inspect": {
+      "post": {
+        "tags": [
+          "search-console"
+        ],
+        "operationId": "gsc_inspect",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InspectInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InspectionRow"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/gsc/performance": {
+      "post": {
+        "tags": [
+          "search-console"
+        ],
+        "operationId": "gsc_performance",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PerformanceInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PerformanceView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/gsc/performance.csv": {
+      "post": {
+        "tags": [
+          "search-console"
+        ],
+        "operationId": "gsc_export",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PerformanceInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/gsc/site": {
+      "put": {
+        "tags": [
+          "search-console"
+        ],
+        "operationId": "gsc_set_site",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SiteInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/gsc/sites": {
+      "get": {
+        "tags": [
+          "search-console"
+        ],
+        "operationId": "gsc_sites",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Site"
+                  }
                 }
               }
             }
@@ -3971,6 +4359,45 @@
           }
         }
       },
+      "ConnectUrl": {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "ConnectionView": {
+        "type": "object",
+        "required": [
+          "configured",
+          "connected"
+        ],
+        "properties": {
+          "configured": {
+            "type": "boolean"
+          },
+          "connected": {
+            "type": "boolean"
+          },
+          "connected_by": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "site_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
       "CreateApiKeyInput": {
         "type": "object",
         "required": [
@@ -4212,6 +4639,38 @@
             "format": "int32",
             "description": "How many top domains to import (1,000–20,000,000; default 1,000,000 ≈ 30 MB download).",
             "minimum": 0
+          }
+        }
+      },
+      "InspectInput": {
+        "type": "object",
+        "required": [
+          "urls"
+        ],
+        "properties": {
+          "urls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "InspectionRow": {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "result": {},
+          "url": {
+            "type": "string"
           }
         }
       },
@@ -5588,6 +6047,148 @@
           }
         }
       },
+      "PerformanceFilter": {
+        "type": "object",
+        "required": [
+          "dimension",
+          "operator",
+          "expression"
+        ],
+        "properties": {
+          "dimension": {
+            "type": "string"
+          },
+          "expression": {
+            "type": "string"
+          },
+          "operator": {
+            "type": "string"
+          }
+        }
+      },
+      "PerformanceInput": {
+        "type": "object",
+        "required": [
+          "start_date",
+          "end_date"
+        ],
+        "properties": {
+          "dimensions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "end_date": {
+            "type": "string"
+          },
+          "filters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PerformanceFilter"
+            }
+          },
+          "row_limit": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "search_type": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "start_date": {
+            "type": "string"
+          },
+          "start_row": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          }
+        }
+      },
+      "PerformanceRow": {
+        "type": "object",
+        "required": [
+          "clicks",
+          "impressions",
+          "ctr",
+          "position"
+        ],
+        "properties": {
+          "clicks": {
+            "type": "number",
+            "format": "double"
+          },
+          "ctr": {
+            "type": "number",
+            "format": "double"
+          },
+          "impressions": {
+            "type": "number",
+            "format": "double"
+          },
+          "keys": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "position": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "PerformanceView": {
+        "type": "object",
+        "required": [
+          "site_url",
+          "dimensions",
+          "rows",
+          "source",
+          "note"
+        ],
+        "properties": {
+          "dimensions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "next_start_row": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "note": {
+            "type": "string"
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PerformanceRow"
+            }
+          },
+          "site_url": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          }
+        }
+      },
       "PinKeywordsInput": {
         "type": "object",
         "required": [
@@ -6628,6 +7229,32 @@
           },
           "signup_open": {
             "type": "boolean"
+          }
+        }
+      },
+      "Site": {
+        "type": "object",
+        "required": [
+          "siteUrl",
+          "permissionLevel"
+        ],
+        "properties": {
+          "permissionLevel": {
+            "type": "string"
+          },
+          "siteUrl": {
+            "type": "string"
+          }
+        }
+      },
+      "SiteInput": {
+        "type": "object",
+        "required": [
+          "site_url"
+        ],
+        "properties": {
+          "site_url": {
+            "type": "string"
           }
         }
       },

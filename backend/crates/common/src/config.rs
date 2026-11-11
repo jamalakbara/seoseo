@@ -67,4 +67,34 @@ pub struct Config {
     /// Override the Common Crawl web-graph release list (mirrors, tests).
     #[arg(long, env = "CC_GRAPHINFO_URL")]
     pub cc_graphinfo_url: Option<String>,
+
+    #[arg(long, env = "GOOGLE_CLIENT_ID")]
+    pub google_client_id: Option<String>,
+    #[arg(long, env = "GOOGLE_CLIENT_SECRET", hide_env_values = true)]
+    pub google_client_secret: Option<String>,
+    /// Operator-only endpoint overrides for local integration fixtures.
+    #[arg(
+        long,
+        env = "GOOGLE_AUTH_URL",
+        default_value = "https://accounts.google.com/o/oauth2/v2/auth"
+    )]
+    pub google_auth_url: String,
+    #[arg(
+        long,
+        env = "GOOGLE_TOKEN_URL",
+        default_value = "https://oauth2.googleapis.com/token"
+    )]
+    pub google_token_url: String,
+    #[arg(
+        long,
+        env = "GSC_API_URL",
+        default_value = "https://www.googleapis.com/webmasters/v3"
+    )]
+    pub gsc_api_url: String,
+    #[arg(
+        long,
+        env = "GSC_INSPECTION_URL",
+        default_value = "https://searchconsole.googleapis.com/v1/urlInspection/index:inspect"
+    )]
+    pub gsc_inspection_url: String,
 }

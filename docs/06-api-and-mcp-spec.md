@@ -130,7 +130,9 @@ Transport: Streamable HTTP at `/mcp`. Each tool: zod-like JSON Schema input, dis
 `*` = new beyond OpenSEO. Cost-estimate tools return request counts & provider quota impact instead of credits.
 
 ### Implemented (M3)
-`whoami`, `list_projects`, `create_project`, `research_keywords`, `list_keyword_research`, `get_keyword_research`, `save_keywords`, `list_saved_keywords`, `remove_saved_keywords`, `get_serp_results`, `get_domain_authority`, `list_data_providers`, `run_site_audit`, `list_site_audits`, `get_audit_status`, `get_audit_issues`, `get_audit_pages`, `delete_site_audit`, `create_rank_tracker`, `list_rank_trackers`, `get_rank_tracker`, `add_rank_tracking_keywords`, `remove_rank_tracking_keywords`, `pin_rank_tracking_keywords`, `estimate_rank_tracker_cost`, `run_rank_tracker`, `get_rank_history`, `list_jobs`, `get_job`.
+GSC REST routes, OAuth setup, access rules and limits: [Search Console](10-search-console.md).
+
+`whoami`, `list_projects`, `create_project`, `research_keywords`, `list_keyword_research`, `get_keyword_research`, `save_keywords`, `list_saved_keywords`, `remove_saved_keywords`, `get_serp_results`, `get_domain_authority`, `list_data_providers`, `run_site_audit`, `list_site_audits`, `get_audit_status`, `get_audit_issues`, `get_audit_pages`, `delete_site_audit`, `create_rank_tracker`, `list_rank_trackers`, `get_rank_tracker`, `add_rank_tracking_keywords`, `remove_rank_tracking_keywords`, `pin_rank_tracking_keywords`, `estimate_rank_tracker_cost`, `run_rank_tracker`, `get_rank_history`, `list_jobs`, `get_job`, `list_search_console_sites`, `set_search_console_site`, `get_search_console_performance`, `inspect_urls` (33 tools).
 
 - Endpoint: `POST /mcp` (also reachable through the web app origin). Stateless: no session ids, JSON responses, any API replica can answer.
 - Auth: `Authorization: Bearer seo_…` API key (or the built-in admin in `AUTH_MODE=none`). 401 carries `WWW-Authenticate: Bearer`.

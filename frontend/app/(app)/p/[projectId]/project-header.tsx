@@ -16,6 +16,7 @@ export function ProjectHeader() {
     { href: base, label: "Overview", exact: true },
     { href: `${base}/keywords`, label: "Keywords" },
     { href: `${base}/rank`, label: "Rank tracking" },
+    { href: `${base}/gsc`, label: "Search Console" },
     { href: `${base}/audit`, label: "Site audit" },
     { href: `${base}/settings`, label: "Settings" },
   ];
@@ -34,7 +35,7 @@ export function ProjectHeader() {
       ) : (
         <Skeleton className="h-12 w-64" />
       )}
-      <nav className="-mb-px flex gap-4 text-sm">
+      <nav className="-mb-px flex gap-4 overflow-x-auto whitespace-nowrap text-sm">
         {tabs.map((t) => {
           const active = t.exact ? pathname === t.href : pathname.startsWith(t.href);
           return (

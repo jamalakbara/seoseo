@@ -12,6 +12,8 @@ Free, open-source, self-hostable SEO platform. Rust (axum) backend · Next.js 16
 | 06 | [API & MCP spec](06-api-and-mcp-spec.md) | REST endpoints, MCP tool list (OpenSEO-compatible names), skills |
 | 07 | [Roadmap](07-roadmap.md) | Milestones M0–M8 with scope and exit criteria |
 | 08 | [Site audit](08-site-audit.md) | How the shipped crawler, rules and audit job work; invariants and tests |
+| 09 | [Browser audits and refresh](09-m2-browser-and-refresh.md) | Renderer, Lighthouse, browser SERP and bulk keyword refresh |
+| 10 | [Search Console](10-search-console.md) | Google OAuth setup, project access, performance/export, inspection and fixture tests |
 
 Reference source: `reference/open-seo/` (git-ignored clone; re-clone with `git clone https://github.com/every-app/open-seo reference/open-seo`).
 Upstream design records worth re-reading before building a feature: `reference/open-seo/docs/maintainers/specs/00xx-*.md`.

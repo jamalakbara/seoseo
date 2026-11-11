@@ -1,0 +1,18 @@
+# Offline GSC fixture overlay; only with the throwaway test stack.
+services:
+  gsc-fixture:
+    image: python:3.12-alpine
+    command: ["python", "/fixture/server.py"]
+    volumes:
+      - ./test/gsc:/fixture:ro
+    ports:
+      - "127.0.0.1:3101:8080"
+  api:
+    environment:
+      GOOGLE_CLIENT_ID: fixture-client
+      GOOGLE_CLIENT_SECRET: fixture-secret
+      APP_ENCRYPTION_KEY: AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=
+      GOOGLE_AUTH_URL: http://127.0.0.1:3101/authorize
+      GOOGLE_TOKEN_URL: http://gsc-fixture:8080/token
+      GSC_API_URL: http://gsc-fixture:8080/webmasters/v3
+      GSC_INSPECTION_URL: http://gsc-fixture:8080/inspect

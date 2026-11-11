@@ -249,7 +249,8 @@ async fn export_audit_issues(
 
 /// Quote a CSV cell and neutralize spreadsheet formula injection.
 pub(crate) fn csv_cell(v: &str) -> String {
-    let v = if v.starts_with(['=', '+', '-', '@']) {
+    let v = if v.starts_with(['\t', '\r', '\n']) || v.trim_start().starts_with(['=', '+', '-', '@'])
+    {
         format!("'{v}")
     } else {
         v.to_string()
@@ -294,5 +295,7 @@ mod tests {
     fn csv_cells_are_quoted_and_safe() {
         assert_eq!(csv_cell(r#"a "b""#), r#""a ""b""""#);
         assert_eq!(csv_cell("=HYPERLINK(1)"), r#""'=HYPERLINK(1)""#);
+        assert_eq!(csv_cell("\t=1+1"), "\"'\t=1+1\"");
+        assert_eq!(csv_cell("  +1"), "\"'  +1\"");
     }
 }

@@ -21,6 +21,7 @@ pub fn router(state: &AppState) -> Router<AppState> {
         hosts.push(h);
     }
     let service = mcp::service(mcp::McpOptions {
+        cfg: state.cfg.clone(),
         pool: state.pool.clone(),
         providers: state.providers.clone(),
         policy: crawler::UrlPolicy {

@@ -3,6 +3,7 @@
 
 pub mod api_keys;
 pub mod audits;
+pub mod gsc;
 pub mod invitations;
 pub mod jobs;
 pub mod keywords;

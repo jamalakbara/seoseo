@@ -5,6 +5,45 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct GscSite {
+    pub project_id: String,
+    /// Exact property URL from list_search_console_sites.
+    pub site_url: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct GscFilter {
+    pub dimension: String,
+    pub operator: String,
+    pub expression: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct GscPerformance {
+    pub project_id: String,
+    /// YYYY-MM-DD, within the last 16 months.
+    pub start_date: String,
+    /// YYYY-MM-DD, at least three days ago.
+    pub end_date: String,
+    /// query, page, country, device, date, searchAppearance. Empty for totals.
+    #[serde(default)]
+    pub dimensions: Vec<String>,
+    #[serde(default)]
+    pub filters: Vec<GscFilter>,
+    pub search_type: Option<String>,
+    /// 1–1000; defaults to 100.
+    pub row_limit: Option<u32>,
+    pub start_row: Option<u32>,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct GscInspect {
+    pub project_id: String,
+    /// 1–10 URLs under the connected property. Reports Google's indexed version, not a live test.
+    pub urls: Vec<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct ProjectRef {
     /// Project id from list_projects.
     pub project_id: String,
