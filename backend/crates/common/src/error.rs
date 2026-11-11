@@ -14,6 +14,9 @@ pub enum AppError {
     Conflict(String),
     #[error("{0}")]
     Validation(String),
+    /// An upstream data provider failed or is rate limited; retrying later may work.
+    #[error("{0}")]
+    Unavailable(String),
     #[error("internal error")]
     Internal(#[from] anyhow::Error),
 }

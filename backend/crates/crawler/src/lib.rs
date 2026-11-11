@@ -19,3 +19,5 @@ pub const DEFAULT_USER_AGENT: &str =
     "Mozilla/5.0 (compatible; SeoSeoBot/0.1; +https://github.com/seoseo/seoseo)";
 /// Token matched against robots.txt groups.
 pub const ROBOTS_TOKEN: &str = "SeoSeoBot";
+
+pub mod extended;

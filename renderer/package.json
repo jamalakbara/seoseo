@@ -1,0 +1,1 @@
+{"name":"seoseo-renderer","private":true,"type":"module","scripts":{"test":"node --test"},"dependencies":{"puppeteer-core":"25.17.0","lighthouse":"13.6.0","ipaddr.js":"2.5.0"}}

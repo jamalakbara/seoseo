@@ -11,7 +11,7 @@ Versions verified 2026-11-10 (npm registry, crates.io, Docker Hub). **Re-verify 
 | Async runtime | tokio | 1.54 |
 | HTTP framework | axum (+ tower, tower-http: cors, compression, trace, timeout, limit) | 0.8.9 / tower-http 0.7 |
 | DB | PostgreSQL | 18.x |
-| DB access | sqlx (compile-time checked queries, migrations) | 0.9 |
+| DB access | sqlx (compile-time checked queries, migrations) | pinned in renderer/package-lock.json |
 | Cache / rate-limit / pubsub | Valkey (Redis-compatible) via `redis` crate | Valkey 9.x / redis 1.8 |
 | Job queue | Postgres-backed queue (`apalis` 1.0 with postgres backend, or hand-rolled `SELECT … FOR UPDATE SKIP LOCKED`) | 1.0 |
 | Scheduler | cron-like table polled by worker (tz-aware via `chrono-tz`) | — |
@@ -20,7 +20,7 @@ Versions verified 2026-11-10 (npm registry, crates.io, Docker Hub). **Re-verify 
 | robots.txt | `texting_robots` | 0.2 |
 | Sitemaps | `quick-xml` | latest |
 | URL/domain | `url`, `publicsuffix`/`psl`, `idna` | latest |
-| Headless browser | `chromiumoxide` → `renderer` container (Chromium) | 0.9 |
+| Headless browser | Puppeteer → isolated `renderer` container (Chromium + Lighthouse), guarded egress proxy | pinned in renderer/package-lock.json |
 | MCP | `rmcp` (official Rust MCP SDK, streamable HTTP server) | 3.9 |
 | OpenAPI | `utoipa` + `utoipa-swagger-ui`/scalar | 6.0 |
 | Auth | `argon2` (passwords), `jsonwebtoken` (OAuth/MCP tokens), `oauth2` crate (Google), cookie sessions in Valkey | 0.6 / 11 |
@@ -183,7 +183,7 @@ Services in `deploy/compose.yaml`:
 | `worker` | same image | `seoseo worker`, scale replicas |
 | `migrate` | same image | `seoseo migrate` one-shot, `api` depends_on completed |
 | `web` | `ghcr.io/<you>/seoseo-frontend` | Next standalone, port 3000 |
-| `renderer` | `chromedp/headless-shell` or custom Chromium + Lighthouse | internal only |
+| `renderer` | Node + Chromium + Puppeteer + Lighthouse; private network; guarded egress proxy | internal only |
 | `searxng` | `searxng/searxng` | profile `serp` |
 | `ollama` | `ollama/ollama` | profile `ai` |
 | `proxy` | `caddy:2` | optional profile `tls`, auto HTTPS |

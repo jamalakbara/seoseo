@@ -1,7 +1,14 @@
 //! Background worker: claims jobs from the Postgres queue, runs handlers, keeps leases alive,
 //! and reaps jobs whose worker died. Job kinds are registered in [`Registry`].
 
+pub mod cc_ranks;
+pub mod keyword_research;
+pub mod provider_ctx;
+pub mod saved_refresh;
+pub mod serp;
 pub mod site_audit;
+
+pub use provider_ctx::ProviderCtx;
 
 use common::{AppResult, new_id};
 use db::models::Job;
@@ -196,3 +203,5 @@ async fn run_one_inner(ctx: JobCtx, registry: &Registry) {
         tracing::error!(error = %e, "could not record job outcome");
     }
 }
+
+pub mod renderer;

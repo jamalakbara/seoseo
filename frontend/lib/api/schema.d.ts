@@ -120,6 +120,60 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/authority": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Status of the domain authority data (SeoSeo Rank from the Common Crawl web graph). */
+        get: operations["get_authority"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/authority/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Import the top domains of the latest Common Crawl web graph (owners). Runs in the
+         *     background; follow it with `GET /jobs/{id}`.
+         */
+        post: operations["import_authority"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/authority/lookup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** SeoSeo Rank of a domain. */
+        get: operations["lookup_authority"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/info": {
         parameters: {
             query?: never;
@@ -459,6 +513,76 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/keyword-research": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_keyword_research"];
+        put?: never;
+        /**
+         * Expand a seed keyword into ideas with popularity, intent, and (for the top ideas)
+         *     difficulty and SERP features. Runs in the background; poll the research until its status
+         *     is `completed`. Metrics that cannot be determined are `null`, never 0.
+         */
+        post: operations["start_keyword_research"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/keyword-research/{research_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_keyword_research"];
+        put?: never;
+        post?: never;
+        delete: operations["delete_keyword_research"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/keyword-research/{research_id}/ideas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_keyword_ideas"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/keyword-research/{research_id}/ideas.csv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** All ideas of a research as CSV. Empty cells mean "unknown". */
+        get: operations["export_keyword_ideas"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/restore": {
         parameters: {
             query?: never;
@@ -469,6 +593,179 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["restore_project"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/saved-keywords": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_saved_keywords"];
+        put?: never;
+        /** Save ideas of a research (`research_id` + `idea_ids`) or keywords typed by hand. */
+        post: operations["save_keywords"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/saved-keywords.csv": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Saved keywords as CSV. Empty cells mean "unknown". */
+        get: operations["export_saved_keywords"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/saved-keywords/delete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["delete_saved_keywords"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/saved-keywords/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["refresh_saved_keywords"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/saved-keywords/tags": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Tags in use on this project's saved keywords. */
+        get: operations["list_saved_keyword_tags"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/saved-keywords/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["update_saved_keyword"];
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/serp-analysis": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Results page of a keyword with each domain's authority, SERP features, related searches,
+         *     difficulty and intent. Cached pages are reused for 7 days unless `refresh` is set.
+         */
+        post: operations["analyze_serp"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/providers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Data providers with their status for the active workspace. Free providers are on by
+         *     default; API keys are never returned.
+         */
+        get: operations["list_providers"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/providers/{provider}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Switch a provider on or off, or set/remove its API key (admins). */
+        put: operations["update_provider"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/providers/{provider}/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Make one small live request to check a provider works (admins). */
+        post: operations["test_provider"];
         delete?: never;
         options?: never;
         head?: never;
@@ -603,6 +900,26 @@ export interface components {
             status: string;
             stop_reason?: string | null;
         };
+        AuthorityStatus: {
+            /**
+             * Format: int64
+             * @description Domains imported (top of the ranking).
+             */
+            imported: number;
+            /** Format: date-time */
+            imported_at: string;
+            /** @description Common Crawl web-graph release, e.g. `cc-main-2026-aug-sep-oct`. */
+            release: string;
+            /**
+             * Format: int64
+             * @description Domains in the whole graph (the worst possible rank).
+             */
+            total_domains: number;
+        };
+        AuthorityView: {
+            active_job?: components["schemas"]["Job"] | null;
+            status?: components["schemas"]["AuthorityStatus"] | null;
+        };
         CreateApiKeyInput: {
             name: string;
         };
@@ -626,6 +943,40 @@ export interface components {
             invitation: components["schemas"]["Invitation"];
             /** @description Secret token for the invite link (`/invite/{token}`). Shown once. */
             token: string;
+        };
+        DeleteSavedInput: {
+            ids: string[];
+        };
+        DeleteSavedResult: {
+            /** Format: int64 */
+            deleted: number;
+        };
+        DomainAuthority: {
+            /** @description False until ranks were imported; then a null `sr` means "weaker than every imported domain". */
+            authority_loaded: boolean;
+            /** @description Registrable domain that was looked up. */
+            domain: string;
+            /**
+             * Format: int64
+             * @description Position by harmonic centrality in the Common Crawl domain graph.
+             */
+            harmonic_rank?: number | null;
+            /** Format: int64 */
+            pagerank_rank?: number | null;
+            release?: string | null;
+            source: string;
+            /**
+             * Format: int32
+             * @description SeoSeo Rank 0–100; null when the domain is outside the imported list.
+             */
+            sr?: number | null;
+        };
+        ImportAuthorityInput: {
+            /**
+             * Format: int32
+             * @description How many top domains to import (1,000–20,000,000; default 1,000,000 ≈ 30 MB download).
+             */
+            limit?: number | null;
         };
         InstanceInfo: {
             auth_mode: string;
@@ -713,6 +1064,70 @@ export interface components {
             run_at: string;
             status: string;
         };
+        KeywordIdea: {
+            /**
+             * Format: int64
+             * @description Estimated monthly searches; null when there is no basis for an estimate.
+             */
+            est_volume?: number | null;
+            /** Format: uuid */
+            id: string;
+            /** @description informational | commercial | transactional | navigational */
+            intent: string;
+            /**
+             * Format: int32
+             * @description Keyword difficulty 0–100; null until a SERP was analysed.
+             */
+            kd?: number | null;
+            kd_source?: string | null;
+            keyword: string;
+            /**
+             * Format: int32
+             * @description Relative popularity within this research (0–100). Not a search volume.
+             */
+            popularity: number;
+            /** Format: uuid */
+            research_id: string;
+            /** @description Null until a SERP was analysed. */
+            serp_features?: string[] | null;
+            /** @description Where the idea came from, e.g. `suggest_google`, `suggest_bing`, `related`, `question`. */
+            sources: string[];
+            /** @description 12 months of `{ month, views }` when a demand signal exists. */
+            trend?: unknown;
+            volume_bucket?: string | null;
+            /** @description measured | estimated | relative */
+            volume_confidence?: string | null;
+            volume_source?: string | null;
+            /** Format: int32 */
+            word_count: number;
+        };
+        KeywordResearch: {
+            config: unknown;
+            country: string;
+            /** Format: date-time */
+            created_at: string;
+            error?: string | null;
+            /** Format: date-time */
+            finished_at?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: int32 */
+            ideas_total: number;
+            /** Format: uuid */
+            job_id?: string | null;
+            language: string;
+            /** @description queued | ideas | demand | serp | done */
+            phase: string;
+            /** Format: uuid */
+            project_id: string;
+            seed: string;
+            /** Format: uuid */
+            started_by?: string | null;
+            /** @description queued | running | completed | failed */
+            status: string;
+            /** @description Human-readable notes: skipped or rate-limited providers, missing setup. */
+            warnings: string[];
+        };
         LinkRow: {
             anchor?: string | null;
             nofollow: boolean;
@@ -744,6 +1159,7 @@ export interface components {
             role: string;
         };
         PageDetail: {
+            browser_result?: unknown;
             canonical_url?: string | null;
             content_type?: string | null;
             /** Format: int32 */
@@ -845,6 +1261,47 @@ export interface components {
             /** Format: int64 */
             total: number;
         };
+        Paged_KeywordIdea: {
+            items: {
+                /**
+                 * Format: int64
+                 * @description Estimated monthly searches; null when there is no basis for an estimate.
+                 */
+                est_volume?: number | null;
+                /** Format: uuid */
+                id: string;
+                /** @description informational | commercial | transactional | navigational */
+                intent: string;
+                /**
+                 * Format: int32
+                 * @description Keyword difficulty 0–100; null until a SERP was analysed.
+                 */
+                kd?: number | null;
+                kd_source?: string | null;
+                keyword: string;
+                /**
+                 * Format: int32
+                 * @description Relative popularity within this research (0–100). Not a search volume.
+                 */
+                popularity: number;
+                /** Format: uuid */
+                research_id: string;
+                /** @description Null until a SERP was analysed. */
+                serp_features?: string[] | null;
+                /** @description Where the idea came from, e.g. `suggest_google`, `suggest_bing`, `related`, `question`. */
+                sources: string[];
+                /** @description 12 months of `{ month, views }` when a demand signal exists. */
+                trend?: unknown;
+                volume_bucket?: string | null;
+                /** @description measured | estimated | relative */
+                volume_confidence?: string | null;
+                volume_source?: string | null;
+                /** Format: int32 */
+                word_count: number;
+            }[];
+            /** Format: int64 */
+            total: number;
+        };
         Paged_PageRow: {
             items: {
                 canonical_url?: string | null;
@@ -880,6 +1337,40 @@ export interface components {
             /** Format: int64 */
             total: number;
         };
+        Paged_SavedKeyword: {
+            items: {
+                country: string;
+                /** Format: date-time */
+                created_at: string;
+                /** Format: int64 */
+                est_volume?: number | null;
+                /** Format: uuid */
+                id: string;
+                intent?: string | null;
+                /** Format: int32 */
+                kd?: number | null;
+                kd_source?: string | null;
+                keyword: string;
+                language: string;
+                /** Format: date-time */
+                metrics_updated_at?: string | null;
+                /**
+                 * Format: int32
+                 * @description Relative popularity from the research it was saved from; null for manual entries.
+                 */
+                popularity?: number | null;
+                /** Format: uuid */
+                project_id: string;
+                serp_features?: string[] | null;
+                tags: string[];
+                trend?: unknown;
+                volume_bucket?: string | null;
+                volume_confidence?: string | null;
+                volume_source?: string | null;
+            }[];
+            /** Format: int64 */
+            total: number;
+        };
         /** @description RFC 9457 problem details. */
         Problem: {
             /** @description Human/agent readable explanation; often tells you what to do next. */
@@ -910,8 +1401,151 @@ export interface components {
             /** Format: date-time */
             updated_at: string;
         };
+        ProviderInfo: {
+            default_enabled: boolean;
+            description: string;
+            /** @description Usable without paying anyone. */
+            free: boolean;
+            id: string;
+            /** @description Where to get a key. */
+            key_url?: string | null;
+            kind: components["schemas"]["ProviderKind"];
+            name: string;
+            /** @description Needs something from the server operator (environment variable). */
+            needs_env?: string | null;
+            /** @description Needs an API key from the user. */
+            needs_key: boolean;
+            /** @description Honest note about data quality or terms. */
+            note?: string | null;
+        };
+        /** @enum {string} */
+        ProviderKind: "suggest" | "serp" | "demand" | "authority";
+        ProviderTest: {
+            /** Format: int64 */
+            latency_ms: number;
+            /** @description What happened, phrased for a person. */
+            message: string;
+            ok: boolean;
+        };
+        ProviderView: components["schemas"]["ProviderInfo"] & {
+            enabled: boolean;
+            /** @description An API key is stored (the key itself is never returned). */
+            has_key: boolean;
+            /** @description What is missing before it can be used. */
+            missing?: string | null;
+            /** @description Enabled and fully configured: research will use it. */
+            ready: boolean;
+            /** Format: date-time */
+            updated_at?: string | null;
+        };
+        RefreshSavedInput: {
+            /** @description Omit or pass an empty list to refresh all saved keywords. Otherwise 1–1000 IDs. */
+            ids?: string[];
+        };
         /** @enum {string} */
         Role: "member" | "admin" | "owner";
+        SaveKeywordsInput: {
+            /** @description …these ones. */
+            idea_ids?: string[] | null;
+            /** @description Or save keywords typed by hand (project market, no metrics yet). */
+            keywords?: string[] | null;
+            /**
+             * Format: uuid
+             * @description Save ideas of this research (with their metrics)…
+             */
+            research_id?: string | null;
+            tags?: string[] | null;
+        };
+        SaveKeywordsResult: {
+            /**
+             * Format: int64
+             * @description Already saved before, so left unchanged.
+             */
+            already_saved: number;
+            /** Format: int64 */
+            saved: number;
+        };
+        SavedKeyword: {
+            country: string;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: int64 */
+            est_volume?: number | null;
+            /** Format: uuid */
+            id: string;
+            intent?: string | null;
+            /** Format: int32 */
+            kd?: number | null;
+            kd_source?: string | null;
+            keyword: string;
+            language: string;
+            /** Format: date-time */
+            metrics_updated_at?: string | null;
+            /**
+             * Format: int32
+             * @description Relative popularity from the research it was saved from; null for manual entries.
+             */
+            popularity?: number | null;
+            /** Format: uuid */
+            project_id: string;
+            serp_features?: string[] | null;
+            tags: string[];
+            trend?: unknown;
+            volume_bucket?: string | null;
+            volume_confidence?: string | null;
+            volume_source?: string | null;
+        };
+        SerpAnalysis: {
+            /** @description False until the Common Crawl ranks were imported (KD needs them). */
+            authority_loaded: boolean;
+            /** @description Served from the shared SERP cache. */
+            cached: boolean;
+            country: string;
+            /** @description True when positions are one search engine's real ranking; false for a meta-search blend. */
+            exact: boolean;
+            features: string[];
+            /** Format: date-time */
+            fetched_at: string;
+            intent: string;
+            items: components["schemas"]["SerpRow"][];
+            /**
+             * Format: int32
+             * @description Keyword difficulty 0–100; null without authority data or with fewer than 5 results.
+             */
+            kd?: number | null;
+            /** @description How KD was computed, e.g. `serp_searxng+authority_commoncrawl`. */
+            kd_source?: string | null;
+            keyword: string;
+            language: string;
+            /** @description Provider that fetched the page, e.g. `serp_searxng`. */
+            provider: string;
+            questions: string[];
+            related: string[];
+            /** Format: uuid */
+            snapshot_id: string;
+        };
+        SerpAnalysisInput: {
+            /** @description Defaults to the project's market. */
+            country?: string | null;
+            keyword: string;
+            language?: string | null;
+            /** @description Fetch a fresh page instead of a cached one (cached pages are reused for 7 days). */
+            refresh?: boolean | null;
+        };
+        SerpRow: {
+            domain: string;
+            /** Format: int32 */
+            position: number;
+            snippet?: string | null;
+            /**
+             * Format: int32
+             * @description SeoSeo Rank of the domain (0–100); null when it is outside the imported list or
+             *     no authority data is loaded.
+             */
+            sr?: number | null;
+            title: string;
+            url: string;
+        };
         /** @enum {string} */
         Severity: "critical" | "warning" | "info";
         SignInInput: {
@@ -943,15 +1577,37 @@ export interface components {
             delay_ms?: number | null;
             /** @description Path prefixes to skip, e.g. `/tag/`. */
             exclude_paths?: string[] | null;
+            /** @description Run desktop Lighthouse lab audits (requires the renderer profile). */
+            lighthouse?: boolean | null;
             /**
              * Format: int32
              * @description Pages to crawl (1–10000, default 500).
              */
             max_pages?: number | null;
+            /** @description Audit the rendered DOM (requires the renderer profile). */
+            render_js?: boolean | null;
             /** @description Obey robots.txt (default true). Turn off only for sites you own. */
             respect_robots?: boolean | null;
             /** @description Defaults to `https://{project domain}/`. */
             start_url?: string | null;
+        };
+        StartResearchInput: {
+            /** @description ISO 3166-1 alpha-2; defaults to the project's market. */
+            country?: string | null;
+            /** @description ISO 639-1; defaults to the project's market. */
+            language?: string | null;
+            /**
+             * Format: int32
+             * @description Ideas to keep (10–500, default 150).
+             */
+            max_ideas?: number | null;
+            /** @description The seed keyword, e.g. `standing desk`. */
+            seed: string;
+            /**
+             * Format: int32
+             * @description Most popular ideas that also get a SERP analysis (0–30, default 10).
+             */
+            serp_top?: number | null;
         };
         SwitchOrgInput: {
             /** Format: uuid */
@@ -965,6 +1621,15 @@ export interface components {
             language_code?: string | null;
             location_name?: string | null;
             name?: string | null;
+        };
+        UpdateProviderInput: {
+            /** @description New API key. Send an empty string to remove the stored key; omit to keep it. */
+            api_key?: string | null;
+            enabled?: boolean | null;
+        };
+        UpdateSavedInput: {
+            /** @description Replaces the keyword's tags. */
+            tags: string[];
         };
         UserView: {
             email: string;
@@ -1180,6 +1845,86 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["SignUpStatus"];
+                };
+            };
+        };
+    };
+    get_authority: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuthorityView"];
+                };
+            };
+        };
+    };
+    import_authority: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportAuthorityInput"];
+            };
+        };
+        responses: {
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Job"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    lookup_authority: {
+        parameters: {
+            query: {
+                /** @description Domain or URL, e.g. `example.com`. */
+                domain: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DomainAuthority"];
+                };
+            };
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
                 };
             };
         };
@@ -1852,6 +2597,191 @@ export interface operations {
             };
         };
     };
+    list_keyword_research: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["KeywordResearch"][];
+                };
+            };
+        };
+    };
+    start_keyword_research: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartResearchInput"];
+            };
+        };
+        responses: {
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["KeywordResearch"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    get_keyword_research: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                research_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["KeywordResearch"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    delete_keyword_research: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                research_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    list_keyword_ideas: {
+        parameters: {
+            query?: {
+                /** @description Substring of the keyword. */
+                search?: string | null;
+                /** @description informational | commercial | transactional | navigational */
+                intent?: string | null;
+                /** @description Only ideas from this source, e.g. `suggest_google`, `related`. */
+                source?: string | null;
+                /** @description Only question-style ideas. */
+                questions?: boolean | null;
+                min_popularity?: number | null;
+                /** @description Only ideas with a known difficulty at or below this. */
+                max_kd?: number | null;
+                /** @description Only ideas with a known volume estimate at or above this. */
+                min_volume?: number | null;
+                min_words?: number | null;
+                max_words?: number | null;
+                /** @description popularity (default) | keyword | est_volume | kd | word_count */
+                sort?: string | null;
+                desc?: boolean | null;
+                limit?: number | null;
+                offset?: number | null;
+            };
+            header?: never;
+            path: {
+                project_id: string;
+                research_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Paged_KeywordIdea"];
+                };
+            };
+        };
+    };
+    export_keyword_ideas: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                research_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": string;
+                };
+            };
+        };
+    };
     restore_project: {
         parameters: {
             query?: never;
@@ -1869,6 +2799,349 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Project"];
+                };
+            };
+        };
+    };
+    list_saved_keywords: {
+        parameters: {
+            query?: {
+                search?: string | null;
+                tag?: string | null;
+                intent?: string | null;
+                /** @description created_at (default) | keyword | popularity | est_volume | kd | word_count */
+                sort?: string | null;
+                desc?: boolean | null;
+                limit?: number | null;
+                offset?: number | null;
+            };
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Paged_SavedKeyword"];
+                };
+            };
+        };
+    };
+    save_keywords: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveKeywordsInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SaveKeywordsResult"];
+                };
+            };
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    export_saved_keywords: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": string;
+                };
+            };
+        };
+    };
+    delete_saved_keywords: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeleteSavedInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DeleteSavedResult"];
+                };
+            };
+        };
+    };
+    refresh_saved_keywords: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RefreshSavedInput"];
+            };
+        };
+        responses: {
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Job"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    list_saved_keyword_tags: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": string[];
+                };
+            };
+        };
+    };
+    update_saved_keyword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateSavedInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SavedKeyword"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    analyze_serp: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SerpAnalysisInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SerpAnalysis"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    list_providers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProviderView"][];
+                };
+            };
+        };
+    };
+    update_provider: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                provider: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateProviderInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProviderView"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    test_provider: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                provider: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProviderTest"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
                 };
             };
         };

@@ -84,6 +84,8 @@ function StartAuditCard({ projectId, defaultUrl }: { projectId: string; defaultU
   const [url, setUrl] = useState<string | null>(null);
   const [maxPages, setMaxPages] = useState(500);
   const [respectRobots, setRespectRobots] = useState(true);
+  const [renderJs, setRenderJs] = useState(false);
+  const [lighthouse, setLighthouse] = useState(false);
   const [exclude, setExclude] = useState("");
 
   const start = useMutation({
@@ -95,6 +97,8 @@ function StartAuditCard({ projectId, defaultUrl }: { projectId: string; defaultU
             start_url: (url ?? defaultUrl) || null,
             max_pages: maxPages,
             respect_robots: respectRobots,
+            render_js: renderJs,
+            lighthouse,
             exclude_paths: exclude
               .split(/[\n,]/)
               .map((s) => s.trim())
@@ -152,6 +156,14 @@ function StartAuditCard({ projectId, defaultUrl }: { projectId: string; defaultU
           <label className="flex items-center gap-2 text-sm md:col-span-2">
             <Switch checked={respectRobots} onCheckedChange={setRespectRobots} />
             Obey robots.txt (turn off only for sites you own)
+          </label>
+          <label className="flex items-center gap-2 text-sm md:col-span-2">
+            <Switch checked={renderJs} onCheckedChange={setRenderJs} />
+            Render JavaScript before checking page content
+          </label>
+          <label className="flex items-center gap-2 text-sm md:col-span-2">
+            <Switch checked={lighthouse} onCheckedChange={setLighthouse} />
+            Include Lighthouse lab scores (slower, desktop measurements)
           </label>
         </CardContent>
         <CardFooter>

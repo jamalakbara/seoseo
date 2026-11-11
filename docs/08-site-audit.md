@@ -52,4 +52,4 @@ Health score = 100 − Σ(affected-page share × weight), weights critical 30 / 
 - Crash-resume was verified manually by SIGKILLing the worker mid-crawl (job attempt 2, identical results, no duplicate pages).
 
 ## Known gaps (later milestones)
-JavaScript rendering + Lighthouse (M2), hreflang validation, soft-404 detection, URL hygiene and asset checks (SA-06), audit comparison and scheduled audits (SA-13), internal-link graph view (SA-12), per-host adaptive throttling.
+audit comparison and scheduled audits (SA-13), internal-link graph view (SA-12), per-host adaptive throttling.

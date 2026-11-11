@@ -41,6 +41,11 @@ impl IntoResponse for ApiError {
             AppError::Forbidden(_) => (StatusCode::FORBIDDEN, "forbidden", "Not allowed"),
             AppError::NotFound(_) => (StatusCode::NOT_FOUND, "not-found", "Not found"),
             AppError::Conflict(_) => (StatusCode::CONFLICT, "conflict", "Conflict"),
+            AppError::Unavailable(_) => (
+                StatusCode::SERVICE_UNAVAILABLE,
+                "provider-unavailable",
+                "Data provider unavailable",
+            ),
             AppError::Internal(e) => {
                 tracing::error!(error = ?e, "internal error");
                 (

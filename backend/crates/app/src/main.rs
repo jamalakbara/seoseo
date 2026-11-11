@@ -77,7 +77,8 @@ async fn main() -> anyhow::Result<()> {
                 .install_recorder()
                 .map_err(|e| tracing::warn!(error = %e, "metrics recorder not installed"))
                 .ok();
-            let state = api::AppState::new(pool, valkey, cfg, metrics);
+            let pctx = jobs::ProviderCtx::from_config(&cfg)?;
+            let state = api::AppState::new(pool, valkey, cfg, metrics, pctx);
             api::serve(state, shutdown_signal()).await?;
         }
         Command::Worker { cfg, concurrency } => {
@@ -87,13 +88,18 @@ async fn main() -> anyhow::Result<()> {
                 shutdown_signal().await;
                 let _ = tx.send(true);
             });
+            let pctx = jobs::ProviderCtx::from_config(&cfg)?;
             let registry = jobs::site_audit::register(
                 jobs::default_registry(),
                 jobs::site_audit::CrawlSettings {
                     user_agent: cfg.crawler_user_agent.clone(),
                     allow_private: cfg.crawler_allow_private,
+                    renderer_url: cfg.renderer_url.clone().filter(|s| !s.is_empty()),
                 },
             );
+            let registry = jobs::keyword_research::register(registry, pctx.clone());
+            let registry = jobs::saved_refresh::register(registry, pctx.clone());
+            let registry = jobs::cc_ranks::register(registry, pctx);
             jobs::run_worker(pool, registry, concurrency, rx).await?;
         }
         Command::Migrate { database_url } => {

@@ -31,11 +31,17 @@ export default function AuditPageDetail() {
   if (view.isPending) return <Skeleton className="h-64" />;
   if (view.isError) return <p className="text-sm text-destructive">{view.error.message}</p>;
   const { page: p, issues, outlinks, inlinks } = view.data;
+  const browser = p.browser_result as { rendered?: boolean; lighthouse?: {
+    scores: Record<string, number | null>; metrics: Record<string, {value: number | null; unit: string | null}>;
+    fetched_at: string; opportunities: {id: string; title: string; display_value: string | null}[];
+  } } | null;
+  const lab = browser?.lighthouse;
   const redirects = (p.redirect_chain as { url: string; status: number }[]) ?? [];
 
   const facts: [string, React.ReactNode][] = [
     ["Status", <StatusCode key="s" code={p.status_code} />],
     ["Fetch result", p.fetch_class.replace(/_/g, " ")],
+    ["Content source", browser?.rendered ? "JavaScript rendered DOM" : "Static HTML"],
     ["Response time", p.response_time_ms != null ? `${p.response_time_ms} ms` : "–"],
     ["Size", p.size_bytes != null ? `${Math.round(p.size_bytes / 1024)} KB` : "–"],
     ["Click depth", p.depth < 0 ? "Not linked" : p.depth],
@@ -89,6 +95,7 @@ export default function AuditPageDetail() {
                 {typeof (i.details as { target?: unknown })?.target === "string" && (
                   <p className="font-mono text-xs">→ {(i.details as { target: string }).target}</p>
                 )}
+                {typeof (i.details as { reason?: unknown })?.reason === "string" && <p className="text-sm text-destructive">{(i.details as { reason: string }).reason}</p>}
                 {t && <p className="text-sm text-muted-foreground">{t.how_to_fix}</p>}
               </div>
             );
@@ -96,6 +103,23 @@ export default function AuditPageDetail() {
         </CardContent>
       </Card>
 
+      {lab && (
+        <Card>
+          <CardHeader><CardTitle>Lighthouse lab results</CardTitle></CardHeader>
+          <CardContent className="grid gap-4">
+            <p className="text-sm text-muted-foreground">Desktop lab measurements, not real-user Core Web Vitals. Measured {new Date(lab.fetched_at).toLocaleString()}.</p>
+            <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+              {Object.entries(lab.scores).map(([name, score]) => (
+                <div key={name}><p className="text-sm capitalize">{name.replaceAll("-", " ")}</p><p className="text-2xl font-semibold">{score ?? "Unknown"}</p></div>
+              ))}
+            </div>
+            <dl className="grid gap-2 text-sm">
+              {Object.entries(lab.metrics).map(([name, metric]) => <div key={name} className="flex justify-between gap-4"><dt>{name.replaceAll("-", " ")}</dt><dd>{metric.value == null ? "Unknown" : `${Number(metric.value.toFixed(3))} ${metric.unit === "millisecond" ? "ms" : ""}`}</dd></div>)}
+            </dl>
+            {lab.opportunities.length > 0 && <details><summary className="cursor-pointer text-sm">Suggested improvements</summary><ul className="mt-2 list-disc space-y-1 pl-5 text-sm">{lab.opportunities.map(o => <li key={o.id}>{o.title}{o.display_value ? `: ${o.display_value}` : ""}</li>)}</ul></details>}
+          </CardContent>
+        </Card>
+      )}
       <div className="grid gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>

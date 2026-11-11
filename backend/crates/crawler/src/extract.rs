@@ -52,6 +52,7 @@ pub struct PageFacts {
     /// http:// resources referenced by scripts, images, iframes and stylesheets.
     pub insecure_resources: Vec<String>,
     pub script_count: u32,
+    pub assets: Vec<String>,
     /// An empty SPA mount point such as `<div id="root">` / `#app` / `#__next`.
     pub has_app_root: bool,
     pub word_count: u32,
@@ -191,6 +192,9 @@ pub fn extract(html: &[u8]) -> PageFacts {
             {
                 s.facts.hreflang.push((lang, href.clone()));
             }
+            if rels.contains(&"stylesheet") && s.facts.assets.len() < MAX_IMAGES {
+                s.facts.assets.push(href.clone());
+            }
             if rels.contains(&"stylesheet") && href.starts_with("http://") {
                 s.facts.insecure_resources.push(href);
             }
@@ -243,6 +247,9 @@ pub fn extract(html: &[u8]) -> PageFacts {
             let src = attr(el, "src")
                 .or_else(|| attr(el, "data-src"))
                 .unwrap_or_default();
+            if s.facts.assets.len() < MAX_IMAGES {
+                s.facts.assets.push(src.clone());
+            }
             if src.starts_with("http://") {
                 s.facts.insecure_resources.push(src.clone());
             }
@@ -260,6 +267,11 @@ pub fn extract(html: &[u8]) -> PageFacts {
             let cap = {
                 let mut s = st_script.borrow_mut();
                 s.facts.script_count += 1;
+                if let Some(src) = &src
+                    && s.facts.assets.len() < MAX_IMAGES
+                {
+                    s.facts.assets.push(src.clone());
+                }
                 if let Some(src) = src.filter(|s| s.starts_with("http://")) {
                     s.facts.insecure_resources.push(src);
                 }

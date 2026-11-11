@@ -1,6 +1,7 @@
 //! Shared building blocks: configuration, errors, ids, token helpers.
 
 pub mod config;
+pub mod crypto;
 pub mod error;
 pub mod token;
 

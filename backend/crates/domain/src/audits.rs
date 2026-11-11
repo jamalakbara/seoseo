@@ -26,6 +26,10 @@ pub struct StartAuditInput {
     pub delay_ms: Option<u64>,
     /// Obey robots.txt (default true). Turn off only for sites you own.
     pub respect_robots: Option<bool>,
+    /// Audit the rendered DOM (requires the renderer profile).
+    pub render_js: Option<bool>,
+    /// Run desktop Lighthouse lab audits (requires the renderer profile).
+    pub lighthouse: Option<bool>,
     /// Path prefixes to skip, e.g. `/tag/`.
     pub exclude_paths: Option<Vec<String>>,
 }
@@ -35,6 +39,7 @@ pub async fn start(
     actor: &Actor,
     project_id: Uuid,
     policy: UrlPolicy,
+    renderer_available: bool,
     input: StartAuditInput,
 ) -> AppResult<Audit> {
     actor.require(Role::Member)?;
@@ -69,6 +74,14 @@ pub async fn start(
         .check_url(&url)
         .map_err(|e| AppError::Validation(format!("cannot audit this URL: {e}")))?;
 
+    if (input.render_js.unwrap_or(false) || input.lighthouse.unwrap_or(false))
+        && !renderer_available
+    {
+        return Err(AppError::Conflict(
+            "start the renderer profile and set RENDERER_URL before requesting browser audits"
+                .into(),
+        ));
+    }
     let d = AuditConfig::default();
     let range = |v: Option<u64>, lo: u64, hi: u64, def: u64, name: &str| -> AppResult<u64> {
         let v = v.unwrap_or(def);
@@ -114,6 +127,9 @@ pub async fn start(
         )? as u32,
         delay_ms: range(input.delay_ms, 0, 10_000, d.delay_ms, "delay_ms")?,
         respect_robots: input.respect_robots.unwrap_or(true),
+        render_js: input.render_js.unwrap_or(false),
+        lighthouse: input.lighthouse.unwrap_or(false),
+        renderer_url: None,
         exclude_paths: exclude,
     };
 

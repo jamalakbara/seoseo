@@ -34,6 +34,12 @@ pub struct AuditConfig {
     pub delay_ms: u64,
     pub respect_robots: bool,
     #[serde(default)]
+    pub render_js: bool,
+    #[serde(default)]
+    pub lighthouse: bool,
+    #[serde(skip)]
+    pub renderer_url: Option<String>,
+    #[serde(default)]
     pub exclude_paths: Vec<String>,
 }
 
@@ -44,6 +50,9 @@ impl Default for AuditConfig {
             concurrency: 4,
             delay_ms: 250,
             respect_robots: true,
+            render_js: false,
+            lighthouse: false,
+            renderer_url: None,
             exclude_paths: Vec::new(),
         }
     }
@@ -54,6 +63,7 @@ impl Default for AuditConfig {
 pub struct CrawlSettings {
     pub user_agent: Option<String>,
     pub allow_private: bool,
+    pub renderer_url: Option<String>,
 }
 
 #[derive(Deserialize)]
@@ -87,7 +97,8 @@ async fn run_audit(ctx: &JobCtx, settings: &CrawlSettings, audit_id: Uuid) -> an
     if matches!(audit.status.as_str(), "completed" | "failed" | "cancelled") {
         return Ok(());
     }
-    let cfg: AuditConfig = serde_json::from_value(audit.config.clone()).unwrap_or_default();
+    let mut cfg: AuditConfig = serde_json::from_value(audit.config.clone()).unwrap_or_default();
+    cfg.renderer_url = settings.renderer_url.clone();
     let fetcher = Fetcher::new(FetcherConfig {
         user_agent: settings
             .user_agent
@@ -308,7 +319,7 @@ async fn crawl(
             } else {
                 rate_limited_streak = 0;
             }
-            store_page(pool, audit_id, scope, cfg, &row, &url, out).await?;
+            store_page(pool, audit_id, scope, cfg, &row, &url, out, fetcher, robots).await?;
         }
         if rate_limited_streak >= MAX_RATE_LIMITED {
             return Ok(Stop::RateLimited);
@@ -328,12 +339,53 @@ async fn store_page(
     row: &audits::FrontierRow,
     url: &Url,
     out: FetchOutcome,
+    fetcher: &Fetcher,
+    robots: &Robots,
 ) -> anyhow::Result<()> {
     let page_id = common::new_id();
     // A redirecting URL is not a page of its own: its destination is crawled separately,
     // so skip content checks and links here to avoid double counting.
     let redirected = !out.redirects.is_empty();
-    let facts = match (&out.class, &out.body) {
+    let mut browser_findings = Vec::new();
+    let mut browser_result = None;
+    let mut rendered = None;
+    if !redirected && out.class == FetchClass::Html && (cfg.render_js || cfg.lighthouse) {
+        match crate::renderer::render(cfg.renderer_url.as_deref(), &out.final_url, cfg.lighthouse)
+            .await
+        {
+            Ok(result) => {
+                if cfg.render_js {
+                    rendered = Some(result.html.into_bytes());
+                }
+                if let Some(error) = &result.lighthouse_error {
+                    browser_findings.push(rules::Finding::new(
+                        "lighthouse-failed",
+                        json!({"reason": error}),
+                    ));
+                }
+                browser_result =
+                    Some(json!({"rendered": cfg.render_js, "lighthouse": result.lighthouse}));
+            }
+            Err(e) => {
+                if cfg.render_js && cfg.lighthouse {
+                    browser_findings.push(rules::Finding::new(
+                        "lighthouse-failed",
+                        json!({"reason": e.to_string()}),
+                    ));
+                }
+                browser_findings.push(rules::Finding::new(
+                    if cfg.render_js {
+                        "render-failed"
+                    } else {
+                        "lighthouse-failed"
+                    },
+                    json!({"reason": e.to_string()}),
+                ));
+            }
+        }
+    }
+    let body = rendered.as_ref().or(out.body.as_ref());
+    let facts = match (&out.class, body) {
         _ if redirected => None,
         (FetchClass::Html, Some(body)) => {
             let body = body.clone();
@@ -377,6 +429,18 @@ async fn store_page(
         }
     }
 
+    if let Some(f) = &facts {
+        for (_, raw) in &f.hreflang {
+            if let Ok(target) = Url::parse(raw)
+                && let Some(target) = urls::normalize(&target)
+                && scope.contains(&target)
+                && !excluded(cfg, &target)
+            {
+                new_frontier.push((urls::hash(&target), target));
+            }
+        }
+    }
+
     let canonical_abs = facts
         .as_ref()
         .and_then(|f| f.canonical.as_deref())
@@ -407,10 +471,53 @@ async fn store_page(
         facts: facts.as_ref(),
     };
     let indexable = !redirected && rules::is_indexable(&input);
-    let findings = rules::page_rules(&input);
+    let mut findings = rules::page_rules(&input);
+    findings.extend(browser_findings);
+    if let Some(f) = &facts {
+        let mut checked = std::collections::HashSet::new();
+        // Bound extra requests; apply the same DNS policy and robots restrictions as pages.
+        for raw in &f.assets {
+            let Some(asset) = urls::resolve(&base, raw) else {
+                continue;
+            };
+            if asset.origin() != url.origin() || !checked.insert(asset.to_string()) {
+                continue;
+            }
+            if checked.len() > 20 {
+                break;
+            }
+            if cfg.respect_robots && !robots.allowed(&asset) {
+                continue;
+            }
+            tokio::time::sleep(Duration::from_millis(
+                cfg.delay_ms
+                    .max((robots.crawl_delay_secs.unwrap_or(0.0) * 1000.0) as u64),
+            ))
+            .await;
+            let result = fetcher.fetch_page(&asset, Some(scope)).await;
+            if matches!(result.class, FetchClass::Blocked | FetchClass::RateLimited) {
+                break;
+            }
+            if matches!(
+                result.class,
+                FetchClass::ClientError | FetchClass::ServerError
+            ) {
+                findings.push(rules::Finding::new(
+                    "broken-asset",
+                    json!({"url": asset, "status": result.status}),
+                ));
+            } else if result.size > 1024 * 1024 {
+                findings.push(rules::Finding::new(
+                    "large-asset",
+                    json!({"url": asset, "bytes": result.size}),
+                ));
+            }
+        }
+    }
 
     let f = facts.as_ref();
     let page = NewPage {
+        browser_result,
         id: page_id,
         url: url.to_string(),
         url_hash: row.url_hash.clone(),
@@ -491,6 +598,8 @@ async fn store_page(
 
 /// Site rules whose results are recomputed wholesale on every analyze run.
 const SITE_ISSUES: &[&str] = &[
+    "hreflang-target-error",
+    "hreflang-missing-return",
     "duplicate-title",
     "duplicate-meta-description",
     "duplicate-content",
@@ -600,6 +709,35 @@ async fn analyze(pool: &sqlx::PgPool, audit_id: Uuid, start: &Url) -> anyhow::Re
                 severity: Severity::Info.as_str().into(),
                 details: json!({ "depth": depth[i] }),
             });
+        }
+    }
+    let by_url: HashMap<&str, &audits::PageSummary> =
+        pages.iter().map(|p| (p.url.as_str(), p)).collect();
+    for p in &pages {
+        let alternates: Vec<(String, String)> =
+            serde_json::from_value(p.hreflang.clone()).unwrap_or_default();
+        for (_, target) in &alternates {
+            let Some(other) = by_url.get(target.as_str()) else {
+                continue;
+            };
+            let other_alts: Vec<(String, String)> =
+                serde_json::from_value(other.hreflang.clone()).unwrap_or_default();
+            let issue = if !other.is_indexable || other.redirected {
+                Some("hreflang-target-error")
+            } else if !other_alts.iter().any(|(_, u)| u == &p.url) {
+                Some("hreflang-missing-return")
+            } else {
+                None
+            };
+            if let Some(issue) = issue {
+                issues.push(NewIssue {
+                    page_id: Some(p.id),
+                    page_url: Some(p.url.clone()),
+                    issue_type: issue.into(),
+                    severity: "warning".into(),
+                    details: json!({"target": target}),
+                });
+            }
         }
     }
     audits::replace_issues(pool, audit_id, SITE_ISSUES, &issues).await?;

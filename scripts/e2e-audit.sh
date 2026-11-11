@@ -29,7 +29,7 @@ for t in missing-title duplicate-title duplicate-meta-description duplicate-cont
          broken-internal-link server-error redirect-chain redirect-loop blocked-page noindex-page canonicalized-page \
          canonical-conflict heading-order-skip multiple-h1 images-missing-alt title-too-long meta-description-too-short \
          invalid-structured-data javascript-rendering-suspected orphan-page deep-page robots-disallowed \
-         redirected-internal-link sitemap-non-indexable; do
+         redirected-internal-link sitemap-non-indexable soft-404 url-hygiene invalid-hreflang hreflang-missing-self hreflang-missing-return hreflang-target-error broken-asset; do
   if [[ " $found " == *" $t "* ]]; then printf '  ok   %s\n' "$t"; else printf '  MISS %s\n' "$t"; missing=1; fi
 done
 # Clean pages must not be flagged.

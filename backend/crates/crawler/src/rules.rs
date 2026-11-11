@@ -63,6 +63,86 @@ macro_rules! issue {
 /// Every issue the audit can report. The API serves this list to the UI and agents.
 pub static CATALOG: &[IssueType] = &[
     issue!(
+        "invalid-hreflang",
+        Warning,
+        "international",
+        "Invalid hreflang",
+        "A language code or alternate URL is invalid or duplicated.",
+        "Use valid language-region codes and absolute HTTP(S) URLs, one target per language."
+    ),
+    issue!(
+        "hreflang-missing-self",
+        Warning,
+        "international",
+        "Hreflang omits this page",
+        "The alternate set does not reference this page.",
+        "Include a self-referencing alternate."
+    ),
+    issue!(
+        "hreflang-target-error",
+        Warning,
+        "international",
+        "Hreflang target is not indexable",
+        "A crawled alternate redirects or is not indexable.",
+        "Point alternates to canonical, indexable pages."
+    ),
+    issue!(
+        "hreflang-missing-return",
+        Warning,
+        "international",
+        "Missing reciprocal hreflang",
+        "A crawled alternate does not link back to this page.",
+        "Include reciprocal alternate links on every language version."
+    ),
+    issue!(
+        "soft-404",
+        Warning,
+        "content",
+        "Possible soft 404",
+        "A short successful page has a not-found title or heading. This is a heuristic.",
+        "Return HTTP 404/410 for missing content or restore the page."
+    ),
+    issue!(
+        "url-hygiene",
+        Info,
+        "crawlability",
+        "URL can be simplified",
+        "The URL is long, contains uppercase or underscores in its path, or has many query parameters.",
+        "Prefer short descriptive paths; avoid changing established URLs without redirects."
+    ),
+    issue!(
+        "broken-asset",
+        Warning,
+        "performance",
+        "Broken page resource",
+        "A checked same-origin image, stylesheet or script returned 4xx/5xx.",
+        "Restore the resource or update its URL."
+    ),
+    issue!(
+        "large-asset",
+        Info,
+        "performance",
+        "Large page resource",
+        "A checked resource exceeds 1 MiB.",
+        "Compress images and split or minify scripts and styles."
+    ),
+    issue!(
+        "render-failed",
+        Warning,
+        "rendering",
+        "JavaScript render failed",
+        "The browser could not render this page. Static HTML was audited instead.",
+        "Check the renderer configuration and page errors."
+    ),
+    issue!(
+        "lighthouse-failed",
+        Warning,
+        "performance",
+        "Lighthouse audit failed",
+        "No lab metrics were available for this page.",
+        "Check renderer availability and the page response."
+    ),
+    issue!(
         "blocked-page",
         Critical,
         "crawlability",
@@ -108,7 +188,7 @@ pub static CATALOG: &[IssueType] = &[
         "rendering",
         "Content may require JavaScript",
         "The HTML contains an app container with almost no readable text, headings or links. Content probably loads in the browser, and content checks may be unreliable.",
-        "Serve important content and links in the initial HTML (server-side rendering or prerendering). JavaScript rendering for audits arrives in a later release."
+        "Serve important content and links in the initial HTML (server-side rendering or prerendering). Enable JavaScript rendering in the audit settings."
     ),
     issue!(
         "rate-limited-page",
@@ -379,7 +459,7 @@ pub struct Finding {
 }
 
 impl Finding {
-    fn new(issue: &'static str, details: Value) -> Self {
+    pub fn new(issue: &'static str, details: Value) -> Self {
         debug_assert!(issue_type(issue).is_some(), "unknown issue {issue}");
         Self { issue, details }
     }
@@ -469,6 +549,7 @@ pub fn page_rules(p: &PageInput) -> Vec<Finding> {
         return out;
     }
 
+    out.extend(crate::extended::page_rules(p));
     let noindex = is_noindex(f.meta_robots.as_deref(), p.x_robots_tag);
     if noindex {
         out.push(Finding::new(
@@ -788,6 +869,24 @@ mod tests {
                 "title-too-short",
             ]
         );
+    }
+
+    #[test]
+    fn extended_rules_use_evidence_and_skip_normal_pages() {
+        let f = extract(br#"<title>404 Page not found</title><h1>Page not found</h1><link rel="alternate" hreflang="en_US" href="/relative"><link rel="alternate" hreflang="de" href="https://ex.com/de">"#);
+        let found = page_rules(&input("https://ex.com/Bad_URL", &f));
+        for id in [
+            "soft-404",
+            "url-hygiene",
+            "invalid-hreflang",
+            "hreflang-missing-self",
+        ] {
+            assert!(ids(&found).contains(&id));
+        }
+        let f = extract(br#"<title>How to fix 404 responses</title><h1>Troubleshooting</h1><link rel="alternate" hreflang="en" href="https://ex.com/help">"#);
+        let found = page_rules(&input("https://ex.com/help", &f));
+        assert!(!ids(&found).contains(&"soft-404"));
+        assert!(!ids(&found).contains(&"hreflang-missing-self"));
     }
 
     #[test]

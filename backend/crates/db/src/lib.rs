@@ -5,9 +5,12 @@ pub mod api_keys;
 pub mod audits;
 pub mod invitations;
 pub mod jobs;
+pub mod keywords;
 pub mod models;
 pub mod orgs;
 pub mod projects;
+pub mod providers;
+pub mod serp;
 pub mod sessions;
 pub mod settings;
 pub mod users;
@@ -45,4 +48,11 @@ pub fn map_err(e: sqlx::Error, conflict_msg: &str) -> AppError {
 
 pub(crate) fn internal(e: sqlx::Error) -> AppError {
     AppError::internal(e)
+}
+
+/// Escape `%`, `_` and `\` so user input is matched literally by `LIKE`/`ILIKE`.
+pub(crate) fn escape_like(s: &str) -> String {
+    s.replace('\\', "\\\\")
+        .replace('%', "\\%")
+        .replace('_', "\\_")
 }

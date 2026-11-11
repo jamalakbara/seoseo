@@ -154,3 +154,17 @@ pub async fn list_for_org(pool: &PgPool, org_id: Uuid, limit: i64) -> AppResult<
     .await
     .map_err(internal)
 }
+
+/// The queued or running job of a kind, if any (instance-wide; used for singleton jobs).
+pub async fn active_of_kind(pool: &PgPool, kind: &str) -> AppResult<Option<Job>> {
+    sqlx::query_as(concat!(
+        "SELECT ",
+        job_columns!(),
+        " FROM jobs WHERE kind = $1 AND status IN ('queued', 'running')
+          ORDER BY created_at DESC LIMIT 1"
+    ))
+    .bind(kind)
+    .fetch_optional(pool)
+    .await
+    .map_err(internal)
+}

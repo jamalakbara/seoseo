@@ -19,6 +19,9 @@ x-backend: &backend
     COOKIE_SECURE: ${COOKIE_SECURE:-false}
     RUST_LOG: ${RUST_LOG:-info}
     LOG_FORMAT: json
+    APP_ENCRYPTION_KEY: ${APP_ENCRYPTION_KEY:-}
+    SEARXNG_URL: ${SEARXNG_URL:-}
+    RENDERER_URL: ${RENDERER_URL:-}
 
 services:
   db:
@@ -57,6 +60,7 @@ services:
         condition: service_healthy
 
   api:
+    networks: [default, browser]
     <<: *backend
     command: ["serve"]
     depends_on:
@@ -69,6 +73,7 @@ services:
       disable: true
 
   worker:
+    networks: [default, browser]
     <<: *backend
     command: ["worker"]
     environment:
@@ -90,6 +95,41 @@ services:
       - "${WEB_BIND:-127.0.0.1}:${WEB_PORT:-3000}:3000"
     depends_on:
       - api
+
+  # Optional free SERP source. Enable with `--profile serp` and SEARXNG_URL=http://searxng:8080.
+  searxng:
+    image: searxng/searxng:latest
+    profiles: ["serp"]
+    restart: unless-stopped
+    environment:
+      SEARXNG_SECRET: ${SEARXNG_SECRET:-change-me-searxng}
+    volumes:
+      - ./searxng/settings.yml:/etc/searxng/settings.yml:ro
+
+  renderer:
+    build: ../renderer
+    profiles: ["renderer"]
+    restart: unless-stopped
+    networks: [browser]
+    shm_size: 256mb
+    mem_limit: 2g
+    pids_limit: 256
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    depends_on: [renderer-proxy]
+  renderer-proxy:
+    build: ../renderer
+    profiles: ["renderer"]
+    command: ["node", "proxy.mjs"]
+    restart: unless-stopped
+    networks: [browser, egress]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+
+networks:
+  browser:
+    internal: true
+  egress:
 
 volumes:
   pgdata:

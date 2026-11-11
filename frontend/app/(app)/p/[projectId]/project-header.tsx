@@ -14,6 +14,7 @@ export function ProjectHeader() {
   const base = `/p/${projectId}`;
   const tabs = [
     { href: base, label: "Overview", exact: true },
+    { href: `${base}/keywords`, label: "Keywords" },
     { href: `${base}/audit`, label: "Site audit" },
     { href: `${base}/settings`, label: "Settings" },
   ];

@@ -263,6 +263,129 @@
         }
       }
     },
+    "/api/v1/authority": {
+      "get": {
+        "tags": [
+          "providers"
+        ],
+        "summary": "Status of the domain authority data (SeoSeo Rank from the Common Crawl web graph).",
+        "operationId": "get_authority",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthorityView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/authority/import": {
+      "post": {
+        "tags": [
+          "providers"
+        ],
+        "summary": "Import the top domains of the latest Common Crawl web graph (owners). Runs in the\nbackground; follow it with `GET /jobs/{id}`.",
+        "operationId": "import_authority",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportAuthorityInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/authority/lookup": {
+      "get": {
+        "tags": [
+          "providers"
+        ],
+        "summary": "SeoSeo Rank of a domain.",
+        "operationId": "lookup_authority",
+        "parameters": [
+          {
+            "name": "domain",
+            "in": "query",
+            "description": "Domain or URL, e.g. `example.com`.",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DomainAuthority"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/info": {
       "get": {
         "tags": [
@@ -1485,6 +1608,466 @@
         ]
       }
     },
+    "/api/v1/projects/{project_id}/keyword-research": {
+      "get": {
+        "tags": [
+          "keywords"
+        ],
+        "operationId": "list_keyword_research",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/KeywordResearch"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "keywords"
+        ],
+        "summary": "Expand a seed keyword into ideas with popularity, intent, and (for the top ideas)\ndifficulty and SERP features. Runs in the background; poll the research until its status\nis `completed`. Metrics that cannot be determined are `null`, never 0.",
+        "operationId": "start_keyword_research",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartResearchInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KeywordResearch"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/keyword-research/{research_id}": {
+      "get": {
+        "tags": [
+          "keywords"
+        ],
+        "operationId": "get_keyword_research",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "research_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KeywordResearch"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "keywords"
+        ],
+        "operationId": "delete_keyword_research",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "research_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {},
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/keyword-research/{research_id}/ideas": {
+      "get": {
+        "tags": [
+          "keywords"
+        ],
+        "operationId": "list_keyword_ideas",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "research_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "description": "Substring of the keyword.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "intent",
+            "in": "query",
+            "description": "informational | commercial | transactional | navigational",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "description": "Only ideas from this source, e.g. `suggest_google`, `related`.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "questions",
+            "in": "query",
+            "description": "Only question-style ideas.",
+            "required": false,
+            "schema": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "min_popularity",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "max_kd",
+            "in": "query",
+            "description": "Only ideas with a known difficulty at or below this.",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "min_volume",
+            "in": "query",
+            "description": "Only ideas with a known volume estimate at or above this.",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          },
+          {
+            "name": "min_words",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "max_words",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int32"
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "popularity (default) | keyword | est_volume | kd | word_count",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "desc",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Paged_KeywordIdea"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/keyword-research/{research_id}/ideas.csv": {
+      "get": {
+        "tags": [
+          "keywords"
+        ],
+        "summary": "All ideas of a research as CSV. Empty cells mean \"unknown\".",
+        "operationId": "export_keyword_ideas",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "research_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/projects/{project_id}/restore": {
       "post": {
         "tags": [
@@ -1508,6 +2091,661 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Project"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/saved-keywords": {
+      "get": {
+        "tags": [
+          "keywords"
+        ],
+        "operationId": "list_saved_keywords",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "search",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "tag",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "intent",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "created_at (default) | keyword | popularity | est_volume | kd | word_count",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "desc",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "boolean",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Paged_SavedKeyword"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "keywords"
+        ],
+        "summary": "Save ideas of a research (`research_id` + `idea_ids`) or keywords typed by hand.",
+        "operationId": "save_keywords",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveKeywordsInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SaveKeywordsResult"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/saved-keywords.csv": {
+      "get": {
+        "tags": [
+          "keywords"
+        ],
+        "summary": "Saved keywords as CSV. Empty cells mean \"unknown\".",
+        "operationId": "export_saved_keywords",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/saved-keywords/delete": {
+      "post": {
+        "tags": [
+          "keywords"
+        ],
+        "operationId": "delete_saved_keywords",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeleteSavedInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DeleteSavedResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/saved-keywords/refresh": {
+      "post": {
+        "tags": [
+          "keywords"
+        ],
+        "operationId": "refresh_saved_keywords",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshSavedInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Job"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/saved-keywords/tags": {
+      "get": {
+        "tags": [
+          "keywords"
+        ],
+        "summary": "Tags in use on this project's saved keywords.",
+        "operationId": "list_saved_keyword_tags",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/saved-keywords/{id}": {
+      "patch": {
+        "tags": [
+          "keywords"
+        ],
+        "operationId": "update_saved_keyword",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSavedInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SavedKeyword"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/serp-analysis": {
+      "post": {
+        "tags": [
+          "keywords"
+        ],
+        "summary": "Results page of a keyword with each domain's authority, SERP features, related searches,\ndifficulty and intent. Cached pages are reused for 7 days unless `refresh` is set.",
+        "operationId": "analyze_serp",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SerpAnalysisInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SerpAnalysis"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/providers": {
+      "get": {
+        "tags": [
+          "providers"
+        ],
+        "summary": "Data providers with their status for the active workspace. Free providers are on by\ndefault; API keys are never returned.",
+        "operationId": "list_providers",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ProviderView"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/providers/{provider}": {
+      "put": {
+        "tags": [
+          "providers"
+        ],
+        "summary": "Switch a provider on or off, or set/remove its API key (admins).",
+        "operationId": "update_provider",
+        "parameters": [
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProviderInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProviderView"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/providers/{provider}/test": {
+      "post": {
+        "tags": [
+          "providers"
+        ],
+        "summary": "Make one small live request to check a provider works (admins).",
+        "operationId": "test_provider",
+        "parameters": [
+          {
+            "name": "provider",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProviderTest"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
                 }
               }
             }
@@ -1877,6 +3115,62 @@
           }
         }
       },
+      "AuthorityStatus": {
+        "type": "object",
+        "required": [
+          "release",
+          "total_domains",
+          "imported",
+          "imported_at"
+        ],
+        "properties": {
+          "imported": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Domains imported (top of the ranking)."
+          },
+          "imported_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "release": {
+            "type": "string",
+            "description": "Common Crawl web-graph release, e.g. `cc-main-2026-aug-sep-oct`."
+          },
+          "total_domains": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Domains in the whole graph (the worst possible rank)."
+          }
+        }
+      },
+      "AuthorityView": {
+        "type": "object",
+        "properties": {
+          "active_job": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Job",
+                "description": "Running or queued import job, if any (poll `/jobs/{id}` for progress)."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "status": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/AuthorityStatus",
+                "description": "Last finished import; null when nothing was imported yet."
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
       "CreateApiKeyInput": {
         "type": "object",
         "required": [
@@ -1961,6 +3255,98 @@
           "token": {
             "type": "string",
             "description": "Secret token for the invite link (`/invite/{token}`). Shown once."
+          }
+        }
+      },
+      "DeleteSavedInput": {
+        "type": "object",
+        "required": [
+          "ids"
+        ],
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        }
+      },
+      "DeleteSavedResult": {
+        "type": "object",
+        "required": [
+          "deleted"
+        ],
+        "properties": {
+          "deleted": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          }
+        }
+      },
+      "DomainAuthority": {
+        "type": "object",
+        "required": [
+          "domain",
+          "source",
+          "authority_loaded"
+        ],
+        "properties": {
+          "authority_loaded": {
+            "type": "boolean",
+            "description": "False until ranks were imported; then a null `sr` means \"weaker than every imported domain\"."
+          },
+          "domain": {
+            "type": "string",
+            "description": "Registrable domain that was looked up."
+          },
+          "harmonic_rank": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "Position by harmonic centrality in the Common Crawl domain graph."
+          },
+          "pagerank_rank": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "release": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source": {
+            "type": "string"
+          },
+          "sr": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "SeoSeo Rank 0–100; null when the domain is outside the imported list."
+          }
+        }
+      },
+      "ImportAuthorityInput": {
+        "type": "object",
+        "properties": {
+          "limit": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "How many top domains to import (1,000–20,000,000; default 1,000,000 ≈ 30 MB download).",
+            "minimum": 0
           }
         }
       },
@@ -2250,6 +3636,191 @@
           }
         }
       },
+      "KeywordIdea": {
+        "type": "object",
+        "required": [
+          "id",
+          "research_id",
+          "keyword",
+          "sources",
+          "word_count",
+          "popularity",
+          "intent"
+        ],
+        "properties": {
+          "est_volume": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "Estimated monthly searches; null when there is no basis for an estimate."
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "intent": {
+            "type": "string",
+            "description": "informational | commercial | transactional | navigational"
+          },
+          "kd": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Keyword difficulty 0–100; null until a SERP was analysed."
+          },
+          "kd_source": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "keyword": {
+            "type": "string"
+          },
+          "popularity": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Relative popularity within this research (0–100). Not a search volume."
+          },
+          "research_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "serp_features": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "description": "Null until a SERP was analysed."
+          },
+          "sources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Where the idea came from, e.g. `suggest_google`, `suggest_bing`, `related`, `question`."
+          },
+          "trend": {
+            "description": "12 months of `{ month, views }` when a demand signal exists."
+          },
+          "volume_bucket": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "volume_confidence": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "measured | estimated | relative"
+          },
+          "volume_source": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "word_count": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "KeywordResearch": {
+        "type": "object",
+        "required": [
+          "id",
+          "project_id",
+          "seed",
+          "country",
+          "language",
+          "status",
+          "phase",
+          "config",
+          "ideas_total",
+          "warnings",
+          "created_at"
+        ],
+        "properties": {
+          "config": {},
+          "country": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "finished_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ideas_total": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "job_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "language": {
+            "type": "string"
+          },
+          "phase": {
+            "type": "string",
+            "description": "queued | ideas | demand | serp | done"
+          },
+          "project_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "seed": {
+            "type": "string"
+          },
+          "started_by": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "description": "queued | running | completed | failed"
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Human-readable notes: skipped or rate-limited providers, missing setup."
+          }
+        }
+      },
       "LinkRow": {
         "type": "object",
         "required": [
@@ -2381,6 +3952,7 @@
           "fetched_at"
         ],
         "properties": {
+          "browser_result": {},
           "canonical_url": {
             "type": [
               "string",
@@ -2739,6 +4311,121 @@
           }
         }
       },
+      "Paged_KeywordIdea": {
+        "type": "object",
+        "required": [
+          "items",
+          "total"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "research_id",
+                "keyword",
+                "sources",
+                "word_count",
+                "popularity",
+                "intent"
+              ],
+              "properties": {
+                "est_volume": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
+                  "format": "int64",
+                  "description": "Estimated monthly searches; null when there is no basis for an estimate."
+                },
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "intent": {
+                  "type": "string",
+                  "description": "informational | commercial | transactional | navigational"
+                },
+                "kd": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
+                  "format": "int32",
+                  "description": "Keyword difficulty 0–100; null until a SERP was analysed."
+                },
+                "kd_source": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "keyword": {
+                  "type": "string"
+                },
+                "popularity": {
+                  "type": "integer",
+                  "format": "int32",
+                  "description": "Relative popularity within this research (0–100). Not a search volume."
+                },
+                "research_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "serp_features": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Null until a SERP was analysed."
+                },
+                "sources": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "Where the idea came from, e.g. `suggest_google`, `suggest_bing`, `related`, `question`."
+                },
+                "trend": {
+                  "description": "12 months of `{ month, views }` when a demand signal exists."
+                },
+                "volume_bucket": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "volume_confidence": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "description": "measured | estimated | relative"
+                },
+                "volume_source": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "word_count": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
       "Paged_PageRow": {
         "type": "object",
         "required": [
@@ -2862,6 +4549,132 @@
           }
         }
       },
+      "Paged_SavedKeyword": {
+        "type": "object",
+        "required": [
+          "items",
+          "total"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "id",
+                "project_id",
+                "keyword",
+                "country",
+                "language",
+                "tags",
+                "created_at"
+              ],
+              "properties": {
+                "country": {
+                  "type": "string"
+                },
+                "created_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "est_volume": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
+                  "format": "int64"
+                },
+                "id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "intent": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "kd": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
+                  "format": "int32"
+                },
+                "kd_source": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "keyword": {
+                  "type": "string"
+                },
+                "language": {
+                  "type": "string"
+                },
+                "metrics_updated_at": {
+                  "type": [
+                    "string",
+                    "null"
+                  ],
+                  "format": "date-time"
+                },
+                "popularity": {
+                  "type": [
+                    "integer",
+                    "null"
+                  ],
+                  "format": "int32",
+                  "description": "Relative popularity from the research it was saved from; null for manual entries."
+                },
+                "project_id": {
+                  "type": "string",
+                  "format": "uuid"
+                },
+                "serp_features": {
+                  "type": [
+                    "array",
+                    "null"
+                  ],
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "tags": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "trend": {},
+                "volume_bucket": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "volume_confidence": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "volume_source": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                }
+              }
+            }
+          },
+          "total": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
       "Problem": {
         "type": "object",
         "description": "RFC 9457 problem details.",
@@ -2956,6 +4769,150 @@
           }
         }
       },
+      "ProviderInfo": {
+        "type": "object",
+        "required": [
+          "id",
+          "kind",
+          "name",
+          "description",
+          "free",
+          "needs_key",
+          "default_enabled"
+        ],
+        "properties": {
+          "default_enabled": {
+            "type": "boolean"
+          },
+          "description": {
+            "type": "string"
+          },
+          "free": {
+            "type": "boolean",
+            "description": "Usable without paying anyone."
+          },
+          "id": {
+            "type": "string"
+          },
+          "key_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Where to get a key."
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ProviderKind"
+          },
+          "name": {
+            "type": "string"
+          },
+          "needs_env": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Needs something from the server operator (environment variable)."
+          },
+          "needs_key": {
+            "type": "boolean",
+            "description": "Needs an API key from the user."
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Honest note about data quality or terms."
+          }
+        }
+      },
+      "ProviderKind": {
+        "type": "string",
+        "enum": [
+          "suggest",
+          "serp",
+          "demand",
+          "authority"
+        ]
+      },
+      "ProviderTest": {
+        "type": "object",
+        "required": [
+          "ok",
+          "message",
+          "latency_ms"
+        ],
+        "properties": {
+          "latency_ms": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          },
+          "message": {
+            "type": "string",
+            "description": "What happened, phrased for a person."
+          },
+          "ok": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ProviderView": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/ProviderInfo"
+          },
+          {
+            "type": "object",
+            "required": [
+              "enabled",
+              "ready",
+              "has_key"
+            ],
+            "properties": {
+              "enabled": {
+                "type": "boolean"
+              },
+              "has_key": {
+                "type": "boolean",
+                "description": "An API key is stored (the key itself is never returned)."
+              },
+              "missing": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "description": "What is missing before it can be used."
+              },
+              "ready": {
+                "type": "boolean",
+                "description": "Enabled and fully configured: research will use it."
+              },
+              "updated_at": {
+                "type": [
+                  "string",
+                  "null"
+                ],
+                "format": "date-time"
+              }
+            }
+          }
+        ]
+      },
+      "RefreshSavedInput": {
+        "type": "object",
+        "properties": {
+          "ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "Omit or pass an empty list to refresh all saved keywords. Otherwise 1–1000 IDs."
+          }
+        }
+      },
       "Role": {
         "type": "string",
         "enum": [
@@ -2963,6 +4920,344 @@
           "admin",
           "owner"
         ]
+      },
+      "SaveKeywordsInput": {
+        "type": "object",
+        "properties": {
+          "idea_ids": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "description": "…these ones."
+          },
+          "keywords": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            },
+            "description": "Or save keywords typed by hand (project market, no metrics yet)."
+          },
+          "research_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Save ideas of this research (with their metrics)…"
+          },
+          "tags": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "SaveKeywordsResult": {
+        "type": "object",
+        "required": [
+          "saved",
+          "already_saved"
+        ],
+        "properties": {
+          "already_saved": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Already saved before, so left unchanged.",
+            "minimum": 0
+          },
+          "saved": {
+            "type": "integer",
+            "format": "int64",
+            "minimum": 0
+          }
+        }
+      },
+      "SavedKeyword": {
+        "type": "object",
+        "required": [
+          "id",
+          "project_id",
+          "keyword",
+          "country",
+          "language",
+          "tags",
+          "created_at"
+        ],
+        "properties": {
+          "country": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "est_volume": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "intent": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "kd": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "kd_source": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "keyword": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          },
+          "metrics_updated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "popularity": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Relative popularity from the research it was saved from; null for manual entries."
+          },
+          "project_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "serp_features": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "trend": {},
+          "volume_bucket": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "volume_confidence": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "volume_source": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "SerpAnalysis": {
+        "type": "object",
+        "required": [
+          "snapshot_id",
+          "keyword",
+          "country",
+          "language",
+          "provider",
+          "exact",
+          "fetched_at",
+          "cached",
+          "items",
+          "features",
+          "related",
+          "questions",
+          "intent",
+          "authority_loaded"
+        ],
+        "properties": {
+          "authority_loaded": {
+            "type": "boolean",
+            "description": "False until the Common Crawl ranks were imported (KD needs them)."
+          },
+          "cached": {
+            "type": "boolean",
+            "description": "Served from the shared SERP cache."
+          },
+          "country": {
+            "type": "string"
+          },
+          "exact": {
+            "type": "boolean",
+            "description": "True when positions are one search engine's real ranking; false for a meta-search blend."
+          },
+          "features": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "fetched_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "intent": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SerpRow"
+            }
+          },
+          "kd": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Keyword difficulty 0–100; null without authority data or with fewer than 5 results."
+          },
+          "kd_source": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "How KD was computed, e.g. `serp_searxng+authority_commoncrawl`."
+          },
+          "keyword": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          },
+          "provider": {
+            "type": "string",
+            "description": "Provider that fetched the page, e.g. `serp_searxng`."
+          },
+          "questions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "related": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "snapshot_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "SerpAnalysisInput": {
+        "type": "object",
+        "required": [
+          "keyword"
+        ],
+        "properties": {
+          "country": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Defaults to the project's market."
+          },
+          "keyword": {
+            "type": "string"
+          },
+          "language": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "refresh": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Fetch a fresh page instead of a cached one (cached pages are reused for 7 days)."
+          }
+        }
+      },
+      "SerpRow": {
+        "type": "object",
+        "required": [
+          "position",
+          "url",
+          "domain",
+          "title"
+        ],
+        "properties": {
+          "domain": {
+            "type": "string"
+          },
+          "position": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "snippet": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sr": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "SeoSeo Rank of the domain (0–100); null when it is outside the imported list or\nno authority data is loaded."
+          },
+          "title": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
       },
       "Severity": {
         "type": "string",
@@ -3060,6 +5355,13 @@
             },
             "description": "Path prefixes to skip, e.g. `/tag/`."
           },
+          "lighthouse": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Run desktop Lighthouse lab audits (requires the renderer profile)."
+          },
           "max_pages": {
             "type": [
               "integer",
@@ -3068,6 +5370,13 @@
             "format": "int32",
             "description": "Pages to crawl (1–10000, default 500).",
             "minimum": 0
+          },
+          "render_js": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Audit the rendered DOM (requires the renderer profile)."
           },
           "respect_robots": {
             "type": [
@@ -3082,6 +5391,50 @@
               "null"
             ],
             "description": "Defaults to `https://{project domain}/`."
+          }
+        }
+      },
+      "StartResearchInput": {
+        "type": "object",
+        "required": [
+          "seed"
+        ],
+        "properties": {
+          "country": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "ISO 3166-1 alpha-2; defaults to the project's market."
+          },
+          "language": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "ISO 639-1; defaults to the project's market."
+          },
+          "max_ideas": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Ideas to keep (10–500, default 150).",
+            "minimum": 0
+          },
+          "seed": {
+            "type": "string",
+            "description": "The seed keyword, e.g. `standing desk`."
+          },
+          "serp_top": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Most popular ideas that also get a SERP analysis (0–30, default 10).",
+            "minimum": 0
           }
         }
       },
@@ -3136,6 +5489,39 @@
               "string",
               "null"
             ]
+          }
+        }
+      },
+      "UpdateProviderInput": {
+        "type": "object",
+        "properties": {
+          "api_key": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "New API key. Send an empty string to remove the stored key; omit to keep it."
+          },
+          "enabled": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          }
+        }
+      },
+      "UpdateSavedInput": {
+        "type": "object",
+        "required": [
+          "tags"
+        ],
+        "properties": {
+          "tags": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Replaces the keyword's tags."
           }
         }
       },
@@ -3204,6 +5590,14 @@
     {
       "name": "team",
       "description": "Workspace members and invitations"
+    },
+    {
+      "name": "providers",
+      "description": "Data providers, API keys and domain authority"
+    },
+    {
+      "name": "keywords",
+      "description": "Keyword research, saved keywords and SERP analysis"
     }
   ]
 }

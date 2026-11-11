@@ -1,7 +1,7 @@
 //! Site audit persistence: audits, crawl frontier, pages, link graph, issues.
 //! Read queries take the project id so callers stay tenant-scoped.
 
-use crate::internal;
+use crate::{escape_like, internal};
 use chrono::{DateTime, Utc};
 use common::{AppError, AppResult};
 use serde::Serialize;
@@ -367,6 +367,7 @@ pub async fn frontier_skip_pending(pool: &PgPool, audit_id: Uuid) -> AppResult<u
 
 #[derive(Debug, Default)]
 pub struct NewPage {
+    pub browser_result: Option<serde_json::Value>,
     pub id: Uuid,
     pub url: String,
     pub url_hash: String,
@@ -434,9 +435,9 @@ pub async fn insert_page(
             response_time_ms, size_bytes, redirect_chain, depth, in_sitemap, title, meta_description, meta_robots,
             x_robots_tag, canonical_url, header_canonical_url, is_indexable, lang, has_viewport, h1, h1_count,
             word_count, images_total, images_missing_alt, internal_links, external_links, structured_data_count,
-            og_title, og_description, og_image, hreflang, content_hash, error)
+            og_title, og_description, og_image, hreflang, content_hash, error, browser_result)
          VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,$26,
-                 $27,$28,$29,$30,$31,$32,$33,$34,$35,$36)
+                 $27,$28,$29,$30,$31,$32,$33,$34,$35,$36,$37)
          ON CONFLICT (audit_id, url_hash) DO NOTHING",
     )
     .bind(p.id)
@@ -475,6 +476,7 @@ pub async fn insert_page(
     .bind(&p.hreflang)
     .bind(&p.content_hash)
     .bind(&p.error)
+    .bind(&p.browser_result)
     .execute(&mut *tx)
     .await
     .map_err(internal)?
@@ -547,6 +549,7 @@ pub async fn replace_issues(
 /// Page summary used by the site-wide rules.
 #[derive(Debug, Clone, sqlx::FromRow)]
 pub struct PageSummary {
+    pub hreflang: serde_json::Value,
     pub id: Uuid,
     pub url: String,
     pub url_hash: String,
@@ -563,7 +566,7 @@ pub struct PageSummary {
 pub async fn page_summaries(pool: &PgPool, audit_id: Uuid) -> AppResult<Vec<PageSummary>> {
     sqlx::query_as(
         "SELECT id, url, url_hash, status_code, fetch_class, is_indexable, in_sitemap,
-                jsonb_array_length(redirect_chain) > 0 AS redirected, title, meta_description, content_hash
+                jsonb_array_length(redirect_chain) > 0 AS redirected, title, meta_description, content_hash, hreflang
          FROM audit_pages WHERE audit_id = $1",
     )
     .bind(audit_id)
@@ -724,14 +727,9 @@ pub async fn pages(
     Ok((rows, total))
 }
 
-fn escape_like(s: &str) -> String {
-    s.replace('\\', "\\\\")
-        .replace('%', "\\%")
-        .replace('_', "\\_")
-}
-
 #[derive(Debug, Clone, Serialize, ToSchema, sqlx::FromRow)]
 pub struct PageDetail {
+    pub browser_result: Option<serde_json::Value>,
     pub id: Uuid,
     pub url: String,
     pub final_url: Option<String>,
@@ -775,7 +773,7 @@ pub async fn page_detail(pool: &PgPool, audit_id: Uuid, page_id: Uuid) -> AppRes
                 redirect_chain, depth, in_sitemap, title, meta_description, meta_robots, x_robots_tag,
                 canonical_url, header_canonical_url, is_indexable, lang, has_viewport, h1, h1_count, word_count,
                 images_total, images_missing_alt, internal_links, external_links, inlinks, structured_data_count,
-                og_title, og_description, og_image, hreflang, error, fetched_at
+                og_title, og_description, og_image, hreflang, error, fetched_at, browser_result
          FROM audit_pages WHERE audit_id = $1 AND id = $2",
     )
     .bind(audit_id)

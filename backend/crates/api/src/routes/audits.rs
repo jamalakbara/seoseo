@@ -68,8 +68,19 @@ async fn start_audit(
     Path(project_id): Path<Uuid>,
     Json(input): Json<StartAuditInput>,
 ) -> ApiResult<(StatusCode, Json<Audit>)> {
-    let audit =
-        domain::audits::start(&state.pool, &actor, project_id, policy(&state), input).await?;
+    let audit = domain::audits::start(
+        &state.pool,
+        &actor,
+        project_id,
+        policy(&state),
+        state
+            .cfg
+            .renderer_url
+            .as_ref()
+            .is_some_and(|s| !s.is_empty()),
+        input,
+    )
+    .await?;
     Ok((StatusCode::ACCEPTED, Json(audit)))
 }
 
@@ -237,7 +248,7 @@ async fn export_audit_issues(
 }
 
 /// Quote a CSV cell and neutralize spreadsheet formula injection.
-fn csv_cell(v: &str) -> String {
+pub(crate) fn csv_cell(v: &str) -> String {
     let v = if v.starts_with(['=', '+', '-', '@']) {
         format!("'{v}")
     } else {

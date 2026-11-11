@@ -19,3 +19,5 @@ anyhow.workspace = true
 jobs.workspace = true
 crawler.workspace = true
 url.workspace = true
+providers.workspace = true
+scoring.workspace = true

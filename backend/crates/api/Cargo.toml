@@ -31,3 +31,4 @@ anyhow.workspace = true
 crawler.workspace = true
 futures.workspace = true
 async-stream.workspace = true
+providers.workspace = true

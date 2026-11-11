@@ -32,6 +32,22 @@ jobs:
           cargo run -q -p app -- openapi > /tmp/openapi.json
           diff -u ../frontend/openapi.json /tmp/openapi.json
 
+  renderer:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: renderer
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: renderer/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: node --check server.mjs && node --check proxy.mjs
+
   frontend:
     runs-on: ubuntu-latest
     defaults:

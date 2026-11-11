@@ -2,7 +2,7 @@
 
 Every feature with an ID, OpenSEO parity reference, priority, data source, and milestone.
 Priority: **P0** MVP · **P1** parity · **P2** beyond parity · **P3** later.
-Status column is updated as we build (`todo` / `wip` / `done`). Last update: 2026-11-10 (M1).
+Status column is updated as we build (`todo` / `wip` / `done`). Last update: 2026-11-11 (M2 keyword, SERP and browser audits).
 
 ## Workspace & identity
 | ID | Feature | OpenSEO ref | Pri | Data | MS | Status |
@@ -19,7 +19,7 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | WS-10 | Project memory (sections, competitors, key pages, research log) | spec 0010 | P1 | — | M4 | todo |
 | WS-11 | Onboarding wizard + website research | spec 0005, researchProjectWebsite | P1 | crawler + LLM | M4 | todo |
 | WS-12 | Team page, transfer ownership, switch org | organization.ts | P1 | — | M1 | wip (team page + remove member done; transfer ownership & org switcher UI todo) |
-| WS-13 | Settings: provider adapters & keys UI | (new) | P0 | — | M1 | todo (moved to M2: no data providers exist until then) |
+| WS-13 | Settings: provider adapters & keys UI | (new) | P0 | — | M1 | done (M2: provider catalog, on/off, encrypted BYOK keys, live test, SR import) |
 
 ## Dashboard
 | DB-01 | Setup checklist | spec 0015 | P1 | — | M4 | todo |
@@ -29,15 +29,15 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | DB-05 | Refresh claims (24 h) | data_refresh_claims | P1 | — | M4 | todo |
 
 ## Keyword research
-| KW-01 | Seed → ideas (autocomplete a–z, questions, prepositions) | researchKeywords | P0 | autocomplete | M2 | todo |
-| KW-02 | Related searches + PAA from SERP | related_keywords | P0 | SERP | M2 | todo |
-| KW-03 | Estimated volume (buckets, confidence) + trend | keyword_overview | P0 | Trends + calibration | M2 | todo |
-| KW-04 | Computed KD | Labs KD | P0 | SERP + SR | M2 | todo |
-| KW-05 | Intent classifier | IntentBadge | P0 | rules (+LLM) | M2 | todo |
-| KW-06 | SERP features detection | serp_features | P0 | SERP | M2 | todo |
-| KW-07 | SERP analysis card | getSerpAnalysis | P0 | SERP | M2 | todo |
-| KW-08 | Filters/sort/paging/export | keyword table | P0 | — | M2 | todo |
-| KW-09 | Saved keywords + tags + refresh + export | saved-keywords | P0 | — | M2 | todo |
+| KW-01 | Seed → ideas (autocomplete a–z, questions, prepositions) | researchKeywords | P0 | autocomplete | M2 | done (Google + Bing autocomplete; a-z, questions, prepositions; en/es/de/fr/pt/id modifiers) |
+| KW-02 | Related searches + PAA from SERP | related_keywords | P0 | SERP | M2 | wip (related searches from SearXNG/Serper and PAA from Serper/Brave become ideas for the seed SERP; SearXNG has no PAA) |
+| KW-03 | Estimated volume (buckets, confidence) + trend | keyword_overview | P0 | Trends + calibration | M2 | wip (relative popularity 0-100 for every idea; volume bucket + 12-mo trend only where a Wikipedia article matches; Google Trends adapter not built, needs bot-check workaround) |
+| KW-04 | Computed KD | Labs KD | P0 | SERP + SR | M2 | done (click-weighted SR of top 10; null without SERP or authority data) |
+| KW-05 | Intent classifier | IntentBadge | P0 | rules (+LLM) | M2 | done (rules + brand + SERP features; LLM refinement later) |
+| KW-06 | SERP features detection | serp_features | P0 | SERP | M2 | done (features exposed by the SERP provider) |
+| KW-07 | SERP analysis card | getSerpAnalysis | P0 | SERP | M2 | done (SERP dialog: results + SR, features, related, PAA, KD, intent; 7-day shared cache) |
+| KW-08 | Filters/sort/paging/export | keyword table | P0 | — | M2 | done (search, intent, questions filter, sort, paging, CSV; API also filters popularity/kd/volume/words) |
+| KW-09 | Saved keywords + tags + refresh + export | saved-keywords | P0 | — | M2 | done (save/manual, tags, CSV, per-keyword SERP refresh and durable bulk refresh with progress; available demand estimates are refreshed through the pageview cache) |
 | KW-10 | Local (city) volume context | spec 0008 | P2 | Trends geo | M6 | todo |
 | KW-11 | Keyword clustering (SERP overlap) | skill only | P2 | SERP | M6 | todo |
 | KW-12 | CPC/competition (BYOK only) | google_ads | P3 | BYOK | M8 | todo |
@@ -59,7 +59,7 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | BL-05 | Spam score | dashboard filter | P1 | computed | M5 | todo |
 | BL-06 | New/lost via snapshot diff | backlink_snapshots | P1 | — | M5 | todo |
 | BL-07 | Link prospecting (link intersect) | skill link-prospecting | P2 | CC | M6 | todo |
-| BL-08 | Domain authority "SR" from CC host graph | Ahrefs DR lookup | P0 | CC host graph | M2 | todo |
+| BL-08 | Domain authority "SR" from CC host graph | Ahrefs DR lookup | P0 | CC host graph | M2 | done (top-N import of Common Crawl domain ranks, SR = log-scaled harmonic rank, lookup API + UI) |
 
 ## Rank tracking
 | RT-01 | Tracker config (domain, market, city, devices, depth, schedule) | rank_tracking_configs | P0 | — | M3 | todo |
@@ -78,9 +78,9 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | SA-03 | SSRF url-policy, throttle, 429 cooldown | url-policy, crawl-throttle | P0 | — | M1 | done |
 | SA-04 | Page analyzer (all audit_pages fields) | page-analyzer | P0 | — | M1 | done |
 | SA-05 | OpenSEO issue rules (27) | issues/* | P0 | — | M1 | done |
-| SA-06 | Extended rules (H1, hreflang, mixed content, orphans, broken links, schema validation, soft-404, …) | (new) | P1 | — | M2 | wip (H1, mixed content, JSON-LD validity, orphans, broken/redirected links, sitemap checks done; hreflang, soft-404, URL hygiene, asset checks todo) |
-| SA-07 | JS rendering (headless Chromium) | rendered-page | P1 | renderer | M2 | todo |
-| SA-08 | Lighthouse (CLI or PSI API) | lighthouse.ts | P1 | renderer/PSI | M2 | todo |
+| SA-06 | Extended rules (H1, hreflang, mixed content, orphans, broken links, schema validation, soft-404, …) | (new) | P1 | — | M2 | done (H1, mixed content, JSON-LD, links, sitemap, hreflang syntax/self/reciprocal/indexability, heuristic soft-404, URL hygiene, bounded same-origin asset checks) |
+| SA-07 | JS rendering (headless Chromium) | rendered-page | P1 | renderer | M2 | done (opt-in rendered DOM, isolated browser + guarded egress proxy, static fallback with explicit issue) |
+| SA-08 | Lighthouse (CLI or PSI API) | lighthouse.ts | P1 | renderer/PSI | M2 | done (desktop lab categories, metrics and opportunities stored per page and shown in page detail) |
 | SA-09 | CrUX field data | (new) | P2 | CrUX API | M6 | todo |
 | SA-10 | Progress (live SSE), history, delete | getCrawlProgress | P0 | — | M1 | done |
 | SA-11 | Results UI: summary, pages, issues, page detail, export | results/* | P0 | — | M1 | done |
@@ -139,7 +139,7 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | FT-01..11 | Keyword generator, SERP simulator, backlink checker, DA checker, domain age, robots tester, sitemap validator, meta checker, schema validator, redirect checker, hreflang checker | web/ free tools | P2 | — | M8 | todo |
 
 ## Ops
-| OP-01 | Docker Compose (api, worker, web, db, valkey, renderer, searxng, [ollama]) | deploy/ | P0 | — | M0 | wip (db, cache, api, worker, web, test overlay; renderer/searxng/ollama/caddy todo) |
+| OP-01 | Docker Compose (api, worker, web, db, valkey, renderer, searxng, [ollama]) | deploy/ | P0 | — | M0 | wip (db, cache, api, worker, web, test overlay, searxng profile, renderer + egress proxy profile; ollama/caddy todo) |
 | OP-02 | Health, Prometheus metrics, JSON logs | /health | P0 | — | M0 | done |
 | OP-03 | Job dashboard (queued/running/failed, retry) | (new) | P1 | — | M3 | todo |
 | OP-04 | Backup/restore script | (new) | P1 | — | M7 | todo |

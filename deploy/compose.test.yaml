@@ -10,7 +10,16 @@ services:
   api:
     environment:
       CRAWLER_ALLOW_PRIVATE: "true"
+      SEARXNG_URL: ${TEST_SEARXNG_URL:-http://badseo}
+      RENDERER_URL: http://renderer:8080
   worker:
     environment:
       CRAWLER_ALLOW_PRIVATE: "true"
+      SEARXNG_URL: ${TEST_SEARXNG_URL:-http://badseo}
+      RENDERER_URL: http://renderer:8080
       WORKER_CONCURRENCY: "8"
+
+  renderer-proxy:
+    environment:
+      RENDERER_ALLOW_PRIVATE: "true"
+    networks: [browser, egress, default]

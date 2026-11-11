@@ -1,0 +1,10 @@
+[package]
+name = "scoring"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[dependencies]
+serde.workspace = true
+psl.workspace = true
+utoipa.workspace = true

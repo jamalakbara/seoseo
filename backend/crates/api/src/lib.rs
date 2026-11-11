@@ -36,7 +36,9 @@ use utoipa_scalar::{Scalar, Servable};
         (name = "projects", description = "Projects and their default market"),
         (name = "jobs", description = "Background jobs"),
         (name = "audits", description = "Site audits: crawl, issues, pages"),
-        (name = "team", description = "Workspace members and invitations")
+        (name = "team", description = "Workspace members and invitations"),
+        (name = "providers", description = "Data providers, API keys and domain authority"),
+        (name = "keywords", description = "Keyword research, saved keywords and SERP analysis")
     )
 )]
 struct ApiDoc;

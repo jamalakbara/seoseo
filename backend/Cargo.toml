@@ -16,6 +16,8 @@ domain = { path = "crates/domain" }
 jobs = { path = "crates/jobs" }
 api = { path = "crates/api" }
 crawler = { path = "crates/crawler" }
+providers = { path = "crates/providers" }
+scoring = { path = "crates/scoring" }
 
 # runtime / web
 tokio = { version = "1.54", features = ["full"] }
@@ -42,6 +44,8 @@ flate2 = "1"
 futures = "0.3"
 tokio-stream = { version = "0.1", features = ["sync"] }
 async-stream = "0.3"
+async-trait = "0.1.92"
+psl = "2.1"
 
 # openapi
 utoipa = { version = "6.0", features = ["axum_extras", "uuid", "chrono"] }
@@ -54,6 +58,7 @@ getrandom = "0.4"
 sha2 = "0.11"
 hex = "0.4"
 base64 = "0.23"
+aes-gcm = "0.11"
 
 # infra
 clap = { version = "4.6", features = ["derive", "env"] }

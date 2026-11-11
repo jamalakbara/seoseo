@@ -29,7 +29,7 @@ OpenSEO's research features are 100% DataForSEO (paid). Our promise is **"comple
 | **Domain overview: traffic, ranked keywords, top pages, competitors** | Labs ranked_keywords etc. | **Our SERP cache index**: every SERP we ever fetch (any user on this instance, opt-in sharing) is stored → inverted index domain→keywords/positions. Traffic estimate = Σ est_volume × CTR(position). Competitors = domains co-occurring in same SERPs. Tranco + Cloudflare Radar top-domain ranks as popularity prior. For own sites: GSC exact. | DataForSEO BYOK | Grows with usage; strongest for niches the user researches. Seed packs (public keyword lists) optional. |
 | **Content gap / keyword gap** | Labs | Diff of ranked-keyword sets from SERP index + GSC | — | — |
 | **Site audit crawl** | own crawler (free) | **Own Rust crawler** | — | Better (faster, more checks). |
-| **JS rendering** | Cloudflare Browser / Context.dev (paid) | **Headless Chromium** (chromiumoxide) in a `renderer` container | — | Full parity, free. |
+| **JS rendering** | Cloudflare Browser / Context.dev (paid) | **Headless Chromium** (Puppeteer) in a `renderer` container | — | Full parity, free. |
 | **Lighthouse / CWV lab** | on_page/lighthouse (paid) | **Lighthouse CLI** in renderer container; or **PageSpeed Insights API** (free key, generous quota) | — | Parity. |
 | **CWV field data** | — (missing) | **CrUX API** (free key) | — | New feature. |
 | **Local pack / Maps rank grid** | serp/google/maps | Headless Maps/local-finder fetch per grid point with `uule`/geo override (opt-in, rate-limited); OSM **Overpass/Nominatim** for business lookup & competitors | Google Places API (user key, free monthly allowance), DataForSEO BYOK | Grid scans are request-heavy → small grids (3×3/5×5) by default. |
@@ -44,6 +44,12 @@ OpenSEO's research features are 100% DataForSEO (paid). Our promise is **"comple
 | **In-app AI agent** | OpenRouter (paid) | Ollama (local, bundled optional profile) / OpenRouter free models / any OpenAI-compatible endpoint | — | Free with local models. |
 | **Maps basemap** | Google Map Tiles (paid) | **OpenStreetMap** tiles (or self-hosted protomaps PMTiles) via MapLibre | — | Free. |
 | **Email** | Loops | SMTP (any) / Mailpit in dev | — | Free. |
+
+## Implementation notes (M2, 2026-11-11)
+- **Google Trends is not wired up.** Its unofficial endpoint only answers a browser-like User-Agent plus a cookie handshake, which means working around a bot check; that breaks principle 5. Trend and volume estimates currently come from **Wikipedia pageviews** (official API) for keywords that match an article; everything else shows relative **popularity** (0–100 within a research) and a null volume.
+- **DuckDuckGo suggest** returns nothing to an honest (non-browser) User-Agent, so it is not an adapter. Google and Bing suggest endpoints work with our real User-Agent.
+- SERP order of preference: Serper (BYOK, exact Google) → Brave API (BYOK) → SearXNG (bundled, `--profile serp`) → Chromium/Bing (explicit opt-in, `--profile renderer`; robots and bot blocks may make it unavailable).
+- SR import streams only the first N lines of the rank file (sorted by harmonic centrality): 1M domains ≈ 30 MB.
 
 ## Data freshness defaults
 | Data | TTL |

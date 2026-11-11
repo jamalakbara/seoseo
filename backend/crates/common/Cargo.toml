@@ -15,3 +15,4 @@ hex.workspace = true
 base64.workspace = true
 getrandom.workspace = true
 clap.workspace = true
+aes-gcm.workspace = true

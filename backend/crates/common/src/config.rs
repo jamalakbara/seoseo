@@ -49,4 +49,22 @@ pub struct Config {
     /// Override the crawler User-Agent header.
     #[arg(long, env = "CRAWLER_USER_AGENT")]
     pub crawler_user_agent: Option<String>,
+
+    /// Base64 of 32 random bytes. Encrypts provider API keys at rest; without it,
+    /// bring-your-own-key providers cannot be configured. `openssl rand -base64 32`
+    #[arg(long, env = "APP_ENCRYPTION_KEY", hide_env_values = true)]
+    pub app_encryption_key: Option<String>,
+
+    /// Base URL of a SearXNG instance with the JSON format enabled (compose profile `serp`).
+    /// Operator-only on purpose: it usually points at an internal host.
+    #[arg(long, env = "SEARXNG_URL")]
+    pub searxng_url: Option<String>,
+
+    /// Internal isolated browser service (compose profile renderer).
+    #[arg(long, env = "RENDERER_URL")]
+    pub renderer_url: Option<String>,
+
+    /// Override the Common Crawl web-graph release list (mirrors, tests).
+    #[arg(long, env = "CC_GRAPHINFO_URL")]
+    pub cc_graphinfo_url: Option<String>,
 }
