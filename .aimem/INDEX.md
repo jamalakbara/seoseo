@@ -10,7 +10,7 @@ Project: `seoseo` · mode: solo · sync: none
 3. END: run `aimem handoff` (Done / Not done / Next / Blocked). Supersede records, never delete them.
 
 ## Counts
-- decision: 15 (proposed 15)
+- decision: 16 (proposed 16)
 - memory: 10 (active 10)
 - handoff: 6 (final 6)
 
