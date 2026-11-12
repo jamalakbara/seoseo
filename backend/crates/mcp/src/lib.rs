@@ -1090,6 +1090,109 @@ impl SeoSeoMcp {
     }
 
     #[tool(
+        description = "List imported backlink snapshot metadata for this project, newest first, including prior website identities for cleanup. These are user-provided samples, not verified crawls. Details are readable only for the current project website."
+    )]
+    async fn list_backlink_snapshots(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<ProjectRef>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::backlinks::list(&self.pool, &a, id("project_id", &p.project_id)?).await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Import a complete backlink sample (max 1000 unique external source/target pairs, 2 MiB body cap). Needs admin, expected_domain must match the current project website and complete_sample must be true. Same-dataset imports compare sample membership; first import is a baseline. Does not fetch or independently verify URLs. Empty imports mark prior pairs absent in the sample. Keep a stable dataset key for comparable exports."
+    )]
+    async fn import_backlink_snapshot(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<BacklinkImportParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::backlinks::import(
+                    &self.pool,
+                    &a,
+                    id("project_id", &p.project_id)?,
+                    domain::backlinks::ImportBacklinksInput {
+                        expected_domain: p.expected_domain,
+                        dataset: p.dataset,
+                        complete_sample: p.complete_sample,
+                        links: p
+                            .links
+                            .into_iter()
+                            .map(|l| domain::backlinks::ImportedBacklink {
+                                source_url: l.source_url,
+                                target_url: l.target_url,
+                                anchor: l.anchor,
+                                nofollow: l.nofollow,
+                            })
+                            .collect(),
+                    },
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Read imported backlink evidence, paginated by state, plus current-sample referring domains, target pages and anchors. Live includes new. New/lost mean presence/absence in this dataset's consecutive imports, not independently verified link status. Spam score is unknown. Aggregates describe live+new only."
+    )]
+    async fn get_backlink_snapshot(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<BacklinkSnapshotParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::backlinks::get(
+                    &self.pool,
+                    &a,
+                    id("project_id", &p.project_id)?,
+                    id("snapshot_id", &p.snapshot_id)?,
+                    domain::backlinks::BacklinkQuery {
+                        state: p.state,
+                        limit: p.limit,
+                        offset: p.offset,
+                    },
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Delete one imported backlink snapshot and its evidence. Needs admin and an active project. Other snapshots retain their recorded diff and comparison timestamp; future imports compare against the latest remaining snapshot in their dataset/website."
+    )]
+    async fn delete_backlink_snapshot(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<BacklinkSnapshotRef>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::backlinks::delete(
+                    &self.pool,
+                    &a,
+                    id("project_id", &p.project_id)?,
+                    id("snapshot_id", &p.snapshot_id)?,
+                )
+                .await?;
+                Ok(json!({"deleted":true}))
+            }
+            .await,
+        )
+    }
+
+    #[tool(
         description = "Look up domain registration age using the IANA-discovered HTTPS registry RDAP service. Public metadata cached for 24 hours. Unknown dates remain null; registration age does not establish website age or continuous ownership. May make two public requests on a cache miss. Registry redirects and private endpoints are not followed."
     )]
     async fn get_domain_age(

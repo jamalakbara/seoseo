@@ -44,6 +44,7 @@ use utoipa_scalar::{Scalar, Servable};
         (name = "providers", description = "Data providers, API keys and domain authority"),
         (name = "keywords", description = "Keyword research, saved keywords and SERP analysis"),
         (name = "competitive", description = "Domain research from project-scoped SERP evidence"),
+        (name = "backlinks", description = "Imported backlink samples and snapshot comparisons"),
         (name = "rank-tracking", description = "Rank trackers, scheduled checks and position history"),
         (name = "reports", description = "Stored HTML reports, templates and public sharing")
     )

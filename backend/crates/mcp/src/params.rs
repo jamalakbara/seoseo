@@ -5,6 +5,38 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct BacklinkImportRow {
+    pub source_url: String,
+    pub target_url: String,
+    pub anchor: Option<String>,
+    pub nofollow: Option<bool>,
+}
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct BacklinkImportParams {
+    pub project_id: String,
+    pub expected_domain: String,
+    /// Stable dataset key; comparisons never cross datasets or websites.
+    pub dataset: String,
+    /// Must be true; this replaces the entire sample for this dataset, including empty samples.
+    pub complete_sample: bool,
+    pub links: Vec<BacklinkImportRow>,
+}
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct BacklinkSnapshotRef {
+    pub project_id: String,
+    pub snapshot_id: String,
+}
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct BacklinkSnapshotParams {
+    pub project_id: String,
+    pub snapshot_id: String,
+    /// all, live (includes new), new, lost
+    pub state: Option<String>,
+    pub limit: Option<usize>,
+    pub offset: Option<usize>,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct DomainAgeParams {
     pub project_id: String,
     /// Domain or URL, defaults to the project's website.

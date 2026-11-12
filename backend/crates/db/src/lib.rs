@@ -3,6 +3,7 @@
 
 pub mod api_keys;
 pub mod audits;
+pub mod backlinks;
 pub mod competitive;
 pub mod dashboard;
 pub mod gsc;

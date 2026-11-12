@@ -2,7 +2,7 @@
 
 Every feature with an ID, OpenSEO parity reference, priority, data source, and milestone.
 Priority: **P0** MVP · **P1** parity · **P2** beyond parity · **P3** later.
-Status column is updated as we build (`todo` / `wip` / `done`). Last update: 2026-11-12 (M4 integrations, onboarding synthesis and MCP OAuth).
+Status column is updated as we build (`todo` / `wip` / `done`). Last update: 2026-11-12 (M5 competitive research, RDAP and imported backlink snapshots).
 
 ## Workspace & identity
 | ID | Feature | OpenSEO ref | Pri | Data | MS | Status |
@@ -25,7 +25,7 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | DB-01 | Setup checklist | spec 0015 | P1 | — | M4 | done |
 | DB-02 | Overview cards (health, GSC new queries, link activity, rank movers) | getDashboardOverview | P1 | GSC/links | M4 | done (recorded link evidence; automatic discovery in M5) |
 | DB-03 | Keywords tab (GSC new/top/striking distance) | getDashboardKeywords | P1 | GSC | M4 | done |
-| DB-04 | Backlinks tab (new/lost/live) | getDashboardBacklinks | P1 | link store | M5 | todo |
+| DB-04 | Backlinks tab (new/lost/live) | getDashboardBacklinks | P1 | link store | M5 | wip (Backlinks tab with imported sample history/diffs; discovery remains) |
 | DB-05 | Refresh claims (24 h) | data_refresh_claims | P1 | — | M4 | done |
 
 ## Keyword research
@@ -52,12 +52,12 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | DO-07 | Domain age (RDAP) | free tool | P1 | RDAP | M5 | done (on-demand HTTPS registry metadata, 24h cache, REST/UI/MCP; unknown dates remain null) |
 
 ## Backlinks
-| BL-01 | Overview + history | backlinks summary/history | P1 | CC + Bing WMT | M5 | todo |
-| BL-02 | Backlinks table | backlinks/backlinks | P1 | CC | M5 | todo |
-| BL-03 | Referring domains | referring_domains | P1 | CC | M5 | todo |
-| BL-04 | Top linked pages, anchors | domain_pages_summary | P1 | CC | M5 | todo |
+| BL-01 | Overview + history | backlinks summary/history | P1 | CC + Bing WMT | M5 | wip (imported evidence samples, scoped history; automatic discovery remains) |
+| BL-02 | Backlinks table | backlinks/backlinks | P1 | CC | M5 | wip (paginated imported URL pairs with anchor/nofollow metadata) |
+| BL-03 | Referring domains | referring_domains | P1 | CC | M5 | wip (current imported-sample groups) |
+| BL-04 | Top linked pages, anchors | domain_pages_summary | P1 | CC | M5 | wip (current imported-sample target/anchor groups) |
 | BL-05 | Spam score | dashboard filter | P1 | computed | M5 | todo |
-| BL-06 | New/lost via snapshot diff | backlink_snapshots | P1 | — | M5 | todo |
+| BL-06 | New/lost via snapshot diff | backlink_snapshots | P1 | — | M5 | wip (atomic same-dataset imported sample diffs; no independent web verification) |
 | BL-07 | Link prospecting (link intersect) | skill link-prospecting | P2 | CC | M6 | todo |
 | BL-08 | Domain authority "SR" from CC host graph | Ahrefs DR lookup | P0 | CC host graph | M2 | done (top-N import of Common Crawl domain ranks, SR = log-scaled harmonic rank, lookup API + UI) |
 

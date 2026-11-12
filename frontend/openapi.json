@@ -1881,6 +1881,231 @@
         ]
       }
     },
+    "/api/v1/projects/{project_id}/backlink-snapshots": {
+      "get": {
+        "tags": [
+          "backlinks"
+        ],
+        "operationId": "list_backlink_snapshots",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BacklinkSnapshot"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "backlinks"
+        ],
+        "operationId": "import_backlink_snapshot",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportBacklinksInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BacklinkSnapshot"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/backlink-snapshots/{snapshot_id}": {
+      "get": {
+        "tags": [
+          "backlinks"
+        ],
+        "operationId": "get_backlink_snapshot",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "snapshot_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "state",
+            "in": "query",
+            "description": "all (default), live (includes new), new, lost",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BacklinkSnapshotView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "backlinks"
+        ],
+        "operationId": "delete_backlink_snapshot",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "snapshot_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {}
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/projects/{project_id}/context": {
       "get": {
         "tags": [
@@ -6249,6 +6474,201 @@
           }
         }
       },
+      "BacklinkAnchorGroup": {
+        "type": "object",
+        "required": [
+          "links"
+        ],
+        "properties": {
+          "anchor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "links": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "BacklinkEvidence": {
+        "type": "object",
+        "required": [
+          "source_url",
+          "target_url",
+          "source_domain",
+          "state"
+        ],
+        "properties": {
+          "anchor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "nofollow": {
+            "type": [
+              "boolean",
+              "null"
+            ],
+            "description": "Null means the imported sample did not specify the link relation."
+          },
+          "source_domain": {
+            "type": "string"
+          },
+          "source_url": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "target_url": {
+            "type": "string"
+          }
+        }
+      },
+      "BacklinkGroup": {
+        "type": "object",
+        "required": [
+          "value",
+          "links"
+        ],
+        "properties": {
+          "links": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "value": {
+            "type": "string"
+          }
+        }
+      },
+      "BacklinkSnapshot": {
+        "type": "object",
+        "required": [
+          "id",
+          "domain",
+          "dataset",
+          "live_count",
+          "new_count",
+          "lost_count",
+          "created_at"
+        ],
+        "properties": {
+          "comparison_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "comparison_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Previous import for this dataset/domain. Kept as provenance even if it is deleted."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "dataset": {
+            "type": "string"
+          },
+          "domain": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "live_count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lost_count": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "new_count": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "BacklinkSnapshotView": {
+        "type": "object",
+        "required": [
+          "snapshot",
+          "source",
+          "confidence",
+          "note",
+          "referring_domain_count",
+          "referring_domains",
+          "top_pages",
+          "anchors",
+          "items",
+          "total"
+        ],
+        "properties": {
+          "anchors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BacklinkAnchorGroup"
+            }
+          },
+          "confidence": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BacklinkEvidence"
+            }
+          },
+          "note": {
+            "type": "string"
+          },
+          "referring_domain_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "referring_domains": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BacklinkGroup"
+            },
+            "description": "Aggregates use current sample membership (live + new), not lost rows; at most 100 each."
+          },
+          "snapshot": {
+            "$ref": "#/components/schemas/BacklinkSnapshot"
+          },
+          "source": {
+            "type": "string"
+          },
+          "spam_score": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Unknown until an independently supported scoring source is available."
+          },
+          "top_pages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BacklinkGroup"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
       "ChangeResult": {
         "type": "object",
         "required": [
@@ -7165,6 +7585,65 @@
             "minimum": 0
           }
         }
+      },
+      "ImportBacklinksInput": {
+        "type": "object",
+        "required": [
+          "expected_domain",
+          "dataset",
+          "complete_sample",
+          "links"
+        ],
+        "properties": {
+          "complete_sample": {
+            "type": "boolean",
+            "description": "Must be true: the provided rows replace the entire sample for this dataset."
+          },
+          "dataset": {
+            "type": "string",
+            "description": "Stable lowercase dataset key, e.g. gsc-export. Diffs never cross datasets."
+          },
+          "expected_domain": {
+            "type": "string",
+            "description": "Exact current project website; prevents a stale import after a website change."
+          },
+          "links": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ImportedBacklink"
+            },
+            "description": "At most 1000 distinct external source/target URL pairs, within the API's 2 MiB body cap."
+          }
+        },
+        "additionalProperties": false
+      },
+      "ImportedBacklink": {
+        "type": "object",
+        "required": [
+          "source_url",
+          "target_url"
+        ],
+        "properties": {
+          "anchor": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "nofollow": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "source_url": {
+            "type": "string"
+          },
+          "target_url": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
       },
       "IndexNowInput": {
         "type": "object",
@@ -11131,6 +11610,10 @@
     {
       "name": "competitive",
       "description": "Domain research from project-scoped SERP evidence"
+    },
+    {
+      "name": "backlinks",
+      "description": "Imported backlink samples and snapshot comparisons"
     },
     {
       "name": "rank-tracking",

@@ -626,6 +626,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/backlink-snapshots": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_backlink_snapshots"];
+        put?: never;
+        post: operations["import_backlink_snapshot"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/backlink-snapshots/{snapshot_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_backlink_snapshot"];
+        put?: never;
+        post?: never;
+        delete: operations["delete_backlink_snapshot"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/context": {
         parameters: {
             query?: never;
@@ -1752,6 +1784,62 @@ export interface components {
             scope?: string | null;
             state?: string | null;
         };
+        BacklinkAnchorGroup: {
+            anchor?: string | null;
+            links: number;
+        };
+        BacklinkEvidence: {
+            anchor?: string | null;
+            /** @description Null means the imported sample did not specify the link relation. */
+            nofollow?: boolean | null;
+            source_domain: string;
+            source_url: string;
+            state: string;
+            target_url: string;
+        };
+        BacklinkGroup: {
+            links: number;
+            value: string;
+        };
+        BacklinkSnapshot: {
+            /** Format: date-time */
+            comparison_at?: string | null;
+            /**
+             * Format: uuid
+             * @description Previous import for this dataset/domain. Kept as provenance even if it is deleted.
+             */
+            comparison_id?: string | null;
+            /** Format: date-time */
+            created_at: string;
+            dataset: string;
+            domain: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: int32 */
+            live_count: number;
+            /** Format: int32 */
+            lost_count: number;
+            /** Format: int32 */
+            new_count: number;
+        };
+        BacklinkSnapshotView: {
+            anchors: components["schemas"]["BacklinkAnchorGroup"][];
+            confidence: string;
+            items: components["schemas"]["BacklinkEvidence"][];
+            note: string;
+            referring_domain_count: number;
+            /** @description Aggregates use current sample membership (live + new), not lost rows; at most 100 each. */
+            referring_domains: components["schemas"]["BacklinkGroup"][];
+            snapshot: components["schemas"]["BacklinkSnapshot"];
+            source: string;
+            /**
+             * Format: int32
+             * @description Unknown until an independently supported scoring source is available.
+             */
+            spam_score?: number | null;
+            top_pages: components["schemas"]["BacklinkGroup"][];
+            total: number;
+        };
         ChangeResult: {
             /**
              * Format: int64
@@ -2010,6 +2098,22 @@ export interface components {
              * @description How many top domains to import (1,000–20,000,000; default 1,000,000 ≈ 30 MB download).
              */
             limit?: number | null;
+        };
+        ImportBacklinksInput: {
+            /** @description Must be true: the provided rows replace the entire sample for this dataset. */
+            complete_sample: boolean;
+            /** @description Stable lowercase dataset key, e.g. gsc-export. Diffs never cross datasets. */
+            dataset: string;
+            /** @description Exact current project website; prevents a stale import after a website change. */
+            expected_domain: string;
+            /** @description At most 1000 distinct external source/target URL pairs, within the API's 2 MiB body cap. */
+            links: components["schemas"]["ImportedBacklink"][];
+        };
+        ImportedBacklink: {
+            anchor?: string | null;
+            nofollow?: boolean | null;
+            source_url: string;
+            target_url: string;
         };
         IndexNowInput: {
             urls: string[];
@@ -4295,6 +4399,115 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["Problem"];
                 };
+            };
+        };
+    };
+    list_backlink_snapshots: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BacklinkSnapshot"][];
+                };
+            };
+        };
+    };
+    import_backlink_snapshot: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportBacklinksInput"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BacklinkSnapshot"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    get_backlink_snapshot: {
+        parameters: {
+            query?: {
+                /** @description all (default), live (includes new), new, lost */
+                state?: string | null;
+                limit?: number | null;
+                offset?: number | null;
+            };
+            header?: never;
+            path: {
+                project_id: string;
+                snapshot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BacklinkSnapshotView"];
+                };
+            };
+        };
+    };
+    delete_backlink_snapshot: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                snapshot_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

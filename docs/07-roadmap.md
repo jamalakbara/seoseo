@@ -26,6 +26,8 @@ M5 started: [competitive research](14-competitive-research.md) provides a projec
 
 M5 continuation: DO-07 domain registration age is implemented with IANA-discovered HTTPS RDAP, minimal 24-hour caching and explicit unknown states in REST/UI/MCP. See [Competitive research](14-competitive-research.md).
 
+M5 backlink foundation: [imported backlink snapshots](15-backlink-snapshots.md) provide scoped history, sample-presence diffs, referring domains, target pages and anchors in REST/UI/MCP. DB-04 and BL-01..04/06 remain `wip`; automatic discovery, independent verification and spam scoring remain unfinished.
+
 ## M3 retained follow-ups
 M3 core is shipped. Per user direction on 2026-11-12, retain keyword file import (RT-02), per-tracker timezones (RT-03), keyword/run matrix (RT-05), and dashboard retry (OP-03) as follow-ups. Device/city/depth controls (RT-01/04) depend on provider support. These rows remain `wip` in the feature catalog; M3 is not marked fully complete.
 
