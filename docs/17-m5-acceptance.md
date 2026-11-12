@@ -25,6 +25,8 @@ There are 87 MCP tools. New schema is additive: 0013 schedules/citation provenan
 
 Fixture output is synthetic and explicitly labelled. The tiny local model proves API integration, not answer quality. Fixture checks do not establish real cloud credentials, billing, model availability or search permissions. Live free SERP coverage depends on the configured provider; the crawl regression uses local HTML fixtures.
 
+Follow-up connection check: the installed, unmodified Claude Code CLI 2.1.304 is authenticated through Claude.ai and returned a successful live `claude-haiku-5-5` answer in print/JSON mode. Tools, MCP servers, customizations and session persistence were disabled for that check; no login tokens were extracted or copied. This confirms the local Claude Code connection only. It does not exercise SeoSeo's Anthropic HTTP adapter, provide Gemini access, or satisfy the three-engine saved-run gate. No direct cloud API credentials were found in the project environment, API/worker configuration or process/user/machine environment. See [Anthropic's authentication guidance](https://code.claude.com/docs/en/legal-and-compliance#authentication-and-credential-use) for the distinction between subscription login and application API authentication.
+
 ## Reproduce on a disposable stack
 
 Run from the repository root. The test overlay disables private-address crawler protection and uses open signup and synthetic API keys. Never apply it to a normal deployment. It needs ports 3400/3402/3403, Docker, Python, pnpm and enough memory for the builds/local model. Override `M5_MODEL_PORT`/`M5_RESEARCH_PORT` if occupied and use those ports in the test commands.
