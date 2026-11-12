@@ -6,9 +6,11 @@ pub mod audits;
 pub mod auth;
 pub mod gsc;
 pub mod keywords;
+pub mod memory;
 pub mod projects;
 pub mod providers;
 pub mod rank;
+pub mod reports;
 pub mod team;
 pub mod validate;
 

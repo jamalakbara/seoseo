@@ -87,3 +87,43 @@ pub struct Job {
     pub created_at: DateTime<Utc>,
     pub finished_at: Option<DateTime<Utc>>,
 }
+
+#[derive(Debug, Clone, Serialize, ToSchema, sqlx::FromRow)]
+pub struct ReportTemplate {
+    pub id: Uuid,
+    pub project_id: Uuid,
+    pub name: String,
+    pub description: Option<String>,
+    pub instructions: String,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Clone, Serialize, ToSchema, sqlx::FromRow)]
+pub struct Report {
+    pub id: Uuid,
+    pub project_id: Uuid,
+    pub title: String,
+    pub summary: Option<String>,
+    pub html: String,
+    pub skill: Option<String>,
+    pub template_id: Option<Uuid>,
+    pub created_by: String,
+    pub shared_at: Option<DateTime<Utc>>,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Clone, Serialize, ToSchema, sqlx::FromRow)]
+pub struct ReportListItem {
+    pub id: Uuid,
+    pub project_id: Uuid,
+    pub title: String,
+    pub summary: Option<String>,
+    pub skill: Option<String>,
+    pub template_id: Option<Uuid>,
+    pub created_by: String,
+    pub shared_at: Option<DateTime<Utc>>,
+    pub created_at: DateTime<Utc>,
+    pub updated_at: DateTime<Utc>,
+}

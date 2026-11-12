@@ -6,6 +6,10 @@ export type Project = Schemas["Project"];
 export type Me = Schemas["MeView"];
 export type ApiKey = Schemas["ApiKey"];
 export type Problem = Schemas["Problem"];
+export type ProjectContext = Schemas["ProjectContext"];
+export type Report = Schemas["Report"];
+export type ReportListItem = Schemas["ReportListItem"];
+export type ReportTemplate = Schemas["ReportTemplate"];
 
 /** Error thrown for non-2xx responses, carrying the RFC 9457 problem body. */
 export class ApiError extends Error {

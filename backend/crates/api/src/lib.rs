@@ -35,12 +35,14 @@ use utoipa_scalar::{Scalar, Servable};
         (name = "auth", description = "Accounts, sessions and workspaces"),
         (name = "api-keys", description = "Organization-bound API keys"),
         (name = "projects", description = "Projects and their default market"),
+        (name = "project-memory", description = "Revisioned project context for people and agents"),
         (name = "jobs", description = "Background jobs"),
         (name = "audits", description = "Site audits: crawl, issues, pages"),
         (name = "team", description = "Workspace members and invitations"),
         (name = "providers", description = "Data providers, API keys and domain authority"),
         (name = "keywords", description = "Keyword research, saved keywords and SERP analysis"),
-        (name = "rank-tracking", description = "Rank trackers, scheduled checks and position history")
+        (name = "rank-tracking", description = "Rank trackers, scheduled checks and position history"),
+        (name = "reports", description = "Stored HTML reports, templates and public sharing")
     )
 )]
 struct ApiDoc;

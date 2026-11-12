@@ -18,6 +18,8 @@ export function ProjectHeader() {
     { href: `${base}/rank`, label: "Rank tracking" },
     { href: `${base}/gsc`, label: "Search Console" },
     { href: `${base}/audit`, label: "Site audit" },
+    { href: `${base}/memory`, label: "Memory" },
+    { href: `${base}/reports`, label: "Reports" },
     { href: `${base}/settings`, label: "Settings" },
   ];
 

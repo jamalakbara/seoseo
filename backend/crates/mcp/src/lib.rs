@@ -135,6 +135,251 @@ impl SeoSeoMcp {
         reply(async { domain::projects::create(&self.pool, &actor, conv(&p)?).await }.await)
     }
 
+    #[tool(
+        description = "Read the project's revisioned memory: context sections, competitors, key pages and immutable research log."
+    )]
+    async fn get_project_context(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<ProjectRef>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        reply(
+            async {
+                domain::memory::get(&self.pool, &actor, id("project_id", &p.project_id)?).await
+            }
+            .await,
+        )
+    }
+
+    #[tool(
+        description = "Replace project context sections, competitors and key pages using the last revision, and optionally append a research note. Admin role."
+    )]
+    async fn update_project_context(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<UpdateProjectContext>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        reply(
+            async {
+                domain::memory::update(
+                    &self.pool,
+                    &actor,
+                    id("project_id", &p.project_id)?,
+                    conv(&p)?,
+                )
+                .await
+            }
+            .await,
+        )
+    }
+
+    // ------------------------------------------------------------ reports
+
+    #[tool(
+        description = "Create a stored self-contained HTML report, or replace one by report_id. Editing revokes any public share link. Admin role."
+    )]
+    async fn save_report(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<SaveReport>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        reply(
+            async {
+                let project_id = id("project_id", &p.project_id)?;
+                let template_id = p
+                    .template_id
+                    .as_deref()
+                    .map(|value| id("template_id", value))
+                    .transpose()?;
+                let input = domain::reports::SaveReportInput {
+                    title: p.title,
+                    summary: p.summary,
+                    html: p.html,
+                    skill: p.skill,
+                    template_id,
+                };
+                match p.report_id {
+                    Some(report_id) => {
+                        domain::reports::update(
+                            &self.pool,
+                            &actor,
+                            project_id,
+                            id("report_id", &report_id)?,
+                            input,
+                        )
+                        .await
+                    }
+                    None => domain::reports::create(&self.pool, &actor, project_id, input).await,
+                }
+            }
+            .await,
+        )
+    }
+
+    #[tool(description = "Get one stored report, including its self-contained HTML document.")]
+    async fn get_report(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<ReportRef>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        reply(
+            async {
+                domain::reports::get(
+                    &self.pool,
+                    &actor,
+                    id("project_id", &p.project_id)?,
+                    id("report_id", &p.report_id)?,
+                )
+                .await
+            }
+            .await,
+        )
+    }
+
+    #[tool(description = "List stored reports newest first. HTML is omitted from list rows.")]
+    async fn list_reports(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<ProjectRef>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        reply(
+            async {
+                domain::reports::list(&self.pool, &actor, id("project_id", &p.project_id)?).await
+            }
+            .await,
+        )
+    }
+
+    #[tool(description = "Permanently delete a stored report. Admin role.")]
+    async fn delete_report(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<ReportRef>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        reply(
+            async {
+                domain::reports::delete(
+                    &self.pool,
+                    &actor,
+                    id("project_id", &p.project_id)?,
+                    id("report_id", &p.report_id)?,
+                )
+                .await?;
+                Ok(json!({ "deleted": true }))
+            }
+            .await,
+        )
+    }
+
+    #[tool(
+        description = "Create a reusable report instruction template (maximum 10 per project). Admin role."
+    )]
+    async fn save_report_template(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<SaveReportTemplate>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        reply(
+            async {
+                let project_id = id("project_id", &p.project_id)?;
+                let input = conv(&p)?;
+                match p.template_id {
+                    Some(template_id) => {
+                        domain::reports::update_template(
+                            &self.pool,
+                            &actor,
+                            project_id,
+                            id("template_id", &template_id)?,
+                            input,
+                        )
+                        .await
+                    }
+                    None => {
+                        domain::reports::create_template(&self.pool, &actor, project_id, input)
+                            .await
+                    }
+                }
+            }
+            .await,
+        )
+    }
+
+    #[tool(description = "List reusable report instruction templates for a project.")]
+    async fn list_report_templates(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<ProjectRef>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        reply(
+            async {
+                domain::reports::list_templates(
+                    &self.pool,
+                    &actor,
+                    id("project_id", &p.project_id)?,
+                )
+                .await
+            }
+            .await,
+        )
+    }
+
+    #[tool(description = "Delete a reusable report instruction template. Admin role.")]
+    async fn delete_report_template(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<ReportTemplateRef>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        reply(
+            async {
+                domain::reports::delete_template(
+                    &self.pool,
+                    &actor,
+                    id("project_id", &p.project_id)?,
+                    id("template_id", &p.template_id)?,
+                )
+                .await?;
+                Ok(json!({ "deleted": true }))
+            }
+            .await,
+        )
+    }
+
+    #[tool(
+        description = "Enable public sharing with a new secret token, or revoke the current link. Admin role."
+    )]
+    async fn set_report_sharing(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<SetReportSharing>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        reply(
+            async {
+                let project_id = id("project_id", &p.project_id)?;
+                let report_id = id("report_id", &p.report_id)?;
+                if p.enabled {
+                    domain::reports::share(&self.pool, &actor, project_id, report_id)
+                        .await
+                        .map(|result| json!(result))
+                } else {
+                    domain::reports::unshare(&self.pool, &actor, project_id, report_id)
+                        .await
+                        .map(|report| json!({ "report": report, "token": null }))
+                }
+            }
+            .await,
+        )
+    }
+
     // ------------------------------------------------------------ keywords
 
     #[tool(

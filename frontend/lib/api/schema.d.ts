@@ -546,6 +546,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/context": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_project_context"];
+        put: operations["update_project_context"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/gsc": {
         parameters: {
             query?: never;
@@ -889,6 +905,102 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/report-templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_report_templates"];
+        put?: never;
+        post: operations["create_report_template"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/report-templates/{template_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["update_report_template"];
+        post?: never;
+        delete: operations["delete_report_template"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/reports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_reports"];
+        put?: never;
+        post: operations["create_report"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/reports/{report_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_report"];
+        put: operations["update_report"];
+        post?: never;
+        delete: operations["delete_report"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/reports/{report_id}/raw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_report_raw"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/reports/{report_id}/share": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["share_report"];
+        delete: operations["unshare_report"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/restore": {
         parameters: {
             query?: never;
@@ -1078,6 +1190,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/shared-reports/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_shared_report"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/shared-reports/{token}/raw": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_shared_report_raw"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/team/invitations": {
         parameters: {
             query?: never;
@@ -1242,6 +1386,16 @@ export interface components {
              */
             keyword_count: number;
         };
+        Competitor: {
+            domain: string;
+            name?: string | null;
+            notes?: string | null;
+        };
+        CompetitorInput: {
+            domain: string;
+            name?: string | null;
+            notes?: string | null;
+        };
         ConnectUrl: {
             url: string;
         };
@@ -1251,6 +1405,17 @@ export interface components {
             /** Format: uuid */
             connected_by?: string | null;
             site_url?: string | null;
+        };
+        ContextSection: {
+            content: string;
+            key: string;
+            title: string;
+            updated_by: string;
+        };
+        ContextSectionInput: {
+            content: string;
+            key: string;
+            title: string;
         };
         CreateApiKeyInput: {
             name: string;
@@ -1441,6 +1606,17 @@ export interface components {
             queued: number;
             /** Format: int64 */
             running: number;
+        };
+        KeyPage: {
+            role: string;
+            topic?: string | null;
+            url: string;
+        };
+        KeyPageInput: {
+            /** @description hub, spoke, money, or other. */
+            role: string;
+            topic?: string | null;
+            url: string;
         };
         KeywordIdea: {
             /**
@@ -1823,6 +1999,21 @@ export interface components {
             /** Format: date-time */
             updated_at: string;
         };
+        ProjectContext: {
+            competitors: components["schemas"]["Competitor"][];
+            key_pages: components["schemas"]["KeyPage"][];
+            /** Format: uuid */
+            project_id: string;
+            research_log: components["schemas"]["ResearchLogEntry"][];
+            /**
+             * Format: int64
+             * @description Send this value as `revision` when updating. Stale updates are rejected.
+             */
+            revision: number;
+            sections: components["schemas"]["ContextSection"][];
+            /** Format: date-time */
+            updated_at?: string | null;
+        };
         ProviderInfo: {
             default_enabled: boolean;
             description: string;
@@ -1989,6 +2180,64 @@ export interface components {
             /** @description Omit or pass an empty list to refresh all saved keywords. Otherwise 1–1000 IDs. */
             ids?: string[];
         };
+        Report: {
+            /** Format: date-time */
+            created_at: string;
+            created_by: string;
+            html: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            project_id: string;
+            /** Format: date-time */
+            shared_at?: string | null;
+            skill?: string | null;
+            summary?: string | null;
+            /** Format: uuid */
+            template_id?: string | null;
+            title: string;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        ReportListItem: {
+            /** Format: date-time */
+            created_at: string;
+            created_by: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            project_id: string;
+            /** Format: date-time */
+            shared_at?: string | null;
+            skill?: string | null;
+            summary?: string | null;
+            /** Format: uuid */
+            template_id?: string | null;
+            title: string;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        ReportTemplate: {
+            /** Format: date-time */
+            created_at: string;
+            description?: string | null;
+            /** Format: uuid */
+            id: string;
+            instructions: string;
+            name: string;
+            /** Format: uuid */
+            project_id: string;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        ResearchLogEntry: {
+            /** Format: date-time */
+            created_at: string;
+            /** Format: uuid */
+            id: string;
+            summary: string;
+            updated_by: string;
+        };
         /** @enum {string} */
         Role: "member" | "admin" | "owner";
         /** @description What a check costs in provider requests (there are no credits or fees in SeoSeo itself). */
@@ -2037,6 +2286,20 @@ export interface components {
             already_saved: number;
             /** Format: int64 */
             saved: number;
+        };
+        SaveReportInput: {
+            /** @description A complete, self-contained HTML document. External scripts are rejected. */
+            html: string;
+            skill?: string | null;
+            summary?: string | null;
+            /** Format: uuid */
+            template_id?: string | null;
+            title: string;
+        };
+        SaveReportTemplateInput: {
+            description?: string | null;
+            instructions: string;
+            name: string;
         };
         SavedKeyword: {
             country: string;
@@ -2121,6 +2384,19 @@ export interface components {
         };
         /** @enum {string} */
         Severity: "critical" | "warning" | "info";
+        ShareReportResult: {
+            report: components["schemas"]["Report"];
+            /** @description Secret URL token. It is shown only when sharing is enabled. */
+            token: string;
+        };
+        SharedReportView: {
+            /** Format: date-time */
+            created_at: string;
+            summary?: string | null;
+            title: string;
+            /** Format: date-time */
+            updated_at: string;
+        };
         SignInInput: {
             email: string;
             password: string;
@@ -2203,6 +2479,18 @@ export interface components {
             /** @description Recent runs, newest first. */
             runs: components["schemas"]["RankRun"][];
             tracker: components["schemas"]["RankTracker"];
+        };
+        UpdateProjectContextInput: {
+            competitors?: components["schemas"]["CompetitorInput"][];
+            key_pages?: components["schemas"]["KeyPageInput"][];
+            /** @description Optional immutable research-log entry appended by the server. */
+            research_note?: string | null;
+            /**
+             * Format: int64
+             * @description Revision returned by the last GET. Use 0 for a context that has never been saved.
+             */
+            revision: number;
+            sections?: components["schemas"]["ContextSectionInput"][];
         };
         /** @description Partial update. Send `null` for nullable fields to clear them; omit to keep. */
         UpdateProjectInput: {
@@ -3241,6 +3529,76 @@ export interface operations {
             };
         };
     };
+    get_project_context: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectContext"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    update_project_context: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateProjectContextInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectContext"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
     gsc_status: {
         parameters: {
             query?: never;
@@ -3960,6 +4318,310 @@ export interface operations {
             };
         };
     };
+    list_report_templates: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportTemplate"][];
+                };
+            };
+        };
+    };
+    create_report_template: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveReportTemplateInput"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportTemplate"];
+                };
+            };
+        };
+    };
+    update_report_template: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                template_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveReportTemplateInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportTemplate"];
+                };
+            };
+        };
+    };
+    delete_report_template: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                template_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    list_reports: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReportListItem"][];
+                };
+            };
+        };
+    };
+    create_report: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveReportInput"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Report"];
+                };
+            };
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    get_report: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                report_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Report"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    update_report: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                report_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SaveReportInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Report"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    delete_report: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                report_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    get_report_raw: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                report_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": string;
+                };
+            };
+        };
+    };
+    share_report: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                report_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShareReportResult"];
+                };
+            };
+        };
+    };
+    unshare_report: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                report_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Report"];
+                };
+            };
+        };
+    };
     restore_project: {
         parameters: {
             query?: never;
@@ -4320,6 +4982,56 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    get_shared_report: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SharedReportView"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    get_shared_report_raw: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": string;
                 };
             };
         };

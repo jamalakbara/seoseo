@@ -62,6 +62,86 @@ pub struct CreateProject {
 }
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct MemorySection {
+    pub key: String,
+    pub title: String,
+    pub content: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct MemoryCompetitor {
+    pub domain: String,
+    pub name: Option<String>,
+    pub notes: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct MemoryKeyPage {
+    pub url: String,
+    /// hub, spoke, money, or other.
+    pub role: String,
+    pub topic: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct UpdateProjectContext {
+    pub project_id: String,
+    /// Revision returned by get_project_context. Use 0 before the first save.
+    pub revision: i64,
+    #[serde(default)]
+    pub sections: Vec<MemorySection>,
+    #[serde(default)]
+    pub competitors: Vec<MemoryCompetitor>,
+    #[serde(default)]
+    pub key_pages: Vec<MemoryKeyPage>,
+    /// Optional immutable research note to append.
+    pub research_note: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct SaveReport {
+    pub project_id: String,
+    /// Omit to create; provide an existing report id to replace it.
+    pub report_id: Option<String>,
+    pub title: String,
+    pub summary: Option<String>,
+    /// Complete self-contained HTML document, at most 500 KiB.
+    pub html: String,
+    pub skill: Option<String>,
+    pub template_id: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ReportRef {
+    pub project_id: String,
+    pub report_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct SaveReportTemplate {
+    pub project_id: String,
+    /// Omit to create; provide an existing template id to replace it.
+    pub template_id: Option<String>,
+    pub name: String,
+    pub description: Option<String>,
+    pub instructions: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ReportTemplateRef {
+    pub project_id: String,
+    pub template_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct SetReportSharing {
+    pub project_id: String,
+    pub report_id: String,
+    /// Enable with a new secret token, or revoke the current token.
+    pub enabled: bool,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct ResearchKeywords {
     pub project_id: String,
     /// Seed keyword, e.g. "standing desk".

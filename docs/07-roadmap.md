@@ -17,6 +17,8 @@ Each milestone ends with: tests green, docker compose up works, docs + `03-featu
 ## Next milestone
 M3 core is shipped. Per user direction on 2026-11-12, retain keyword file import (RT-02), per-tracker timezones (RT-03), keyword/run matrix (RT-05), and dashboard retry (OP-03) as follow-ups. Device/city/depth controls (RT-01/04) depend on provider support. These rows remain `wip` in the feature catalog; M3 is not marked fully complete.
 
+M4 is in progress. WS-10 and RP-01..03 shipped on 2026-11-12 with REST, UI, and 10 new MCP tools (43 total). Remaining M4 scope: dashboard DB-01..03/05, onboarding WS-11, GA4 IN-03, IndexNow IN-05, and MCP OAuth MC-02. See [Project memory and reports](11-memory-and-reports.md).
+
 GSC operator setup and verification: [Search Console](10-search-console.md). Real Google consent/property access still needs a configured Google Cloud client.
 
 M2 setup and verification: [Browser audits and keyword refresh](09-m2-browser-and-refresh.md).
