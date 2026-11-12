@@ -155,6 +155,30 @@ impl Fetcher {
         }
     }
 
+    /// Read an ownership file without following redirects, using the guarded DNS resolver.
+    pub async fn get_exact_bytes(&self, url: &Url, max: usize) -> Result<(u16, Vec<u8>), String> {
+        self.policy.check_url(url).map_err(|e| e.to_string())?;
+        let mut response = self
+            .client
+            .get(url.clone())
+            .send()
+            .await
+            .map_err(|_| "ownership check could not reach host".to_string())?;
+        let status = response.status().as_u16();
+        let mut bytes = Vec::new();
+        while let Some(chunk) = response
+            .chunk()
+            .await
+            .map_err(|_| "ownership response interrupted".to_string())?
+        {
+            if bytes.len() + chunk.len() > max {
+                return Err("ownership file too large".into());
+            }
+            bytes.extend_from_slice(&chunk);
+        }
+        Ok((status, bytes))
+    }
+
     /// Fetch a page for the audit. Redirects that leave `scope` stop with `RedirectOffsite`.
     pub async fn fetch_page(&self, url: &Url, scope: Option<&Scope>) -> FetchOutcome {
         self.fetch_inner(url, scope, MAX_HTML_BYTES, false).await

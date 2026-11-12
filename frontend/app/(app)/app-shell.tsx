@@ -24,6 +24,7 @@ const NAV = [
   { href: "/settings/team", label: "Team", icon: Users },
   { href: "/settings/providers", label: "Data providers", icon: Database },
   { href: "/settings/jobs", label: "Jobs", icon: Activity },
+  { href: "/settings/connected-apps", label: "Connected apps", icon: KeyRound },
   { href: "/settings/api-keys", label: "API keys", icon: KeyRound },
 ];
 

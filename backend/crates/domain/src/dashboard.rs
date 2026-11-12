@@ -20,6 +20,7 @@ pub struct ChecklistStep {
 #[derive(Serialize, ToSchema)]
 pub struct DashboardOverview {
     pub checklist: Vec<ChecklistStep>,
+    pub link_activity: Vec<db::integrations::LinkObservation>,
     pub latest_audit: Option<Audit>,
     pub completed_audit: Option<Audit>,
     pub counts: Counts,
@@ -138,6 +139,7 @@ pub async fn overview(pool: &PgPool, actor: &Actor, pid: Uuid) -> AppResult<Dash
     let rank_movers = repo::movers(pool, actor.org_id, pid).await?;
     Ok(DashboardOverview {
         checklist,
+        link_activity: db::integrations::links(pool, actor.org_id, pid).await?,
         latest_audit,
         completed_audit,
         counts,

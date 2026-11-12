@@ -4,6 +4,7 @@ mod auth;
 mod error;
 mod mcp_mount;
 mod middleware;
+mod oauth;
 mod routes;
 mod state;
 
@@ -73,14 +74,27 @@ pub fn router(state: AppState) -> Router {
         .nest("/api/v1", routes::v1())
         .split_for_parts();
 
+    let web_origin: axum::http::HeaderValue = state
+        .cfg
+        .web_base_url
+        .parse()
+        .expect("WEB_BASE_URL must be a valid origin");
+    let mcp_browser_auth = state.cfg.auth_mode != common::AuthMode::None;
     let cors = CorsLayer::new()
-        .allow_origin(AllowOrigin::exact(
-            state
-                .cfg
-                .web_base_url
-                .parse()
-                .expect("WEB_BASE_URL must be a valid origin"),
-        ))
+        .allow_origin(AllowOrigin::predicate(move |origin, request| {
+            origin == web_origin
+                || (mcp_browser_auth && request.uri.path() == "/mcp")
+                || matches!(
+                    request.uri.path(),
+                    "/oauth/token"
+                        | "/oauth/register"
+                        | "/oauth/revoke"
+                        | "/oauth/authorize"
+                        | "/.well-known/oauth-authorization-server"
+                        | "/.well-known/oauth-protected-resource"
+                        | "/.well-known/oauth-protected-resource/mcp"
+                )
+        }))
         .allow_credentials(true)
         .allow_methods(tower_http::cors::AllowMethods::mirror_request())
         .allow_headers(tower_http::cors::AllowHeaders::mirror_request());
@@ -94,6 +108,7 @@ pub fn router(state: AppState) -> Router {
             axum::routing::get(move || async move { axum::Json(openapi_json) }),
         )
         .merge(routes::system())
+        .merge(oauth::public())
         .merge(mcp_mount::router(&state))
         .layer(axum::middleware::from_fn(middleware::track_metrics))
         // OAuth callback queries contain authorization codes; never put them in spans.

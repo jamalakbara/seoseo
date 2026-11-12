@@ -110,6 +110,439 @@ fn conv<T: DeserializeOwned>(params: &impl Serialize) -> AppResult<T> {
 #[tool_router]
 impl SeoSeoMcp {
     #[tool(
+        description = "List accessible GA4 properties with pagination. Needs admin and a separate Analytics grant; pass next_page_token as page_token."
+    )]
+    async fn list_google_analytics_properties(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<Ga4PropertyPage>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                let pid = id("project_id", &p.project_id)?;
+                domain::ga4::properties(&self.pool, &a, pid, &self.cfg, p.page_token).await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Bind a project to a freshly verified GA4 property from list_google_analytics_properties. Needs admin; the Google grant is independent of Search Console."
+    )]
+    async fn set_google_analytics_property(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<Ga4PropertySelection>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                let pid = id("project_id", &p.project_id)?;
+                domain::ga4::set_property(
+                    &self.pool,
+                    &a,
+                    pid,
+                    &self.cfg,
+                    domain::ga4::Ga4PropertyInput {
+                        property_id: p.property_id,
+                    },
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Create or reuse a project IndexNow ownership key. Needs admin; host this key at the named domain root before verification or submission."
+    )]
+    async fn setup_indexnow(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<ProjectRef>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                let pid = id("project_id", &p.project_id)?;
+                domain::integrations::indexnow_setup(&self.pool, &a, pid).await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Verify the exact root IndexNow key file with guarded DNS and no redirects. Needs admin. A failed check sends no URLs to engines."
+    )]
+    async fn verify_indexnow(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<ProjectRef>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                let pid = id("project_id", &p.project_id)?;
+                domain::integrations::indexnow_verify(&self.pool, &a, pid, &self.cfg).await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Submit 1-1000 changed URLs on the project domain or subdomains after checking ownership on each host. Needs admin. Engine acceptance is not indexing; one-minute cooldown."
+    )]
+    async fn submit_indexnow_urls(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<IndexNowUrls>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                let pid = id("project_id", &p.project_id)?;
+                domain::integrations::indexnow_submit(
+                    &self.pool,
+                    &a,
+                    pid,
+                    &self.cfg,
+                    domain::integrations::IndexNowInput { urls: p.urls },
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Generate an optional local or compatible-model draft from bounded crawl evidence. Needs admin and configured LLM. This never saves memory: review output with the user before save_project_website_setup."
+    )]
+    async fn synthesize_project_website(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<ProjectRef>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                let pid = id("project_id", &p.project_id)?;
+                domain::integrations::synthesize(&self.pool, &a, pid, &self.cfg).await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "List up to 100 most recent project link observations. These are recorded evidence, not an exhaustive backlink index or independently verified live status."
+    )]
+    async fn list_link_observations(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<ProjectRef>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                let pid = id("project_id", &p.project_id)?;
+                domain::integrations::links(&self.pool, &a, pid).await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Record a user-reviewed external link observation (live or lost), targeting this project website. Needs admin. This does not crawl or verify the source URL."
+    )]
+    async fn save_link_observation(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<LinkObservationInput>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                let pid = id("project_id", &p.project_id)?;
+                domain::integrations::save_link(
+                    &self.pool,
+                    &a,
+                    pid,
+                    domain::integrations::LinkInput {
+                        source_url: p.source_url,
+                        target_url: p.target_url,
+                        state: p.state,
+                    },
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Read the bounded GA4 organic overview report. Dates required, at most 366 days ending two UTC days ago; limit 1-1000. Inspect channel, privacy metadata, quota and unknown values. No arbitrary report JSON."
+    )]
+    async fn get_google_analytics_organic_overview(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<Ga4ReportParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                let pid = id("project_id", &p.project_id)?;
+                domain::ga4::report(
+                    &self.pool,
+                    &a,
+                    pid,
+                    &self.cfg,
+                    domain::ga4::Ga4ReportKind::OrganicOverview,
+                    domain::ga4::Ga4ReportInput {
+                        start_date: p.start_date,
+                        end_date: p.end_date,
+                        limit: p.limit,
+                        offset: p.offset,
+                    },
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Read the bounded GA4 organic landing pages report. Dates required, at most 366 days ending two UTC days ago; limit 1-1000. Inspect channel, privacy metadata, quota and unknown values. No arbitrary report JSON."
+    )]
+    async fn get_google_analytics_organic_landing_pages(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<Ga4ReportParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                let pid = id("project_id", &p.project_id)?;
+                domain::ga4::report(
+                    &self.pool,
+                    &a,
+                    pid,
+                    &self.cfg,
+                    domain::ga4::Ga4ReportKind::OrganicLandingPages,
+                    domain::ga4::Ga4ReportInput {
+                        start_date: p.start_date,
+                        end_date: p.end_date,
+                        limit: p.limit,
+                        offset: p.offset,
+                    },
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Read the bounded GA4 page performance report. Dates required, at most 366 days ending two UTC days ago; limit 1-1000. Inspect channel, privacy metadata, quota and unknown values. No arbitrary report JSON."
+    )]
+    async fn get_google_analytics_page_performance(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<Ga4ReportParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                let pid = id("project_id", &p.project_id)?;
+                domain::ga4::report(
+                    &self.pool,
+                    &a,
+                    pid,
+                    &self.cfg,
+                    domain::ga4::Ga4ReportKind::PagePerformance,
+                    domain::ga4::Ga4ReportInput {
+                        start_date: p.start_date,
+                        end_date: p.end_date,
+                        limit: p.limit,
+                        offset: p.offset,
+                    },
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Read the bounded GA4 traffic acquisition report. Dates required, at most 366 days ending two UTC days ago; limit 1-1000. Inspect channel, privacy metadata, quota and unknown values. No arbitrary report JSON."
+    )]
+    async fn get_google_analytics_traffic_acquisition(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<Ga4ReportParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                let pid = id("project_id", &p.project_id)?;
+                domain::ga4::report(
+                    &self.pool,
+                    &a,
+                    pid,
+                    &self.cfg,
+                    domain::ga4::Ga4ReportKind::TrafficAcquisition,
+                    domain::ga4::Ga4ReportInput {
+                        start_date: p.start_date,
+                        end_date: p.end_date,
+                        limit: p.limit,
+                        offset: p.offset,
+                    },
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Read the bounded GA4 key events report. Dates required, at most 366 days ending two UTC days ago; limit 1-1000. Inspect channel, privacy metadata, quota and unknown values. No arbitrary report JSON."
+    )]
+    async fn get_google_analytics_key_events(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<Ga4ReportParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                let pid = id("project_id", &p.project_id)?;
+                domain::ga4::report(
+                    &self.pool,
+                    &a,
+                    pid,
+                    &self.cfg,
+                    domain::ga4::Ga4ReportKind::KeyEvents,
+                    domain::ga4::Ga4ReportInput {
+                        start_date: p.start_date,
+                        end_date: p.end_date,
+                        limit: p.limit,
+                        offset: p.offset,
+                    },
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Read the bounded GA4 ecommerce performance report. Dates required, at most 366 days ending two UTC days ago; limit 1-1000. Inspect channel, privacy metadata, quota and unknown values. No arbitrary report JSON."
+    )]
+    async fn get_google_analytics_ecommerce_performance(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<Ga4ReportParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                let pid = id("project_id", &p.project_id)?;
+                domain::ga4::report(
+                    &self.pool,
+                    &a,
+                    pid,
+                    &self.cfg,
+                    domain::ga4::Ga4ReportKind::EcommercePerformance,
+                    domain::ga4::Ga4ReportInput {
+                        start_date: p.start_date,
+                        end_date: p.end_date,
+                        limit: p.limit,
+                        offset: p.offset,
+                    },
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Read the bounded GA4 site search report. Dates required, at most 366 days ending two UTC days ago; limit 1-1000. Inspect channel, privacy metadata, quota and unknown values. No arbitrary report JSON."
+    )]
+    async fn get_google_analytics_site_search(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<Ga4ReportParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                let pid = id("project_id", &p.project_id)?;
+                domain::ga4::report(
+                    &self.pool,
+                    &a,
+                    pid,
+                    &self.cfg,
+                    domain::ga4::Ga4ReportKind::SiteSearch,
+                    domain::ga4::Ga4ReportInput {
+                        start_date: p.start_date,
+                        end_date: p.end_date,
+                        limit: p.limit,
+                        offset: p.offset,
+                    },
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Read the bounded GA4 audience breakdown report. Dates required, at most 366 days ending two UTC days ago; limit 1-1000. Inspect channel, privacy metadata, quota and unknown values. No arbitrary report JSON."
+    )]
+    async fn get_google_analytics_audience_breakdown(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<Ga4ReportParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                let pid = id("project_id", &p.project_id)?;
+                domain::ga4::report(
+                    &self.pool,
+                    &a,
+                    pid,
+                    &self.cfg,
+                    domain::ga4::Ga4ReportKind::AudienceBreakdown,
+                    domain::ga4::Ga4ReportInput {
+                        start_date: p.start_date,
+                        end_date: p.end_date,
+                        limit: p.limit,
+                        offset: p.offset,
+                    },
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Read the bounded GA4 measurement health report. Dates required, at most 366 days ending two UTC days ago; limit 1-1000. Inspect channel, privacy metadata, quota and unknown values. No arbitrary report JSON."
+    )]
+    async fn get_google_analytics_measurement_health(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<Ga4ReportParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                let pid = id("project_id", &p.project_id)?;
+                domain::ga4::report(
+                    &self.pool,
+                    &a,
+                    pid,
+                    &self.cfg,
+                    domain::ga4::Ga4ReportKind::MeasurementHealth,
+                    domain::ga4::Ga4ReportInput {
+                        start_date: p.start_date,
+                        end_date: p.end_date,
+                        limit: p.limit,
+                        offset: p.offset,
+                    },
+                )
+                .await
+            }
+            .await,
+        )
+    }
+
+    #[tool(
         description = "Get the project dashboard: setup checklist, current-site audit health, rank movers, counts and cached Search Console highlights."
     )]
     async fn get_dashboard_overview(
@@ -1199,7 +1632,7 @@ mod tests {
     #[test]
     fn tools_are_registered_with_object_schemas() {
         let tools = super::SeoSeoMcp::tool_router().list_all();
-        assert!(tools.len() >= 49, "only {} tools", tools.len());
+        assert!(tools.len() >= 66, "only {} tools", tools.len());
         for name in [
             "get_dashboard_overview",
             "get_dashboard_keywords",

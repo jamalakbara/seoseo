@@ -45,22 +45,51 @@ pub fn router(state: &AppState) -> Router<AppState> {
 /// Resolve the caller and hand it to the tools through the request extensions.
 async fn authenticate(State(state): State<AppState>, req: Request, next: Next) -> Response {
     let (mut parts, body) = req.into_parts();
+    // Public browser MCP clients must present a bearer; never expose cross-origin cookies.
+    if parts
+        .headers
+        .get(header::ORIGIN)
+        .is_some_and(|o| o.as_bytes() != state.cfg.web_base_url.as_bytes())
+        && !parts.headers.contains_key(header::AUTHORIZATION)
+    {
+        return challenge(&state);
+    }
+
+    if let Some(secret) = parts
+        .headers
+        .get(header::AUTHORIZATION)
+        .and_then(|h| h.to_str().ok())
+        .and_then(|h| h.strip_prefix("Bearer "))
+        .filter(|s| s.starts_with("mcp_"))
+    {
+        match domain::oauth::authenticate(&state.pool, &state.cfg, secret).await {
+            Ok(Some(actor)) => {
+                parts.extensions.insert(actor);
+                return next.run(Request::from_parts(parts, body)).await;
+            }
+            _ => return challenge(&state),
+        }
+    }
     match Auth::from_request_parts(&mut parts, &state).await {
         Ok(Auth(actor)) => {
             parts.extensions.insert(actor);
             next.run(Request::from_parts(parts, body)).await
         }
-        Err(_) => {
-            let mut res = (
-                StatusCode::UNAUTHORIZED,
-                "MCP needs an API key: send `Authorization: Bearer seo_…` (create one under Settings → API keys)",
-            )
-                .into_response();
-            res.headers_mut().insert(
-                header::WWW_AUTHENTICATE,
-                HeaderValue::from_static("Bearer realm=\"seoseo\""),
-            );
-            res
-        }
+        Err(_) => challenge(&state),
     }
+}
+fn challenge(state: &AppState) -> Response {
+    let mut res = (
+        StatusCode::UNAUTHORIZED,
+        "MCP requires an OAuth token or a Settings API key",
+    )
+        .into_response();
+    let value = format!(
+        "Bearer resource_metadata=\"{}/.well-known/oauth-protected-resource/mcp\", scope=\"mcp\"",
+        domain::oauth::issuer(&state.cfg)
+    );
+    if let Ok(value) = HeaderValue::from_str(&value) {
+        res.headers_mut().insert(header::WWW_AUTHENTICATE, value);
+    }
+    res
 }

@@ -386,6 +386,54 @@
         ]
       }
     },
+    "/api/v1/ga4/oauth/callback": {
+      "get": {
+        "tags": [
+          "analytics"
+        ],
+        "operationId": "ga4_callback",
+        "parameters": [
+          {
+            "name": "state",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "error",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "303": {}
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
     "/api/v1/gsc/oauth/callback": {
       "get": {
         "tags": [
@@ -731,6 +779,128 @@
           },
           {
             "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/oauth/consent": {
+      "post": {
+        "tags": [
+          "oauth"
+        ],
+        "operationId": "oauth_consent",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConsentInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsentResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/v1/oauth/grants": {
+      "get": {
+        "tags": [
+          "oauth"
+        ],
+        "operationId": "oauth_grants",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GrantView"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/v1/oauth/grants/{id}": {
+      "delete": {
+        "tags": [
+          "oauth"
+        ],
+        "operationId": "oauth_revoke_grant",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {}
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/v1/oauth/preview": {
+      "post": {
+        "tags": [
+          "oauth"
+        ],
+        "operationId": "oauth_preview",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Authorization"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsentView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
           }
         ]
       }
@@ -1976,6 +2146,257 @@
         ]
       }
     },
+    "/api/v1/projects/{project_id}/ga4": {
+      "get": {
+        "tags": [
+          "analytics"
+        ],
+        "operationId": "ga4_status",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ga4ConnectionView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "analytics"
+        ],
+        "operationId": "ga4_disconnect",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {}
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/ga4/connect": {
+      "post": {
+        "tags": [
+          "analytics"
+        ],
+        "operationId": "ga4_connect",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ga4ConnectUrl"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/ga4/properties": {
+      "get": {
+        "tags": [
+          "analytics"
+        ],
+        "operationId": "ga4_properties",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page_token",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ga4Properties"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/ga4/property": {
+      "put": {
+        "tags": [
+          "analytics"
+        ],
+        "operationId": "ga4_set_property",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Ga4PropertyInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ga4ConnectionView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/ga4/reports/{kind}": {
+      "post": {
+        "tags": [
+          "analytics"
+        ],
+        "operationId": "ga4_report",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "kind",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Ga4ReportKind"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Ga4ReportInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ga4ReportView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/projects/{project_id}/gsc": {
       "get": {
         "tags": [
@@ -2301,6 +2722,133 @@
                   "items": {
                     "$ref": "#/components/schemas/Site"
                   }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/indexnow/setup": {
+      "post": {
+        "tags": [
+          "integrations"
+        ],
+        "operationId": "indexnow_setup_route",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IndexNowSettings"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/indexnow/submit": {
+      "post": {
+        "tags": [
+          "integrations"
+        ],
+        "operationId": "indexnow_submit_route",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IndexNowInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/IndexNowResult"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/indexnow/verify": {
+      "post": {
+        "tags": [
+          "integrations"
+        ],
+        "operationId": "indexnow_verify_route",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IndexNowResult"
                 }
               }
             }
@@ -2761,6 +3309,93 @@
               "text/csv": {
                 "schema": {
                   "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/links": {
+      "get": {
+        "tags": [
+          "integrations"
+        ],
+        "operationId": "link_list_route",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LinkObservation"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "integrations"
+        ],
+        "operationId": "link_save_route",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LinkInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinkObservation"
                 }
               }
             }
@@ -4732,6 +5367,44 @@
         ]
       }
     },
+    "/api/v1/projects/{project_id}/website-synthesis": {
+      "post": {
+        "tags": [
+          "integrations"
+        ],
+        "operationId": "website_synthesize_route",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebsiteSynthesis"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/providers": {
       "get": {
         "tags": [
@@ -5156,6 +5829,7 @@
         "enum": [
           "session",
           "api_key",
+          "o_auth",
           "no_auth"
         ]
       },
@@ -5385,6 +6059,49 @@
           }
         }
       },
+      "Authorization": {
+        "type": "object",
+        "required": [
+          "client_id",
+          "redirect_uri",
+          "response_type",
+          "code_challenge",
+          "code_challenge_method",
+          "resource"
+        ],
+        "properties": {
+          "client_id": {
+            "type": "string"
+          },
+          "code_challenge": {
+            "type": "string"
+          },
+          "code_challenge_method": {
+            "type": "string"
+          },
+          "redirect_uri": {
+            "type": "string"
+          },
+          "resource": {
+            "type": "string"
+          },
+          "response_type": {
+            "type": "string"
+          },
+          "scope": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "state": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
       "ChangeResult": {
         "type": "object",
         "required": [
@@ -5529,6 +6246,55 @@
               "string",
               "null"
             ]
+          }
+        }
+      },
+      "ConsentInput": {
+        "type": "object",
+        "required": [
+          "authorization",
+          "allow"
+        ],
+        "properties": {
+          "allow": {
+            "type": "boolean"
+          },
+          "authorization": {
+            "$ref": "#/components/schemas/Authorization"
+          }
+        }
+      },
+      "ConsentResult": {
+        "type": "object",
+        "required": [
+          "redirect_uri"
+        ],
+        "properties": {
+          "redirect_uri": {
+            "type": "string"
+          }
+        }
+      },
+      "ConsentView": {
+        "type": "object",
+        "required": [
+          "client_name",
+          "redirect_uri",
+          "resource",
+          "scope"
+        ],
+        "properties": {
+          "client_name": {
+            "type": "string"
+          },
+          "redirect_uri": {
+            "type": "string"
+          },
+          "resource": {
+            "type": "string"
+          },
+          "scope": {
+            "type": "string"
           }
         }
       },
@@ -5756,6 +6522,7 @@
         "type": "object",
         "required": [
           "checklist",
+          "link_activity",
           "counts",
           "rank_movers",
           "gsc_connected",
@@ -5796,6 +6563,12 @@
                 "type": "null"
               }
             ]
+          },
+          "link_activity": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LinkObservation"
+            }
           },
           "rank_movers": {
             "type": "array",
@@ -5883,6 +6656,184 @@
           }
         }
       },
+      "Ga4ConnectUrl": {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "Ga4ConnectionView": {
+        "type": "object",
+        "required": [
+          "configured",
+          "connected"
+        ],
+        "properties": {
+          "configured": {
+            "type": "boolean"
+          },
+          "connected": {
+            "type": "boolean"
+          },
+          "connected_by": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "property_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "Ga4Properties": {
+        "type": "object",
+        "required": [
+          "properties"
+        ],
+        "properties": {
+          "next_page_token": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "properties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ga4Property"
+            }
+          }
+        }
+      },
+      "Ga4Property": {
+        "type": "object",
+        "required": [
+          "property",
+          "display_name"
+        ],
+        "properties": {
+          "display_name": {
+            "type": "string"
+          },
+          "property": {
+            "type": "string"
+          }
+        }
+      },
+      "Ga4PropertyInput": {
+        "type": "object",
+        "required": [
+          "property_id"
+        ],
+        "properties": {
+          "property_id": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ga4ReportInput": {
+        "type": "object",
+        "required": [
+          "start_date",
+          "end_date"
+        ],
+        "properties": {
+          "end_date": {
+            "type": "string"
+          },
+          "limit": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "offset": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "start_date": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ga4ReportKind": {
+        "type": "string",
+        "enum": [
+          "organic_overview",
+          "organic_landing_pages",
+          "page_performance",
+          "traffic_acquisition",
+          "key_events",
+          "ecommerce_performance",
+          "site_search",
+          "audience_breakdown",
+          "measurement_health"
+        ]
+      },
+      "Ga4ReportView": {
+        "type": "object",
+        "required": [
+          "property_id",
+          "report",
+          "channel",
+          "data",
+          "note"
+        ],
+        "properties": {
+          "channel": {
+            "type": "string"
+          },
+          "data": {},
+          "note": {
+            "type": "string"
+          },
+          "property_id": {
+            "type": "string"
+          },
+          "report": {
+            "$ref": "#/components/schemas/Ga4ReportKind"
+          }
+        }
+      },
+      "GrantView": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "created_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
       "ImportAuthorityInput": {
         "type": "object",
         "properties": {
@@ -5894,6 +6845,78 @@
             "format": "int32",
             "description": "How many top domains to import (1,000–20,000,000; default 1,000,000 ≈ 30 MB download).",
             "minimum": 0
+          }
+        }
+      },
+      "IndexNowInput": {
+        "type": "object",
+        "required": [
+          "urls"
+        ],
+        "properties": {
+          "urls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "IndexNowResult": {
+        "type": "object",
+        "required": [
+          "host",
+          "key_url",
+          "verified",
+          "accepted",
+          "note"
+        ],
+        "properties": {
+          "accepted": {
+            "type": "boolean"
+          },
+          "host": {
+            "type": "string"
+          },
+          "key_url": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "status": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "verified": {
+            "type": "boolean"
+          }
+        }
+      },
+      "IndexNowSettings": {
+        "type": "object",
+        "required": [
+          "domain",
+          "key"
+        ],
+        "properties": {
+          "domain": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "last_submitted_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
           }
         }
       },
@@ -6602,6 +7625,55 @@
           },
           "truncated": {
             "type": "boolean"
+          }
+        }
+      },
+      "LinkInput": {
+        "type": "object",
+        "required": [
+          "source_url",
+          "target_url",
+          "state"
+        ],
+        "properties": {
+          "source_url": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "target_url": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "LinkObservation": {
+        "type": "object",
+        "required": [
+          "id",
+          "source_url",
+          "target_url",
+          "state",
+          "observed_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "source_url": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "target_url": {
+            "type": "string"
           }
         }
       },
@@ -9505,6 +10577,26 @@
             ]
           }
         }
+      },
+      "WebsiteSynthesis": {
+        "type": "object",
+        "required": [
+          "business_overview",
+          "suggested_goal",
+          "note"
+        ],
+        "properties": {
+          "business_overview": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "suggested_goal": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
       }
     },
     "securitySchemes": {

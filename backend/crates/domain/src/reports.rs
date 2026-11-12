@@ -56,7 +56,7 @@ impl From<&Report> for SharedReportView {
 
 fn creator(actor: &Actor) -> &'static str {
     match actor.via {
-        ActorVia::ApiKey => "mcp",
+        ActorVia::ApiKey | ActorVia::OAuth => "mcp",
         ActorVia::Session | ActorVia::NoAuth => "user",
     }
 }

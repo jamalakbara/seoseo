@@ -148,3 +148,7 @@ Port & adapt (MIT-licensed upstream — keep attribution): seo-project-setup, ke
 Six additional MCP tools (49 total): `get_dashboard_overview`, `get_dashboard_keywords`, `refresh_dashboard`, `research_project_website`, `get_project_website_setup`, `save_project_website_setup`.
 
 REST: `GET /projects/{pid}/dashboard/overview`, `GET /projects/{pid}/dashboard/keywords`, `POST /projects/{pid}/dashboard/refresh`, `PUT /projects/{pid}/dashboard/checklist`, `GET/POST /projects/{pid}/website-setup`, `POST /projects/{pid}/website-research`. All use existing tenant authentication; research/setup writes need admin. Saved setup uses the existing revisioned `/context` document, preserving other sections, competitors and pages. See [Dashboard and onboarding](12-dashboard-and-onboarding.md).
+
+### M4 completion
+
+MCP now exposes 66 tools: the previous 49 plus property discovery/selection, nine Analytics report tools, IndexNow setup/verification/submission, website synthesis and link-observation list/save. OAuth discovery/DCR/PKCE/consent and rotating resource-bound tokens complement existing API keys. Feature endpoints and protocol details are documented in [M4 integrations and OAuth](13-m4-integrations-and-oauth.md).

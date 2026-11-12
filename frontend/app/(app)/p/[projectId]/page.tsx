@@ -261,6 +261,34 @@ export default function ProjectOverview() {
           )}
         </CardContent>
       </Card>
+      <Card>
+        <CardHeader>
+          <CardTitle>Recorded link activity</CardTitle>
+          <CardDescription>
+            Latest user or agent observations. Source URLs are not independently
+            verified here.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="grid gap-3">
+          {data.link_activity.length === 0 ? (
+            <p className="text-sm text-muted-foreground">
+              No link observations yet.
+            </p>
+          ) : (
+            data.link_activity.slice(0, 5).map((l) => (
+              <p key={l.id} className="break-all text-sm">
+                {l.state}: {l.source_url} → {l.target_url}
+              </p>
+            ))
+          )}
+          <Link
+            className="text-sm underline"
+            href={`/p/${projectId}/integrations`}
+          >
+            Manage integrations and link evidence
+          </Link>
+        </CardContent>
+      </Card>
     </div>
   );
 }

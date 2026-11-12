@@ -362,3 +362,34 @@ pub struct GetRankHistory {
 pub struct JobRef {
     pub job_id: String,
 }
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct Ga4PropertySelection {
+    pub project_id: String,
+    pub property_id: String,
+}
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct Ga4PropertyPage {
+    pub project_id: String,
+    pub page_token: Option<String>,
+}
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct Ga4ReportParams {
+    pub project_id: String,
+    pub start_date: String,
+    pub end_date: String,
+    pub limit: Option<u32>,
+    pub offset: Option<u32>,
+}
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct IndexNowUrls {
+    pub project_id: String,
+    pub urls: Vec<String>,
+}
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct LinkObservationInput {
+    pub project_id: String,
+    pub source_url: String,
+    pub target_url: String,
+    pub state: String,
+}

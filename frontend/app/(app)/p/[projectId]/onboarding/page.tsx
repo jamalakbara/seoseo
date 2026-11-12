@@ -143,12 +143,21 @@ function SetupForm({
 }) {
   const qc = useQueryClient();
   const [overview, setOverview] = useState(
-    data.context.sections.find((s) => s.key === "business_overview")?.content ?? "",
+    data.context.sections.find((s) => s.key === "business_overview")?.content ??
+      "",
   );
   const [goal, setGoal] = useState(
     data.context.sections.find((s) => s.key === "current_goal")?.content ?? "",
   );
   const [selected, setSelected] = useState<string[]>([]);
+  const synthesis = useMutation({
+    mutationFn: () =>
+      unwrap(
+        api.POST("/api/v1/projects/{project_id}/website-synthesis", {
+          params: { path: { project_id: projectId } },
+        }),
+      ),
+  });
   const save = useMutation({
     mutationFn: () =>
       unwrap(
@@ -180,6 +189,55 @@ function SetupForm({
       </CardHeader>
       <CardContent className="grid min-w-0 grid-cols-1 gap-4">
         <p className="text-sm text-muted-foreground">{data.note}</p>
+        <div className="grid gap-3 rounded border p-3">
+          <p className="text-sm">
+            Optional: ask the configured local or compatible model to draft an
+            overview and suggested goal from the crawl evidence. Review before
+            applying or saving.
+          </p>
+          <Button
+            variant="outline"
+            disabled={!editable || synthesis.isPending || !data.evidence.length}
+            onClick={() => synthesis.mutate()}
+          >
+            {synthesis.isPending ? "Drafting…" : "Generate model draft"}
+          </Button>
+          {synthesis.error && (
+            <p role="alert" className="text-sm text-destructive">
+              {synthesis.error.message}
+            </p>
+          )}
+          {synthesis.data && (
+            <>
+              <p className="whitespace-pre-wrap text-sm">
+                {synthesis.data.business_overview}
+              </p>
+              <p className="text-sm">
+                Suggested goal: {synthesis.data.suggested_goal}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {synthesis.data.note}
+              </p>
+              <Button
+                variant="outline"
+                disabled={!editable || save.isPending}
+                onClick={() => {
+                  if (
+                    (!overview && !goal) ||
+                    window.confirm(
+                      "Replace this form's overview and goal with the model draft?",
+                    )
+                  ) {
+                    setOverview(synthesis.data!.business_overview);
+                    setGoal(synthesis.data!.suggested_goal);
+                  }
+                }}
+              >
+                Apply draft to form
+              </Button>
+            </>
+          )}
+        </div>
         {data.suggested_overview && (
           <div className="grid gap-3 rounded border p-3">
             <h3 className="text-sm font-medium">

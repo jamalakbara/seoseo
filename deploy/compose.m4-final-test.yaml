@@ -1,0 +1,15 @@
+# Disposable integration fixture only. No production endpoints or paid model calls.
+services:
+  gsc-fixture:
+    networks:
+      default:
+        aliases: [example.test, www.example.test]
+  api:
+    environment: &fixture
+      GA4_ADMIN_URL: http://gsc-fixture:8080/analytics-admin
+      GA4_DATA_URL: http://gsc-fixture:8080/analytics-data
+      INDEXNOW_URL: http://gsc-fixture:8080/indexnow
+      OPENAI_COMPAT_BASE_URL: http://gsc-fixture:8080/v1
+      LLM_MODEL: fixture-model
+  worker:
+    environment: *fixture

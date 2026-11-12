@@ -174,6 +174,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/ga4/oauth/callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ga4_callback"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/gsc/oauth/callback": {
         parameters: {
             query?: never;
@@ -319,6 +335,70 @@ export interface paths {
         get: operations["get_me"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/oauth/consent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["oauth_consent"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/oauth/grants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["oauth_grants"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/oauth/grants/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["oauth_revoke_grant"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/oauth/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["oauth_preview"];
         delete?: never;
         options?: never;
         head?: never;
@@ -626,6 +706,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/ga4": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ga4_status"];
+        put?: never;
+        post?: never;
+        delete: operations["ga4_disconnect"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/ga4/connect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ga4_connect"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/ga4/properties": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ga4_properties"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/ga4/property": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["ga4_set_property"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/ga4/reports/{kind}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["ga4_report"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/gsc": {
         parameters: {
             query?: never;
@@ -738,6 +898,54 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/indexnow/setup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["indexnow_setup_route"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/indexnow/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["indexnow_submit_route"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/indexnow/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["indexnow_verify_route"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/keyword-research": {
         parameters: {
             query?: never;
@@ -802,6 +1010,22 @@ export interface paths {
         get: operations["export_keyword_ideas"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/links": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["link_list_route"];
+        put?: never;
+        post: operations["link_save_route"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1232,6 +1456,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/website-synthesis": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["website_synthesize_route"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/providers": {
         parameters: {
             query?: never;
@@ -1396,7 +1636,7 @@ export interface components {
             organization_id: string;
         };
         /** @enum {string} */
-        ActorVia: "session" | "api_key" | "no_auth";
+        ActorVia: "session" | "api_key" | "o_auth" | "no_auth";
         AddKeywordsInput: {
             keywords: string[];
             tags?: string[] | null;
@@ -1470,6 +1710,16 @@ export interface components {
             active_job?: components["schemas"]["Job"] | null;
             status?: components["schemas"]["AuthorityStatus"] | null;
         };
+        Authorization: {
+            client_id: string;
+            code_challenge: string;
+            code_challenge_method: string;
+            redirect_uri: string;
+            resource: string;
+            response_type: string;
+            scope?: string | null;
+            state?: string | null;
+        };
         ChangeResult: {
             /**
              * Format: int64
@@ -1512,6 +1762,19 @@ export interface components {
             /** Format: uuid */
             connected_by?: string | null;
             site_url?: string | null;
+        };
+        ConsentInput: {
+            allow: boolean;
+            authorization: components["schemas"]["Authorization"];
+        };
+        ConsentResult: {
+            redirect_uri: string;
+        };
+        ConsentView: {
+            client_name: string;
+            redirect_uri: string;
+            resource: string;
+            scope: string;
         };
         ContextSection: {
             content: string;
@@ -1587,6 +1850,7 @@ export interface components {
             gsc_connected: boolean;
             keywords: components["schemas"]["KeywordDashboard"];
             latest_audit?: components["schemas"]["Audit"] | null;
+            link_activity: components["schemas"]["LinkObservation"][];
             rank_movers: components["schemas"]["RankMover"][];
         };
         DeleteSavedInput: {
@@ -1616,12 +1880,75 @@ export interface components {
              */
             sr?: number | null;
         };
+        Ga4ConnectUrl: {
+            url: string;
+        };
+        Ga4ConnectionView: {
+            configured: boolean;
+            connected: boolean;
+            /** Format: uuid */
+            connected_by?: string | null;
+            property_id?: string | null;
+        };
+        Ga4Properties: {
+            next_page_token?: string | null;
+            properties: components["schemas"]["Ga4Property"][];
+        };
+        Ga4Property: {
+            display_name: string;
+            property: string;
+        };
+        Ga4PropertyInput: {
+            property_id: string;
+        };
+        Ga4ReportInput: {
+            end_date: string;
+            /** Format: int32 */
+            limit?: number | null;
+            /** Format: int32 */
+            offset?: number | null;
+            start_date: string;
+        };
+        /** @enum {string} */
+        Ga4ReportKind: "organic_overview" | "organic_landing_pages" | "page_performance" | "traffic_acquisition" | "key_events" | "ecommerce_performance" | "site_search" | "audience_breakdown" | "measurement_health";
+        Ga4ReportView: {
+            channel: string;
+            data: unknown;
+            note: string;
+            property_id: string;
+            report: components["schemas"]["Ga4ReportKind"];
+        };
+        GrantView: {
+            /** Format: date-time */
+            created_at: string;
+            /** Format: uuid */
+            id: string;
+            name: string;
+        };
         ImportAuthorityInput: {
             /**
              * Format: int32
              * @description How many top domains to import (1,000–20,000,000; default 1,000,000 ≈ 30 MB download).
              */
             limit?: number | null;
+        };
+        IndexNowInput: {
+            urls: string[];
+        };
+        IndexNowResult: {
+            accepted: boolean;
+            host: string;
+            key_url: string;
+            note: string;
+            /** Format: int32 */
+            status?: number | null;
+            verified: boolean;
+        };
+        IndexNowSettings: {
+            domain: string;
+            key: string;
+            /** Format: date-time */
+            last_submitted_at?: string | null;
         };
         InspectInput: {
             urls: string[];
@@ -1834,6 +2161,20 @@ export interface components {
             striking_distance: components["schemas"]["PerformanceRow"][];
             top: components["schemas"]["PerformanceRow"][];
             truncated: boolean;
+        };
+        LinkInput: {
+            source_url: string;
+            state: string;
+            target_url: string;
+        };
+        LinkObservation: {
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            observed_at: string;
+            source_url: string;
+            state: string;
+            target_url: string;
         };
         LinkRow: {
             anchor?: string | null;
@@ -2717,6 +3058,11 @@ export interface components {
             note: string;
             suggested_overview?: string | null;
         };
+        WebsiteSynthesis: {
+            business_overview: string;
+            note: string;
+            suggested_goal: string;
+        };
     };
     responses: never;
     parameters: never;
@@ -3008,6 +3354,27 @@ export interface operations {
             };
         };
     };
+    ga4_callback: {
+        parameters: {
+            query: {
+                state: string;
+                code?: string | null;
+                error?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            303: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     gsc_callback: {
         parameters: {
             query: {
@@ -3220,6 +3587,90 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    oauth_consent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConsentInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConsentResult"];
+                };
+            };
+        };
+    };
+    oauth_grants: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GrantView"][];
+                };
+            };
+        };
+    };
+    oauth_revoke_grant: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    oauth_preview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Authorization"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConsentView"];
                 };
             };
         };
@@ -3877,6 +4328,141 @@ export interface operations {
             };
         };
     };
+    ga4_status: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Ga4ConnectionView"];
+                };
+            };
+        };
+    };
+    ga4_disconnect: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    ga4_connect: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Ga4ConnectUrl"];
+                };
+            };
+        };
+    };
+    ga4_properties: {
+        parameters: {
+            query?: {
+                page_token?: string;
+            };
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Ga4Properties"];
+                };
+            };
+        };
+    };
+    ga4_set_property: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Ga4PropertyInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Ga4ConnectionView"];
+                };
+            };
+        };
+    };
+    ga4_report: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                kind: components["schemas"]["Ga4ReportKind"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["Ga4ReportInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Ga4ReportView"];
+                };
+            };
+        };
+    };
     gsc_status: {
         parameters: {
             query?: never;
@@ -4055,6 +4641,73 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Site"][];
+                };
+            };
+        };
+    };
+    indexnow_setup_route: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IndexNowSettings"];
+                };
+            };
+        };
+    };
+    indexnow_submit_route: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["IndexNowInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IndexNowResult"][];
+                };
+            };
+        };
+    };
+    indexnow_verify_route: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["IndexNowResult"];
                 };
             };
         };
@@ -4240,6 +4893,52 @@ export interface operations {
                 };
                 content: {
                     "text/csv": string;
+                };
+            };
+        };
+    };
+    link_list_route: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LinkObservation"][];
+                };
+            };
+        };
+    };
+    link_save_route: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LinkInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LinkObservation"];
                 };
             };
         };
@@ -5234,6 +5933,27 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ProjectContext"];
+                };
+            };
+        };
+    };
+    website_synthesize_route: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WebsiteSynthesis"];
                 };
             };
         };

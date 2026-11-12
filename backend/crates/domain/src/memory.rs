@@ -95,7 +95,7 @@ pub struct UpdateProjectContextInput {
 
 fn author(actor: &Actor) -> &'static str {
     match actor.via {
-        ActorVia::ApiKey => "mcp",
+        ActorVia::ApiKey | ActorVia::OAuth => "mcp",
         ActorVia::Session | ActorVia::NoAuth => "user",
     }
 }

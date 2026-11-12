@@ -164,7 +164,7 @@ pub async fn connect(
     cfg: &Config,
 ) -> AppResult<ConnectUrl> {
     authorize(pool, actor, project, true).await?;
-    if actor.via == ActorVia::ApiKey {
+    if matches!(actor.via, ActorVia::ApiKey | ActorVia::OAuth) {
         return Err(AppError::Forbidden(
             "Connect Google from the dashboard using a browser session".into(),
         ));
@@ -211,7 +211,7 @@ pub async fn callback(
     cfg: &Config,
     input: Callback,
 ) -> AppResult<Uuid> {
-    if actor.via == ActorVia::ApiKey {
+    if matches!(actor.via, ActorVia::ApiKey | ActorVia::OAuth) {
         return Err(AppError::Forbidden(
             "Use the browser session that started the connection".into(),
         ));

@@ -38,8 +38,8 @@ node scripts/e2e-m4-browser.cjs http://127.0.0.1:3200
 
 The API regression covers concurrent audit/refresh claims, evidence review, repeated memory saves, preserved context, stale revisions/domain, cross-tenant access, GSC OAuth fixture, truncated baseline verification, source invalidation, provider quota backoff, MCP reads and archived-memory protection. Browser regression covers project creation through review/save, dashboard/navigation 390-pixel layouts and anonymous report sharing. Standard checks: Rust fmt, workspace tests, strict Clippy, frontend lint/typecheck/build, and Docker image/Compose startup.
 
-## Remaining scope
+## M4 completion
 
-DB-02 link activity awaits the M5 link store. WS-11 LLM synthesis is deferred; the current flow requires human review. GA4 IN-03, IndexNow IN-05 and MCP OAuth MC-02 remain M4 work. Real Google consent requires operator credentials; offline fixtures do not verify live account access.
+The remaining M4 implementation is now provided by [Integrations and OAuth](13-m4-integrations-and-oauth.md): optional model synthesis with explicit review, recorded link activity, GA4, IndexNow and MCP OAuth. Automatic backlink discovery remains M5.
 
 Verified 2026-11-12: 58 Rust workspace tests, strict Clippy/fmt, frontend lint/typecheck and production builds, separate backend/web Docker images, fresh Compose migration/startup, dashboard API/MCP regression, existing Memory/Reports and GSC regressions, and Chrome desktop/mobile/anonymous-share checks.

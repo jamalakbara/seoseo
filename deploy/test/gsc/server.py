@@ -4,6 +4,7 @@ import datetime
 import hashlib
 import json
 import secrets
+import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, unquote, urlencode, urlsplit
 
@@ -28,16 +29,34 @@ class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         url = urlsplit(self.path)
         if url.path == "/stats":
-            return self.reply({"queries": getattr(Handler, "queries", 0)})
+            return self.reply({"queries": getattr(Handler, "queries", 0), "submissions": getattr(Handler,"submissions",0)})
         if url.path == "/authorize":
             q = {k: v[0] for k, v in parse_qs(url.query).items()}
-            if q.get("scope") != scope or q.get("code_challenge_method") != "S256" or q.get("access_type") != "offline":
+            if q.get("scope") not in (scope,"https://www.googleapis.com/auth/analytics.readonly") or q.get("code_challenge_method") != "S256" or q.get("access_type") != "offline":
                 return self.reply({"error": "invalid_request"}, 400)
             code = secrets.token_urlsafe(24)
             codes[code] = q
             self.send_response(302)
             self.send_header("Location", q["redirect_uri"] + "?" + urlencode({"state": q["state"], "code": code}))
             self.end_headers()
+            return
+        if url.path.startswith("/analytics-admin/accountSummaries"):
+            page = parse_qs(url.query).get("pageToken", [None])[0]
+            return self.reply({"accountSummaries": [{"propertySummaries": [{"property": "properties/222" if page else "properties/111", "displayName": "Fixture Analytics"}]}], **({} if page else {"nextPageToken": "page2"})})
+        if url.path.endswith(".txt"):
+            key = url.path.strip("/").removesuffix(".txt")
+            if mode == "key-missing":
+                return self.reply({"error": "missing"}, 404)
+            if mode == "key-redirect":
+                self.send_response(302)
+                self.send_header("Location", "/redirected.txt")
+                self.end_headers()
+                return
+            body = key.encode()
+            self.send_response(200)
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
             return
         if url.path == "/webmasters/v3/sites":
             return self.reply({"siteEntry": [
@@ -64,10 +83,24 @@ class Handler(BaseHTTPRequestHandler):
                     return self.reply({"error": "invalid_grant"}, 400)
                 refresh = secrets.token_urlsafe(32)
                 refresh_tokens.add(refresh)
-                return self.reply({"access_token": "fixture-access", "refresh_token": refresh, "scope": scope, "expires_in": 3600})
+                return self.reply({"access_token": "fixture-access", "refresh_token": refresh, "scope": auth["scope"], "expires_in": 3600})
             if q.get("refresh_token") not in refresh_tokens or mode == "revoked":
                 return self.reply({"error": "invalid_grant"}, 400)
             return self.reply({"access_token": "fixture-access", "expires_in": 3600})
+        if self.path == "/indexnow":
+            Handler.submissions = getattr(Handler, "submissions", 0) + 1
+            payload = json.loads(raw)
+            if not payload.get("key") or not payload.get("urlList"):
+                return self.reply({"error": "invalid"}, 400)
+            return self.reply({"ok": True}, 429 if mode == "index-quota" else 202)
+        if self.path == "/v1/chat/completions":
+            q = json.loads(raw)
+            if q.get("model") != "fixture-model":
+                return self.reply({"error": "bad_model"}, 400)
+            if mode == "model-invalid":
+                return self.reply({"choices": [{"message": {"content": "invalid json"}}]})
+            draft = {"business_overview": "Fixture business serving small teams", "suggested_goal": "Suggested: grow qualified leads", "note": "Draft from supplied crawl evidence; review before saving."}
+            return self.reply({"choices": [{"message": {"content": json.dumps(draft)}}]})
         if self.headers.get("Authorization") != "Bearer fixture-access":
             return self.reply({"error": "unauthorized"}, 401)
         if mode == "quota":
@@ -75,6 +108,18 @@ class Handler(BaseHTTPRequestHandler):
         if mode == "forbidden":
             return self.reply({"error": "forbidden"}, 403)
         q = json.loads(raw)
+        if self.path.startswith("/analytics-data/properties/") and self.path.endswith(":runReport"):
+            if mode == "empty":
+                return self.reply({"rowCount": 0, "metadata": {"timeZone": "Asia/Jakarta", "currencyCode": "IDR"}})
+            dimensions = q["dimensions"]
+            metrics = q["metrics"]
+            if q.get("dimensionFilter", {}).get("filter", {}).get("fieldName") == "sessionDefaultChannelGroup":
+                assert q["dimensionFilter"]["filter"]["stringFilter"]["value"] == "Organic Search"
+            assert q["returnPropertyQuota"] and not q["keepEmptyRows"]
+            metadata = {"timeZone": "Asia/Jakarta", "currencyCode": "IDR", "subjectToThresholding": mode == "restricted"}
+            if mode == "restricted":
+                metadata["schemaRestrictionResponse"] = {"activeMetricRestrictions": [{"metricName": metrics[0]["name"], "restrictedMetricTypes": ["REVENUE_DATA"]}]}
+            return self.reply({"dimensionHeaders": dimensions, "metricHeaders": metrics, "rows": [{"dimensionValues": [{"value": d["name"]} for d in dimensions], "metricValues": [{"value": "10"} for m in metrics]}], "rowCount": 1, "metadata": metadata, "propertyQuota": {"tokensPerDay": {"remaining": 1000}}})
         if self.path.endswith("/searchAnalytics/query"):
             Handler.queries = getattr(Handler, "queries", 0) + 1
             site = unquote(self.path.removeprefix("/webmasters/v3/sites/").removesuffix("/searchAnalytics/query"))
@@ -111,4 +156,5 @@ class Handler(BaseHTTPRequestHandler):
         self.reply({"error": "not_found"}, 404)
 
 
+threading.Thread(target=ThreadingHTTPServer(("0.0.0.0", 80), Handler).serve_forever, daemon=True).start()
 ThreadingHTTPServer(("0.0.0.0", 8080), Handler).serve_forever()

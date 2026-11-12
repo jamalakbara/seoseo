@@ -15,7 +15,7 @@ export function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
   // `/mcp` is the MCP endpoint for AI clients (API-key authenticated by the API).
-  if (pathname.startsWith("/api/") || pathname === "/mcp") {
+  if (pathname.startsWith("/api/") || pathname === "/mcp" || pathname.startsWith("/.well-known/") || ["/oauth/authorize", "/oauth/token", "/oauth/register", "/oauth/revoke"].includes(pathname)) {
     return NextResponse.rewrite(new URL(pathname + search, API_URL));
   }
 
@@ -27,7 +27,7 @@ export function proxy(request: NextRequest) {
   const isPublic = PUBLIC_PAGES.some((p) => pathname.startsWith(p));
   if (!signedIn && !isPublic) {
     const url = new URL("/sign-in", request.url);
-    if (pathname !== "/") url.searchParams.set("next", pathname);
+    if (pathname !== "/") url.searchParams.set("next", pathname + search);
     return NextResponse.redirect(url);
   }
   return NextResponse.next();

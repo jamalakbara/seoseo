@@ -2,7 +2,9 @@ mod api_keys;
 mod audits;
 mod auth;
 mod dashboard;
+mod ga4;
 mod gsc;
+mod integrations;
 mod jobs;
 mod keywords;
 mod memory;
@@ -21,6 +23,7 @@ pub use system::router as system;
 pub fn v1() -> OpenApiRouter<AppState> {
     OpenApiRouter::new()
         .merge(system::documented())
+        .merge(crate::oauth::documented())
         .merge(auth::router())
         .merge(api_keys::router())
         .merge(projects::router())
@@ -34,4 +37,6 @@ pub fn v1() -> OpenApiRouter<AppState> {
         .merge(rank::router())
         .merge(reports::router())
         .merge(gsc::router())
+        .merge(ga4::router())
+        .merge(integrations::router())
 }
