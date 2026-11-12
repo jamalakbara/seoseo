@@ -10,13 +10,13 @@ Project: `seoseo` · mode: solo · sync: none
 3. END: run `aimem handoff` (Done / Not done / Next / Blocked). Supersede records, never delete them.
 
 ## Counts
-- decision: 19 (proposed 19)
+- decision: 20 (proposed 20)
 - memory: 11 (active 11)
-- handoff: 13 (final 13)
+- handoff: 20 (final 20)
 
 ## Recent handoffs
 - hnd-2nbqvmzb 2026-11-12 (agent:codex) — Done: Verified codex/m4-memory-reports is clean and synchronized with origin at 7cf5bf0; no implementation changes were pending. · Next: Resume remaining M4 scope when requested.
 - hnd-bp9vjpsg 2026-11-12 (agent:codex) — Done: Rebuilt and committed the missing first M4 delivery on codex/m4-memory-reports: WS-10 revisioned project memory; RP-01-03 report store, template CRUD, sandboxed private/public viewers and hashe…
 - hnd-vt9j7yc6 2026-11-12 (agent:codex) — Done: Implemented first M4 delivery on codex/m4-memory-reports: WS-10 project memory, RP-01-03 reports/templates/public sharing, additive migration 0007, tenant-scoped revision-checked services, REST…
-- hnd-cr6j96gw 2026-11-11 (agent:codex) — Done: Diagnosed old localhost UI: running seoseo web/api/worker containers were created Nov 10 and use old image IDs. Current source has Keywords, Rank tracking and Search Console tabs. Git fast-forw…
-- hnd-vca5rheh 2026-11-11 (agent:codex) — Done: Fast-forwarded master from 18b157b to a4d301f and switched to master. Verified all four milestone branches M0 M1 M2 M3 are ancestors of master. Preserved existing uncommitted memory files. · Ne…
+- hnd-37k7a0sv 2026-11-12 (human:akbar) — Done: Explained generating the project encryption key and setting it in .env, with the requirement to keep it stable. · Next: Generate the key and restart the app if needed.
+- hnd-rr7mggec 2026-11-11 (human:akbar) — Done: Explained keyword metric nulls from source: volume/trend only from Wikipedia article matches (25 lookups); SERP enrichment limited to configured top ideas; KD needs Common Crawl authority plus…
