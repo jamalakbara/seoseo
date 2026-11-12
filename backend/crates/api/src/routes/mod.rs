@@ -1,3 +1,4 @@
+mod ai_visibility;
 mod api_keys;
 mod audits;
 mod auth;
@@ -28,6 +29,7 @@ pub fn v1() -> OpenApiRouter<AppState> {
         .merge(crate::oauth::documented())
         .merge(auth::router())
         .merge(api_keys::router())
+        .merge(ai_visibility::router())
         .merge(projects::router())
         .merge(jobs::router())
         .merge(audits::router())

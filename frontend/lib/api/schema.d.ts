@@ -4,6 +4,22 @@
  */
 
 export interface paths {
+    "/api/v1/ai-visibility/models": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ai_visibility_models"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/api-keys": {
         parameters: {
             query?: never;
@@ -453,6 +469,70 @@ export interface paths {
         options?: never;
         head?: never;
         patch: operations["update_project"];
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/ai-trackers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_ai_trackers"];
+        put?: never;
+        post: operations["create_ai_tracker"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/ai-trackers/{tracker_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_ai_tracker"];
+        put?: never;
+        post?: never;
+        delete: operations["delete_ai_tracker"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/ai-trackers/{tracker_id}/runs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["start_ai_run"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/ai-trackers/{tracker_id}/runs/{run_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_ai_run"];
+        put?: never;
+        post?: never;
+        delete: operations["delete_ai_run"];
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/v1/projects/{project_id}/archive": {
@@ -1705,6 +1785,81 @@ export interface components {
             keywords: string[];
             tags?: string[] | null;
         };
+        AiAnswerView: {
+            answer?: string | null;
+            /** Format: date-time */
+            created_at: string;
+            error?: string | null;
+            mentions?: string[] | null;
+            model: string;
+            /** Format: int32 */
+            prompt_index: number;
+            sources?: components["schemas"]["AiReportedSource"][] | null;
+        };
+        AiBrandRate: {
+            brand: string;
+            /** Format: double */
+            mention_rate_pct?: number | null;
+            mentioned_answers: number;
+        };
+        AiModelAvailability: {
+            models: string[];
+            note?: string | null;
+            ready: boolean;
+        };
+        AiReportedSource: {
+            domain: string;
+            url: string;
+        };
+        AiRunView: {
+            answers: components["schemas"]["AiAnswerView"][];
+            brand_rates: components["schemas"]["AiBrandRate"][];
+            confidence: string;
+            expected_answers: number;
+            failed_answers: number;
+            note: string;
+            run: components["schemas"]["AiVisibilityRun"];
+            source: string;
+            successful_answers: number;
+        };
+        AiTrackerConfig: {
+            brands: string[];
+            country: string;
+            language: string;
+            models: string[];
+            prompts: string[];
+        };
+        AiTrackerView: {
+            runs: components["schemas"]["AiVisibilityRun"][];
+            tracker: components["schemas"]["AiVisibilityTracker"];
+        };
+        AiVisibilityRun: {
+            config: components["schemas"]["AiTrackerConfig"];
+            /** Format: date-time */
+            created_at: string;
+            error?: string | null;
+            /** Format: date-time */
+            finished_at?: string | null;
+            gateway_id: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            job_id?: string | null;
+            status: string;
+            /** Format: uuid */
+            tracker_id: string;
+        };
+        AiVisibilityTracker: {
+            config: components["schemas"]["AiTrackerConfig"];
+            /** Format: date-time */
+            created_at: string;
+            domain: string;
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** Format: uuid */
+            project_id: string;
+        };
         ApiKey: {
             /** Format: date-time */
             created_at: string;
@@ -1915,6 +2070,15 @@ export interface components {
             saved_keywords: number;
             /** Format: int64 */
             trackers: number;
+        };
+        CreateAiTrackerInput: {
+            brands: string[];
+            country?: string | null;
+            expected_domain: string;
+            language?: string | null;
+            models: string[];
+            name: string;
+            prompts: string[];
         };
         CreateApiKeyInput: {
             name: string;
@@ -3150,6 +3314,9 @@ export interface components {
         SiteInput: {
             site_url: string;
         };
+        StartAiRunInput: {
+            expected_domain: string;
+        };
         StartAuditInput: {
             /**
              * Format: int32
@@ -3302,6 +3469,25 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    ai_visibility_models: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiModelAvailability"];
+                };
+            };
+        };
+    };
     list_api_keys: {
         parameters: {
             query?: never;
@@ -4073,6 +4259,180 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["Problem"];
                 };
+            };
+        };
+    };
+    list_ai_trackers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiVisibilityTracker"][];
+                };
+            };
+        };
+    };
+    create_ai_tracker: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateAiTrackerInput"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiVisibilityTracker"];
+                };
+            };
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    get_ai_tracker: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                tracker_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiTrackerView"];
+                };
+            };
+        };
+    };
+    delete_ai_tracker: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                tracker_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    start_ai_run: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                tracker_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartAiRunInput"];
+            };
+        };
+        responses: {
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiVisibilityRun"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    get_ai_run: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                tracker_id: string;
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiRunView"];
+                };
+            };
+        };
+    };
+    delete_ai_run: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                tracker_id: string;
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

@@ -19,6 +19,7 @@ Free, open-source, self-hostable SEO platform. Rust (axum) backend · Next.js 16
 | 13 | [M4 integrations and OAuth](13-m4-integrations-and-oauth.md) | GA4, IndexNow, optional model drafts, link observations, MCP OAuth and fixture verification |
 | 14 | [Competitive research](14-competitive-research.md) | First M5 delivery: project SERP evidence, domain overview, competitors and keyword gaps |
 | 15 | [Backlink snapshots](15-backlink-snapshots.md) | Imported evidence, sample diffs, referring domains, pages/anchors, retention and tests |
+| 16 | [AI visibility](16-ai-visibility.md) | Manual model comparisons, durable runs, literal mentions, coverage, setup and tests |
 
 Reference source: `reference/open-seo/` (git-ignored clone; re-clone with `git clone https://github.com/every-app/open-seo reference/open-seo`).
 Upstream design records worth re-reading before building a feature: `reference/open-seo/docs/maintainers/specs/00xx-*.md`.

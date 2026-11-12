@@ -123,4 +123,7 @@ pub struct Config {
     pub openai_compat_api_key: Option<String>,
     #[arg(long, env = "LLM_MODEL")]
     pub llm_model: Option<String>,
+    /// Operator-approved models for manual AI visibility comparisons; defaults to LLM_MODEL.
+    #[arg(long, env = "AI_VISIBILITY_MODELS", value_delimiter = ',')]
+    pub ai_visibility_models: Vec<String>,
 }

@@ -28,6 +28,8 @@ M5 continuation: DO-07 domain registration age is implemented with IANA-discover
 
 M5 backlink foundation: [imported backlink snapshots](15-backlink-snapshots.md) provide scoped history, sample-presence diffs, referring domains, target pages and anchors in REST/UI/MCP. DB-04 and BL-01..04/06 remain `wip`; automatic discovery, independent verification and spam scoring remain unfinished.
 
+M5 AI visibility foundation: [manual model comparisons](16-ai-visibility.md) add approved models, immutable trackers, durable runs, stored answers, literal brand mention rates, reported URLs and JSON export (REST/UI/MCP). AI-01/03/04 remain `wip`; scheduling, prompt generation, grounded engines, share-of-voice/trends and live-model verification remain unfinished.
+
 ## M3 retained follow-ups
 M3 core is shipped. Per user direction on 2026-11-12, retain keyword file import (RT-02), per-tracker timezones (RT-03), keyword/run matrix (RT-05), and dashboard retry (OP-03) as follow-ups. Device/city/depth controls (RT-01/04) depend on provider support. These rows remain `wip` in the feature catalog; M3 is not marked fully complete.
 

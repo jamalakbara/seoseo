@@ -6,6 +6,7 @@
 //! - a block or CAPTCHA is reported as [`ProviderError::Blocked`] and never worked around;
 //! - unknown data stays unknown (`None`), never a made-up number.
 
+pub mod ai_visibility;
 pub mod catalog;
 pub mod commoncrawl;
 mod http;

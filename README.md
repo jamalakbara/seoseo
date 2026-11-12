@@ -6,6 +6,8 @@ Free, open-source, self-hostable SEO platform — an alternative to Semrush, Ahr
 
 M5 development has started with [competitive domain research](docs/14-competitive-research.md) from project keyword SERP evidence, available in the Competitive tab, REST and MCP.
 
+M5 also includes [imported backlink snapshots](docs/15-backlink-snapshots.md) and [manual AI model comparisons](docs/16-ai-visibility.md). Automatic discovery and grounded AI visibility remain in development.
+
 ## Quick start (Docker)
 
 ```bash

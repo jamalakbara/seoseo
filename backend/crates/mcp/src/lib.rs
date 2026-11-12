@@ -1090,6 +1090,180 @@ impl SeoSeoMcp {
     }
 
     #[tool(
+        description = "List operator-approved AI visibility models. Uses one configured compatible gateway, including local Ollama. Returns model identifiers and readiness, never credentials or a configurable endpoint. Plain API answers have no web-search tools."
+    )]
+    async fn list_ai_visibility_models(&self, ctx: RequestContext<RoleServer>) -> ToolResult {
+        actor(&ctx)?;
+        reply(Ok(domain::ai_visibility::models(&self.cfg)))
+    }
+    #[tool(
+        description = "Create an immutable manual AI visibility tracker. Needs admin, expected_domain must match the project website. Select 1-3 approved model IDs, 1-10 prompts (500 chars each), and 1-10 literal brand terms (80 chars each). No model request until an explicit run. Country/language are requested model context, not geographic verification."
+    )]
+    async fn create_ai_visibility_tracker(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<CreateAiTrackerParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::ai_visibility::create(
+                    &self.pool,
+                    &a,
+                    id("project_id", &p.project_id)?,
+                    &self.cfg,
+                    domain::ai_visibility::CreateAiTrackerInput {
+                        expected_domain: p.expected_domain,
+                        name: p.name,
+                        brands: p.brands,
+                        prompts: p.prompts,
+                        models: p.models,
+                        country: p.country,
+                        language: p.language,
+                    },
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "List this project's AI visibility tracker configurations, including previous websites for cleanup. Read details and start runs only for the current project website."
+    )]
+    async fn list_ai_visibility_trackers(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<ProjectRef>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::ai_visibility::list(&self.pool, &a, id("project_id", &p.project_id)?).await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Read a current-website AI tracker and its last 20 run records. Run status and errors matter; never treat unchecked or failed answers as brand absence."
+    )]
+    async fn get_ai_visibility_tracker(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<AiTrackerRef>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::ai_visibility::get(
+                    &self.pool,
+                    &a,
+                    id("project_id", &p.project_id)?,
+                    id("tracker_id", &p.tracker_id)?,
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Explicitly start a manual model API comparison (up to 30 requests) using operator-configured models/credentials. Needs admin. Runs in the durable background queue with frozen prompts/brands/models. Poll get_ai_visibility_run. One active run per tracker, two per project, one-minute cooldown. No live browsing; provider failures stop collection and retain partial results."
+    )]
+    async fn run_ai_visibility_tracker(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<StartAiRunParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::ai_visibility::start(
+                    &self.pool,
+                    &a,
+                    id("project_id", &p.project_id)?,
+                    id("tracker_id", &p.tracker_id)?,
+                    &self.cfg,
+                    domain::ai_visibility::StartAiRunInput {
+                        expected_domain: p.expected_domain,
+                    },
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Read stored AI answers, literal brand mentions, unverified model-reported URLs and mention rates. Rates use successful answers only, not failed/unattempted cells; they are not share of voice or endorsements. Inspect model/prompt coverage and run errors. JSON data can be exported by the caller."
+    )]
+    async fn get_ai_visibility_run(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<AiRunRef>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::ai_visibility::run(
+                    &self.pool,
+                    &a,
+                    id("project_id", &p.project_id)?,
+                    id("tracker_id", &p.tracker_id)?,
+                    id("run_id", &p.run_id)?,
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Delete an AI tracker and all its stored runs/answers. Needs admin and active project; cannot delete while this tracker has an active run."
+    )]
+    async fn delete_ai_visibility_tracker(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<AiTrackerRef>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::ai_visibility::delete(
+                    &self.pool,
+                    &a,
+                    id("project_id", &p.project_id)?,
+                    id("tracker_id", &p.tracker_id)?,
+                    None,
+                )
+                .await?;
+                Ok(json!({"deleted":true}))
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Delete one stored AI run and its answers to free retention quota. Needs admin and active project; cannot delete while this tracker has an active run."
+    )]
+    async fn delete_ai_visibility_run(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<AiRunRef>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::ai_visibility::delete(
+                    &self.pool,
+                    &a,
+                    id("project_id", &p.project_id)?,
+                    id("tracker_id", &p.tracker_id)?,
+                    Some(id("run_id", &p.run_id)?),
+                )
+                .await?;
+                Ok(json!({"deleted":true}))
+            }
+            .await,
+        )
+    }
+
+    #[tool(
         description = "List imported backlink snapshot metadata for this project, newest first, including prior website identities for cleanup. These are user-provided samples, not verified crawls. Details are readable only for the current project website."
     )]
     async fn list_backlink_snapshots(

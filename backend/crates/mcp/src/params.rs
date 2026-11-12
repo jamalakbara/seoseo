@@ -5,6 +5,35 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CreateAiTrackerParams {
+    pub project_id: String,
+    pub expected_domain: String,
+    pub name: String,
+    pub brands: Vec<String>,
+    pub prompts: Vec<String>,
+    pub models: Vec<String>,
+    pub country: Option<String>,
+    pub language: Option<String>,
+}
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct AiTrackerRef {
+    pub project_id: String,
+    pub tracker_id: String,
+}
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct StartAiRunParams {
+    pub project_id: String,
+    pub tracker_id: String,
+    pub expected_domain: String,
+}
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct AiRunRef {
+    pub project_id: String,
+    pub tracker_id: String,
+    pub run_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct BacklinkImportRow {
     pub source_url: String,
     pub target_url: String,

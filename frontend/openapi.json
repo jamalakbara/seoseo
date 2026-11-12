@@ -9,6 +9,33 @@
     "version": "0.1.0"
   },
   "paths": {
+    "/api/v1/ai-visibility/models": {
+      "get": {
+        "tags": [
+          "ai-visibility"
+        ],
+        "operationId": "ai_visibility_models",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiModelAvailability"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/api-keys": {
       "get": {
         "tags": [
@@ -1155,6 +1182,354 @@
               }
             }
           }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/ai-trackers": {
+      "get": {
+        "tags": [
+          "ai-visibility"
+        ],
+        "operationId": "list_ai_trackers",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AiVisibilityTracker"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "ai-visibility"
+        ],
+        "operationId": "create_ai_tracker",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateAiTrackerInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiVisibilityTracker"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/ai-trackers/{tracker_id}": {
+      "get": {
+        "tags": [
+          "ai-visibility"
+        ],
+        "operationId": "get_ai_tracker",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tracker_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiTrackerView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "ai-visibility"
+        ],
+        "operationId": "delete_ai_tracker",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tracker_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {}
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/ai-trackers/{tracker_id}/runs": {
+      "post": {
+        "tags": [
+          "ai-visibility"
+        ],
+        "operationId": "start_ai_run",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tracker_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartAiRunInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiVisibilityRun"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/ai-trackers/{tracker_id}/runs/{run_id}": {
+      "get": {
+        "tags": [
+          "ai-visibility"
+        ],
+        "operationId": "get_ai_run",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tracker_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiRunView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "ai-visibility"
+        ],
+        "operationId": "delete_ai_run",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tracker_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {}
         },
         "security": [
           {
@@ -6228,6 +6603,313 @@
           }
         }
       },
+      "AiAnswerView": {
+        "type": "object",
+        "required": [
+          "prompt_index",
+          "model",
+          "created_at"
+        ],
+        "properties": {
+          "answer": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "mentions": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "string"
+            }
+          },
+          "model": {
+            "type": "string"
+          },
+          "prompt_index": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sources": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/AiReportedSource"
+            }
+          }
+        }
+      },
+      "AiBrandRate": {
+        "type": "object",
+        "required": [
+          "brand",
+          "mentioned_answers"
+        ],
+        "properties": {
+          "brand": {
+            "type": "string"
+          },
+          "mention_rate_pct": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
+          "mentioned_answers": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "AiModelAvailability": {
+        "type": "object",
+        "required": [
+          "ready",
+          "models"
+        ],
+        "properties": {
+          "models": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "ready": {
+            "type": "boolean"
+          }
+        }
+      },
+      "AiReportedSource": {
+        "type": "object",
+        "required": [
+          "url",
+          "domain"
+        ],
+        "properties": {
+          "domain": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "AiRunView": {
+        "type": "object",
+        "required": [
+          "run",
+          "answers",
+          "expected_answers",
+          "successful_answers",
+          "failed_answers",
+          "brand_rates",
+          "source",
+          "confidence",
+          "note"
+        ],
+        "properties": {
+          "answers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AiAnswerView"
+            }
+          },
+          "brand_rates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AiBrandRate"
+            }
+          },
+          "confidence": {
+            "type": "string"
+          },
+          "expected_answers": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "failed_answers": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "note": {
+            "type": "string"
+          },
+          "run": {
+            "$ref": "#/components/schemas/AiVisibilityRun"
+          },
+          "source": {
+            "type": "string"
+          },
+          "successful_answers": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "AiTrackerConfig": {
+        "type": "object",
+        "required": [
+          "brands",
+          "prompts",
+          "models",
+          "country",
+          "language"
+        ],
+        "properties": {
+          "brands": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "country": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          },
+          "models": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "prompts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "AiTrackerView": {
+        "type": "object",
+        "required": [
+          "tracker",
+          "runs"
+        ],
+        "properties": {
+          "runs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AiVisibilityRun"
+            }
+          },
+          "tracker": {
+            "$ref": "#/components/schemas/AiVisibilityTracker"
+          }
+        }
+      },
+      "AiVisibilityRun": {
+        "type": "object",
+        "required": [
+          "id",
+          "tracker_id",
+          "config",
+          "gateway_id",
+          "status",
+          "created_at"
+        ],
+        "properties": {
+          "config": {
+            "$ref": "#/components/schemas/AiTrackerConfig"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "finished_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "gateway_id": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "job_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string"
+          },
+          "tracker_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "AiVisibilityTracker": {
+        "type": "object",
+        "required": [
+          "id",
+          "project_id",
+          "domain",
+          "name",
+          "config",
+          "created_at"
+        ],
+        "properties": {
+          "config": {
+            "$ref": "#/components/schemas/AiTrackerConfig"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "domain": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "project_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
       "ApiKey": {
         "type": "object",
         "required": [
@@ -6932,6 +7614,55 @@
             "format": "int64"
           }
         }
+      },
+      "CreateAiTrackerInput": {
+        "type": "object",
+        "required": [
+          "expected_domain",
+          "name",
+          "brands",
+          "prompts",
+          "models"
+        ],
+        "properties": {
+          "brands": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "country": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "expected_domain": {
+            "type": "string"
+          },
+          "language": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "models": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "name": {
+            "type": "string"
+          },
+          "prompts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
       },
       "CreateApiKeyInput": {
         "type": "object",
@@ -11060,6 +11791,18 @@
           }
         }
       },
+      "StartAiRunInput": {
+        "type": "object",
+        "required": [
+          "expected_domain"
+        ],
+        "properties": {
+          "expected_domain": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "StartAuditInput": {
         "type": "object",
         "properties": {
@@ -11614,6 +12357,10 @@
     {
       "name": "backlinks",
       "description": "Imported backlink samples and snapshot comparisons"
+    },
+    {
+      "name": "ai-visibility",
+      "description": "Manual model API answer comparisons and literal brand mentions"
     },
     {
       "name": "rank-tracking",

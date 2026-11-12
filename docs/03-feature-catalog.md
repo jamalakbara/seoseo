@@ -2,7 +2,7 @@
 
 Every feature with an ID, OpenSEO parity reference, priority, data source, and milestone.
 Priority: **P0** MVP · **P1** parity · **P2** beyond parity · **P3** later.
-Status column is updated as we build (`todo` / `wip` / `done`). Last update: 2026-11-12 (M5 competitive research, RDAP and imported backlink snapshots).
+Status column is updated as we build (`todo` / `wip` / `done`). Last update: 2026-11-13 (M5 competitive research, RDAP, imported backlinks and manual AI model comparisons).
 
 ## Workspace & identity
 | ID | Feature | OpenSEO ref | Pri | Data | MS | Status |
@@ -99,10 +99,10 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | LO-06 | Categories list | list_business_categories | P2 | static list | M6 | todo |
 
 ## AI visibility
-| AI-01 | Tracker config (engines, market, schedule) | ai_trackers | P1 | — | M5 | todo |
+| AI-01 | Tracker config (engines, market, schedule) | ai_trackers | P1 | — | M5 | wip (immutable manual trackers, market context, approved compatible models; scheduling remains) |
 | AI-02 | Prompt generation/research | generateAiVisibilityPrompts | P1 | LLM | M5 | todo |
-| AI-03 | Run workflow (answers, sources, matches) | AiVisibilityWorkflow | P1 | LLM APIs / Ollama | M5 | todo |
-| AI-04 | Results, SoV, trend, sources, answer viewer, export | getAiVisibility* | P1 | — | M5 | todo |
+| AI-03 | Run workflow (answers, sources, matches) | AiVisibilityWorkflow | P1 | LLM APIs / Ollama | M5 | wip (durable manual runs, partial failures/resume, literal matches, unverified reported URLs; grounded engines remain) |
+| AI-04 | Results, SoV, trend, sources, answer viewer, export | getAiVisibility* | P1 | — | M5 | wip (coverage, mention rates, plain answer viewer and JSON export; SoV/trends remain) |
 | AI-05 | Brand lookup, prompt explorer (own index) | brand-lookup, prompt-explorer | P2 | own index | M6 | todo |
 | AI-06 | Google AI Overview capture | google_ai_overview | P2 | SERP | M6 | todo |
 

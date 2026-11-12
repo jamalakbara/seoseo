@@ -157,4 +157,6 @@ M5 continuation adds `get_domain_age` (68 tools total) and `POST /projects/{proj
 
 Imported backlink snapshots add `list_backlink_snapshots`, `import_backlink_snapshot`, `get_backlink_snapshot` and `delete_backlink_snapshot` (72 tools total), with corresponding `/projects/{project_id}/backlink-snapshots` REST routes. See [Backlink snapshots](15-backlink-snapshots.md) for dataset/domain identity, comparison semantics and limits.
 
+Manual AI visibility adds eight model/tracker/run tools (80 tools total), model availability at `/ai-visibility/models`, and `/projects/{project_id}/ai-trackers` tracker/run routes. See [AI visibility](16-ai-visibility.md) for operator setup, answer-sample semantics, durable jobs and limits.
+
 MCP now exposes 66 tools: the previous 49 plus property discovery/selection, nine Analytics report tools, IndexNow setup/verification/submission, website synthesis and link-observation list/save. OAuth discovery/DCR/PKCE/consent and rotating resource-bound tokens complement existing API keys. Feature endpoints and protocol details are documented in [M4 integrations and OAuth](13-m4-integrations-and-oauth.md).
