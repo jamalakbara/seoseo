@@ -24,6 +24,8 @@ Next milestone: **M5**, competitive research, backlinks and AI visibility.
 
 M5 started: [competitive research](14-competitive-research.md) provides a project-scoped local SERP sample through the web app, REST and MCP: observed keywords/distribution, top pages, SERP competitors and keyword gaps. DO-01..05 remain `wip`; exhaustive domain coverage, traffic estimates, backlink discovery and AI visibility remain unfinished.
 
+M5 continuation: DO-07 domain registration age is implemented with IANA-discovered HTTPS RDAP, minimal 24-hour caching and explicit unknown states in REST/UI/MCP. See [Competitive research](14-competitive-research.md).
+
 ## M3 retained follow-ups
 M3 core is shipped. Per user direction on 2026-11-12, retain keyword file import (RT-02), per-tracker timezones (RT-03), keyword/run matrix (RT-05), and dashboard retry (OP-03) as follow-ups. Device/city/depth controls (RT-01/04) depend on provider support. These rows remain `wip` in the feature catalog; M3 is not marked fully complete.
 

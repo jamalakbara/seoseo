@@ -706,6 +706,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/domain-age": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["lookup_domain_age"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/domain-overview": {
         parameters: {
             query?: never;
@@ -1876,6 +1892,21 @@ export interface components {
             /** Format: int64 */
             deleted: number;
         };
+        DomainAge: {
+            /**
+             * Format: int64
+             * @description Whole days since the registry's registration event, computed at read time. Unknown = null.
+             */
+            age_days?: number | null;
+            cached: boolean;
+            confidence?: string | null;
+            record: components["schemas"]["RdapRecord"];
+            source: string;
+        };
+        DomainAgeInput: {
+            /** @description Defaults to the project's website; subdomains normalize to the registrable name. */
+            domain?: string | null;
+        };
         DomainAuthority: {
             /** @description False until ranks were imported; then a null `sr` means "weaker than every imported domain". */
             authority_loaded: boolean;
@@ -2751,6 +2782,21 @@ export interface components {
             provider: string;
             url: string;
         };
+        RdapRecord: {
+            /** Format: date-time */
+            checked_at: string;
+            domain: string;
+            /**
+             * Format: date-time
+             * @description Registry's registration event, not the date the website first went online.
+             */
+            registered_at?: string | null;
+            source_url?: string | null;
+            status: components["schemas"]["RdapStatus"];
+            warning?: string | null;
+        };
+        /** @enum {string} */
+        RdapStatus: "found" | "not_found" | "unsupported";
         RefreshSavedInput: {
             /** @description Omit or pass an empty list to refresh all saved keywords. Otherwise 1–1000 IDs. */
             ids?: string[];
@@ -4404,6 +4450,55 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["KeywordDashboard"];
+                };
+            };
+        };
+    };
+    lookup_domain_age: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DomainAgeInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DomainAge"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
                 };
             };
         };

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { api, unwrap } from "@/lib/api/client";
 import { useProject } from "@/lib/queries";
 import { Button } from "@/components/ui/button";
@@ -213,6 +213,11 @@ export default function CompetitivePage() {
               </p>
             </CardContent>
           </Card>
+          <DomainAgeCard
+            key={`${projectId}:${data.domain}`}
+            projectId={projectId}
+            domain={data.domain}
+          />
           <Card>
             <CardHeader>
               <CardTitle>Observed ranking keywords</CardTitle>
@@ -360,5 +365,88 @@ export default function CompetitivePage() {
         </>
       )}
     </div>
+  );
+}
+
+function DomainAgeCard({
+  projectId,
+  domain,
+}: {
+  projectId: string;
+  domain: string;
+}) {
+  const lookup = useMutation({
+    mutationFn: () =>
+      unwrap(
+        api.POST("/api/v1/projects/{project_id}/domain-age", {
+          params: { path: { project_id: projectId } },
+          body: { domain },
+        }),
+      ),
+  });
+  const data = lookup.data;
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Domain registration age</CardTitle>
+        <CardDescription>
+          Check the registry’s reported registration date for {domain}. This
+          date does not establish website age or continuous ownership.
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="grid gap-3">
+        <div>
+          <Button
+            variant="outline"
+            onClick={() => lookup.mutate()}
+            disabled={lookup.isPending}
+          >
+            {lookup.isPending ? "Checking registry…" : "Check registration age"}
+          </Button>
+        </div>
+        <p className="text-sm text-muted-foreground">
+          Uses public RDAP data, cached for 24 hours. Only runs when you request
+          it.
+        </p>
+        {lookup.error && (
+          <p role="alert" className="text-destructive">
+            {lookup.error.message}
+          </p>
+        )}
+        {data && (
+          <div aria-live="polite" className="grid gap-2 text-sm">
+            <p>
+              <strong>
+                {data.age_days == null
+                  ? "Age unknown"
+                  : `${data.age_days.toLocaleString()} days since reported registration`}
+              </strong>
+            </p>
+            {data.record.registered_at && (
+              <p>
+                Registration date:{" "}
+                {new Date(data.record.registered_at).toLocaleDateString()}
+              </p>
+            )}
+            <p className="text-muted-foreground">
+              RDAP ·{" "}
+              {data.record.status === "found"
+                ? "Registry record found"
+                : data.record.status === "not_found"
+                  ? "No registry record returned"
+                  : "Registry service unsupported"}{" "}
+              · Checked {new Date(data.record.checked_at).toLocaleString()}
+              {data.cached ? " · Cached result" : ""}
+            </p>
+            {data.record.source_url && (
+              <p className="break-all text-muted-foreground">
+                Source: {data.record.source_url}
+              </p>
+            )}
+            {data.record.warning && <p>{data.record.warning}</p>}
+          </div>
+        )}
+      </CardContent>
+    </Card>
   );
 }

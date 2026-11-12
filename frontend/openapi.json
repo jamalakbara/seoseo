@@ -2146,6 +2146,81 @@
         ]
       }
     },
+    "/api/v1/projects/{project_id}/domain-age": {
+      "post": {
+        "tags": [
+          "competitive"
+        ],
+        "operationId": "lookup_domain_age",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DomainAgeInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DomainAge"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/projects/{project_id}/domain-overview": {
       "get": {
         "tags": [
@@ -6678,6 +6753,51 @@
           }
         }
       },
+      "DomainAge": {
+        "type": "object",
+        "required": [
+          "record",
+          "source",
+          "cached"
+        ],
+        "properties": {
+          "age_days": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "Whole days since the registry's registration event, computed at read time. Unknown = null."
+          },
+          "cached": {
+            "type": "boolean"
+          },
+          "confidence": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "record": {
+            "$ref": "#/components/schemas/RdapRecord"
+          },
+          "source": {
+            "type": "string"
+          }
+        }
+      },
+      "DomainAgeInput": {
+        "type": "object",
+        "properties": {
+          "domain": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Defaults to the project's website; subdomains normalize to the registrable name."
+          }
+        }
+      },
       "DomainAuthority": {
         "type": "object",
         "required": [
@@ -9602,6 +9722,54 @@
             "type": "string"
           }
         }
+      },
+      "RdapRecord": {
+        "type": "object",
+        "required": [
+          "domain",
+          "status",
+          "checked_at"
+        ],
+        "properties": {
+          "checked_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "domain": {
+            "type": "string"
+          },
+          "registered_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "Registry's registration event, not the date the website first went online."
+          },
+          "source_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "$ref": "#/components/schemas/RdapStatus"
+          },
+          "warning": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "RdapStatus": {
+        "type": "string",
+        "enum": [
+          "found",
+          "not_found",
+          "unsupported"
+        ]
       },
       "RefreshSavedInput": {
         "type": "object",

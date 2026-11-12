@@ -49,7 +49,7 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | DO-04 | SERP competitors | serp_competitors | P1 | SERP index | M5 | wip (shared observed keywords in sample) |
 | DO-05 | Domain keyword suggestions / keyword gap | getDomainKeywordSuggestions | P1 | SERP index | M5 | wip (sampled gaps against project website) |
 | DO-06 | Tech stack detection | (new) | P2 | fingerprints | M6 | todo |
-| DO-07 | Domain age (RDAP) | free tool | P1 | RDAP | M5 | todo |
+| DO-07 | Domain age (RDAP) | free tool | P1 | RDAP | M5 | done (on-demand HTTPS registry metadata, 24h cache, REST/UI/MCP; unknown dates remain null) |
 
 ## Backlinks
 | BL-01 | Overview + history | backlinks summary/history | P1 | CC + Bing WMT | M5 | todo |

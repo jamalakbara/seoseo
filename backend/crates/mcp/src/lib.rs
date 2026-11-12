@@ -1090,6 +1090,29 @@ impl SeoSeoMcp {
     }
 
     #[tool(
+        description = "Look up domain registration age using the IANA-discovered HTTPS registry RDAP service. Public metadata cached for 24 hours. Unknown dates remain null; registration age does not establish website age or continuous ownership. May make two public requests on a cache miss. Registry redirects and private endpoints are not followed."
+    )]
+    async fn get_domain_age(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<DomainAgeParams>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        reply(
+            async {
+                domain::domain_age::lookup(
+                    &self.pool,
+                    &actor,
+                    id("project_id", &p.project_id)?,
+                    domain::domain_age::DomainAgeInput { domain: p.domain },
+                )
+                .await
+            }
+            .await,
+        )
+    }
+
+    #[tool(
         description = "Research a domain from this project's saved/researched keyword SERPs: observed keywords, top pages, competing domains and gaps against the project website. Latest 30-day snapshots, up to 500 keywords and positions 1-30; not an exhaustive index. No provider requests. Traffic is unknown; inspect coverage, provider and exact flags before drawing conclusions."
     )]
     async fn get_domain_overview(

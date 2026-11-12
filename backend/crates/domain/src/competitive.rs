@@ -80,7 +80,7 @@ pub struct DomainOverview {
     pub warnings: Vec<String>,
 }
 
-fn normalize_domain(input: &str) -> AppResult<String> {
+pub(crate) fn normalize_domain(input: &str) -> AppResult<String> {
     let host = validate::domain(input)?;
     scoring::registrable_domain(&host).ok_or_else(|| {
         AppError::Validation("enter a registrable domain such as example.com".into())

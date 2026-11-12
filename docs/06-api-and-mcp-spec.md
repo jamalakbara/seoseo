@@ -153,4 +153,6 @@ REST: `GET /projects/{pid}/dashboard/overview`, `GET /projects/{pid}/dashboard/k
 
 The subsequent first M5 delivery adds `get_domain_overview` (67 tools total) and `GET /projects/{project_id}/domain-overview`; see [Competitive research](14-competitive-research.md) for evidence scope and limits.
 
+M5 continuation adds `get_domain_age` (68 tools total) and `POST /projects/{project_id}/domain-age` for on-demand, cached registry registration dates. This is separate from SERP inspection and never substitutes other RDAP event dates for registration.
+
 MCP now exposes 66 tools: the previous 49 plus property discovery/selection, nine Analytics report tools, IndexNow setup/verification/submission, website synthesis and link-observation list/save. OAuth discovery/DCR/PKCE/consent and rotating resource-bound tokens complement existing API keys. Feature endpoints and protocol details are documented in [M4 integrations and OAuth](13-m4-integrations-and-oauth.md).

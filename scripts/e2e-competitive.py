@@ -6,6 +6,7 @@ The API needs ALLOW_SIGNUP=true; the DB container must allow local psql as seose
 Creates synthetic users/projects and SERP fixtures. Never point at production.
 """
 import http.cookiejar
+import datetime
 import json
 import subprocess
 import sys
@@ -99,6 +100,37 @@ api(root + "/domain-overview?domain=co.uk", status=422)
 api(root + "/domain-overview?country=USA", status=422)
 api(root + "/domain-overview?language=EN", status=422)
 key = api("/api-keys", "POST", {"name": "Competitive regression"}, 201)
+
+# Domain registration age: cache-only fixture tests with no external dependencies.
+def cache(kind, name, value):
+    payload = json.dumps(value).replace("'", "''")
+    sql(f"INSERT INTO provider_cache(kind,cache_key,payload) VALUES ('{kind}','{name}','{payload}'::jsonb) ON CONFLICT(kind,cache_key) DO UPDATE SET payload=excluded.payload,fetched_at=now();")
+
+
+record = {"domain": "ours.com", "status": "found", "registered_at": "2000-01-01T00:00:00Z",
+    "source_url": "https://rdap.example.com/domain/ours.com", "checked_at": "2026-11-01T00:00:00Z", "warning": None}
+cache("rdap_registration_v1", "ours.com", record)
+age = api(root + "/domain-age", "POST", {})
+assert age["cached"] and age["record"] == record and age["source"] == "rdap" and age["confidence"] == "measured", age
+days = (datetime.datetime.now(datetime.timezone.utc) - datetime.datetime(2000, 1, 1, tzinfo=datetime.timezone.utc)).days
+assert abs(age["age_days"] - days) <= 1, age
+assert api(root + "/domain-age", "POST", {"domain": "https://news.ours.com/path"}) == age
+api(root + "/domain-age", "POST", {}, status=404, client=outsider)
+api(root + "/domain-age", "POST", {}, status=401, client=session())
+api(root + "/domain-age", "POST", {"domain": "co.uk"}, status=422)
+api(root + "/domain-age", "POST", {"domain": "localhost"}, status=422)
+for state in ["found", "not_found", "unsupported"]:
+    unknown = dict(record, domain="unknown.invalid", status=state, registered_at=None)
+    cache("rdap_registration_v1", "unknown.invalid", unknown)
+    result = api(root + "/domain-age", "POST", {"domain": "unknown.invalid"})
+    assert result["age_days"] is None and result["confidence"] is None and result["record"]["status"] == state
+cache("rdap_bootstrap_v1", "iana_dns", {"services": [[["invalid"], ["https://127.0.0.1/"]]]})
+cache("rdap_registration_v1", "expired.invalid", dict(record, domain="expired.invalid"))
+sql("UPDATE provider_cache SET fetched_at=now()-interval '2 days' WHERE kind='rdap_registration_v1' AND cache_key='expired.invalid';")
+expired = api(root + "/domain-age", "POST", {"domain": "expired.invalid"})
+assert not expired["cached"] and expired["record"]["status"] == "unsupported" and expired["age_days"] is None
+assert api(root + "/domain-age", "POST", {"domain": "expired.invalid"})["cached"]
+
 request = urllib.request.Request(origin + "/mcp", method="POST", headers={"Authorization": "Bearer " + key["secret"],
     "Content-Type": "application/json", "Accept": "application/json, text/event-stream"}, data=json.dumps({"jsonrpc": "2.0", "id": 1,
     "method": "tools/call", "params": {"name": "get_domain_overview", "arguments": {"project_id": p["id"], "domain": "rival.com"}}}).encode())
@@ -106,10 +138,17 @@ with urllib.request.urlopen(request) as response:
     payload = json.loads(response.read())
 mcp = json.loads(payload["result"]["content"][0]["text"])
 assert mcp["ok"] and mcp["data"] == r, mcp
+age_request = urllib.request.Request(origin + "/mcp", method="POST", headers={"Authorization": "Bearer " + key["secret"],
+    "Content-Type": "application/json", "Accept": "application/json, text/event-stream"}, data=json.dumps({"jsonrpc": "2.0", "id": 2,
+    "method": "tools/call", "params": {"name": "get_domain_age", "arguments": {"project_id": p["id"], "domain": "ours.com"}}}).encode())
+with urllib.request.urlopen(age_request) as response:
+    payload = json.loads(response.read())
+age_mcp = json.loads(payload["result"]["content"][0]["text"])
+assert age_mcp["ok"] and age_mcp["data"] == age, age_mcp
 api("/api-keys/" + key["key"]["id"], "DELETE", status=204)
 # Bound the project scope while retaining its real size in the response.
 sql(f"INSERT INTO saved_keywords(id,project_id,keyword,country,language) SELECT gen_random_uuid(),'{p['id']}', 'bounded ' || lpad(n::text,4,'0'),'US','en' FROM generate_series(1,501) n;")
 bounded = api(path)
 assert bounded["scope_keywords"] == 506 and bounded["sampled_keywords"] == 500
 assert any("500" in w for w in bounded["warnings"])
-print("PASS: competitive research, latest/empty/stale snapshots, market/project/tenant isolation, gaps, scope cap, validation, MCP parity")
+print("PASS: competitive research, latest/empty/stale snapshots, market/project/tenant isolation, gaps, scope cap, validation, RDAP age/cache/unknown/expiry/safe endpoints, MCP parity")

@@ -9,6 +9,7 @@
 pub mod catalog;
 pub mod commoncrawl;
 mod http;
+pub mod rdap;
 pub mod registry;
 pub mod serp;
 pub mod suggest;

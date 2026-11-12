@@ -6,6 +6,7 @@ pub mod audits;
 pub mod auth;
 pub mod competitive;
 pub mod dashboard;
+pub mod domain_age;
 pub mod gsc;
 pub mod keywords;
 pub mod memory;
