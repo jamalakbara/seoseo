@@ -8,16 +8,20 @@ Each milestone ends with: tests green, docker compose up works, docs + `03-featu
 | **M1** ✅ | Site audit core | Crawler (SA-01..05, SA-10, SA-11), job queue + SSE, orgs/invites (WS-04/05/12). WS-13 moved to M2 | Done 2026-11-10: `badseo` fixture finds all 26 expected issue types; crash-resume verified |
 | **M2** ✅ | Keyword + SERP | Provider settings UI (WS-13), SERP providers (SearXNG, Chromium opt-in, BYOK), autocomplete, pageview demand estimates (Trends deferred), volume estimator, KD, intent (KW-01..09), SR authority from CC host graph (BL-08), extended audit rules + JS render + Lighthouse (SA-06..08) | Done 2026-11-11: seed → 150+ ideas with popularity, intent, labelled volume, KD via SearXNG + SR (`scripts/e2e-keywords.sh`). Extended rules, isolated JS rendering + Lighthouse, opt-in Chromium/Bing adapter and durable bulk refresh implemented. Provider-dependent PAA and Wikipedia-only volume coverage remain explicit limitations |
 | **M3** (core verified; follow-ups) | Rank tracking + GSC + MCP | RT-01..06, IN-01/02, MCP server w/ API keys (MC-01), job dashboard (OP-03) | 2026-11-12: rank/MCP/Jobs E2E repaired and verified; GSC OAuth, property selection, performance/CSV, inspection and four MCP tools shipped (33 tools total). Browser checks + offline GSC fixture pass. Remaining catalog items explicitly retained as follow-ups below. |
-| **M4** | Dashboard, memory, reports | DB-01..03/05, WS-10/11, IN-03 GA4, IN-05 IndexNow, RP-01..03, MCP OAuth (MC-02) | New project onboarding auto-runs audit; agent saves report; share link works |
+| **M4** (in progress) | Dashboard, memory, reports | DB-01..03/05, WS-10/11, IN-03 GA4, IN-05 IndexNow, RP-01..03, MCP OAuth (MC-02) | New project onboarding auto-runs audit; agent saves report; share link works |
 | **M5** | Competitive + backlinks + AI visibility | DO-01..05/07, BL-01..06, DB-04, AI-01..04, skills (MC-05) | Domain overview of competitor; AI visibility run on 3 engines incl. Ollama |
 | **M6** | Local SEO + advanced | LO-01..04/06, KW-10/11, DO-06, BL-07, SA-09/12/13, AI-05/06, IN-04 Bing | 5×5 grid heatmap; clustering UI; audit compare |
 | **M7** | Assistant, alerts, content | AG-01..03, RT-08, SA-16, IN-06, RP-04..06, LO-05, OP-04, WS-07 | In-app assistant with local LLM; weekly digest email |
 | **M8** | Polish & extras | Free public tools (FT), MCP widgets, log analyzer, volatility index, i18n, BYOK CPC, telemetry opt-in, docs site | v1.0 release, multi-arch images published |
 
-## Next milestone
-M3 core is shipped. Per user direction on 2026-11-12, retain keyword file import (RT-02), per-tracker timezones (RT-03), keyword/run matrix (RT-05), and dashboard retry (OP-03) as follow-ups. Device/city/depth controls (RT-01/04) depend on provider support. These rows remain `wip` in the feature catalog; M3 is not marked fully complete.
+## Current milestone: M4
 
-M4 is in progress. WS-10 and RP-01..03 shipped on 2026-11-12 with REST, UI, and 10 new MCP tools (43 total). Remaining M4 scope: dashboard DB-01..03/05, onboarding WS-11, GA4 IN-03, IndexNow IN-05, and MCP OAuth MC-02. See [Project memory and reports](11-memory-and-reports.md).
+Memory/reports (WS-10, RP-01�03) and dashboard checklist, keyword views and durable refreshes (DB-01/03/05) are implemented. Website onboarding automatically starts a bounded audit from project creation, then lets the user review crawl evidence and save business context. Overview health, new queries and rank movers are implemented; link activity awaits the M5 link store. Onboarding uses explicit evidence review; LLM synthesis remains deferred. See [Memory and reports](11-memory-and-reports.md) and [Dashboard and onboarding](12-dashboard-and-onboarding.md).
+
+Remaining M4: GA4 IN-03, IndexNow IN-05, MCP OAuth MC-02, plus the explicit WS-11/DB-02 limitations above.
+
+## M3 retained follow-ups
+M3 core is shipped. Per user direction on 2026-11-12, retain keyword file import (RT-02), per-tracker timezones (RT-03), keyword/run matrix (RT-05), and dashboard retry (OP-03) as follow-ups. Device/city/depth controls (RT-01/04) depend on provider support. These rows remain `wip` in the feature catalog; M3 is not marked fully complete.
 
 GSC operator setup and verification: [Search Console](10-search-console.md). Real Google consent/property access still needs a configured Google Cloud client.
 

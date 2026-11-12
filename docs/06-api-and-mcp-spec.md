@@ -132,7 +132,7 @@ Transport: Streamable HTTP at `/mcp`. Each tool: zod-like JSON Schema input, dis
 ### Implemented (M3 + first M4 delivery)
 GSC REST routes, OAuth setup, access rules and limits: [Search Console](10-search-console.md).
 
-The M3 set plus `get_project_context`, `update_project_context`, `save_report`, `get_report`, `list_reports`, `delete_report`, `save_report_template`, `list_report_templates`, `delete_report_template`, and `set_report_sharing` (43 tools total).
+The M3 set plus `get_project_context`, `update_project_context`, `save_report`, `get_report`, `list_reports`, `delete_report`, `save_report_template`, `list_report_templates`, `delete_report_template`, and `set_report_sharing` (43 tools total before the dashboard/onboarding delivery).
 
 - Endpoint: `POST /mcp` (also reachable through the web app origin). Stateless: no session ids, JSON responses, any API replica can answer.
 - Auth: `Authorization: Bearer seo_…` API key (or the built-in admin in `AUTH_MODE=none`). 401 carries `WWW-Authenticate: Bearer`.
@@ -142,3 +142,9 @@ The M3 set plus `get_project_context`, `update_project_context`, `save_report`, 
 
 ## 3. Agent skills to ship (`skills/`)
 Port & adapt (MIT-licensed upstream — keep attribution): seo-project-setup, keyword-research, keyword-clustering, competitor-analysis, competitive-landscape, link-prospecting, local-seo, seo-audit, ai-prompt-research, ai-visibility-audit, seo-report, seo-coach. New: content-brief, technical-fix-plan.
+
+### Dashboard and website onboarding (M4 continuation)
+
+Six additional MCP tools (49 total): `get_dashboard_overview`, `get_dashboard_keywords`, `refresh_dashboard`, `research_project_website`, `get_project_website_setup`, `save_project_website_setup`.
+
+REST: `GET /projects/{pid}/dashboard/overview`, `GET /projects/{pid}/dashboard/keywords`, `POST /projects/{pid}/dashboard/refresh`, `PUT /projects/{pid}/dashboard/checklist`, `GET/POST /projects/{pid}/website-setup`, `POST /projects/{pid}/website-research`. All use existing tenant authentication; research/setup writes need admin. Saved setup uses the existing revisioned `/context` document, preserving other sections, competitors and pages. See [Dashboard and onboarding](12-dashboard-and-onboarding.md).

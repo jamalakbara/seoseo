@@ -1,6 +1,7 @@
 mod api_keys;
 mod audits;
 mod auth;
+mod dashboard;
 mod gsc;
 mod jobs;
 mod keywords;
@@ -25,6 +26,7 @@ pub fn v1() -> OpenApiRouter<AppState> {
         .merge(projects::router())
         .merge(jobs::router())
         .merge(audits::router())
+        .merge(dashboard::router())
         .merge(team::router())
         .merge(providers::router())
         .merge(keywords::router())

@@ -5,6 +5,22 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct WebsiteResearch {
+    pub project_id: String,
+    pub start_url: Option<String>,
+}
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct WebsiteSetup {
+    pub project_id: String,
+    pub revision: i64,
+    pub expected_domain: String,
+    pub business_overview: String,
+    pub current_goal: String,
+    #[serde(default)]
+    pub key_pages: Vec<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct GscSite {
     pub project_id: String,
     /// Exact property URL from list_search_console_sites.

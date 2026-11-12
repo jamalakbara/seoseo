@@ -147,6 +147,17 @@ pub async fn update(
     project_id: Uuid,
     input: UpdateProjectContextInput,
 ) -> AppResult<ProjectContext> {
+    update_for_domain(pool, actor, project_id, input, None).await
+}
+
+/// Onboarding also compares the website under the same project lock as the memory write.
+pub async fn update_for_domain(
+    pool: &PgPool,
+    actor: &Actor,
+    project_id: Uuid,
+    input: UpdateProjectContextInput,
+    expected_domain: Option<&str>,
+) -> AppResult<ProjectContext> {
     actor.require(Role::Admin)?;
     if input.revision < 0 {
         return Err(AppError::Validation("revision cannot be negative".into()));
@@ -260,6 +271,7 @@ pub async fn update(
         project_id,
         db::memory::ContextUpdate {
             expected_revision: input.revision,
+            expected_domain: expected_domain.map(str::to_string),
             sections: serde_json::to_value(sections).map_err(AppError::internal)?,
             competitors: serde_json::to_value(competitors).map_err(AppError::internal)?,
             key_pages: serde_json::to_value(key_pages).map_err(AppError::internal)?,

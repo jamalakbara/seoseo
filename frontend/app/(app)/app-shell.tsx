@@ -30,13 +30,13 @@ const NAV = [
 /** Uses the URL, so it streams in after the static shell (Cache Components). */
 function NavLinks({ active }: { active?: string }) {
   return (
-    <nav className="flex items-center gap-1 text-sm">
+    <nav className="order-3 flex w-full min-w-0 items-center gap-1 overflow-x-auto text-sm sm:order-none sm:w-auto">
       {NAV.map(({ href, label, icon: Icon }) => (
         <Link
           key={href}
           href={href}
           className={cn(
-            "flex items-center gap-1.5 rounded-md px-2.5 py-1.5 text-muted-foreground hover:bg-muted hover:text-foreground",
+            "flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1.5 text-muted-foreground hover:bg-muted hover:text-foreground",
             active?.startsWith(href) && "bg-muted text-foreground",
           )}
         >
@@ -70,7 +70,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen flex-1 flex-col">
       <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur">
-        <div className="mx-auto flex min-h-14 max-w-6xl items-center gap-3 overflow-x-auto px-4 py-2 sm:gap-6">
+        <div className="mx-auto flex min-h-14 max-w-6xl flex-wrap items-center gap-3 px-4 py-2 sm:gap-6">
           <Link href="/projects" className="flex items-center gap-2 font-semibold">
             <Search className="size-4" /> SeoSeo
           </Link>
@@ -79,7 +79,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </Suspense>
           <div className="ml-auto shrink-0">
             <DropdownMenu>
-              <DropdownMenuTrigger render={<Button variant="ghost" size="sm" />}>
+              <DropdownMenuTrigger render={<Button variant="ghost" size="sm" className="max-w-40 truncate" />}>
                 {me.data?.user.name ?? "…"}
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">

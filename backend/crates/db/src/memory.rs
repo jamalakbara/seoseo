@@ -45,6 +45,7 @@ pub async fn get(
 
 pub struct ContextUpdate {
     pub expected_revision: i64,
+    pub expected_domain: Option<String>,
     pub sections: Value,
     pub competitors: Value,
     pub key_pages: Value,
@@ -58,12 +59,47 @@ pub async fn put(
     project_id: Uuid,
     input: ContextUpdate,
 ) -> AppResult<ProjectContextRow> {
+    let mut tx = pool.begin().await.map_err(internal)?;
+    let project: Project =
+        sqlx::query_as("SELECT * FROM projects WHERE id=$1 AND organization_id=$2 FOR UPDATE")
+            .bind(project_id)
+            .bind(org_id)
+            .fetch_optional(&mut *tx)
+            .await
+            .map_err(internal)?
+            .ok_or(AppError::NotFound("project"))?;
+    if project.archived_at.is_some() {
+        return Err(AppError::Conflict(
+            "restore the project before editing memory".into(),
+        ));
+    }
+    if input
+        .expected_domain
+        .as_deref()
+        .is_some_and(|d| project.domain.as_deref() != Some(d))
+    {
+        return Err(AppError::Conflict(
+            "website changed; reload onboarding before saving".into(),
+        ));
+    }
+    let revision: i64 =
+        sqlx::query_scalar("SELECT revision FROM project_contexts WHERE project_id=$1")
+            .bind(project_id)
+            .fetch_optional(&mut *tx)
+            .await
+            .map_err(internal)?
+            .unwrap_or(0);
+    if revision != input.expected_revision {
+        return Err(AppError::Conflict(
+            "project memory changed since it was loaded; reload it and apply the edit again".into(),
+        ));
+    }
     let row = sqlx::query_as(
         "INSERT INTO project_contexts
              (project_id, revision, sections, competitors, key_pages, research_log)
          SELECT p.id, 1, $4, $5, $6, $7
          FROM projects p
-         WHERE p.id = $1 AND p.organization_id = $2 AND $3 = 0
+         WHERE p.id = $1 AND p.organization_id = $2
          ON CONFLICT (project_id) DO UPDATE SET
              revision = project_contexts.revision + 1,
              sections = EXCLUDED.sections,
@@ -81,10 +117,11 @@ pub async fn put(
     .bind(input.competitors)
     .bind(input.key_pages)
     .bind(input.research_log)
-    .fetch_optional(pool)
+    .fetch_optional(&mut *tx)
     .await
     .map_err(internal)?;
     if let Some(row) = row {
+        tx.commit().await.map_err(internal)?;
         return Ok(row);
     }
 

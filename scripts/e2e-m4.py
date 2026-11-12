@@ -5,9 +5,13 @@ from __future__ import annotations
 
 import argparse
 import json
+import http.cookiejar
+import uuid
 import urllib.error
 import urllib.request
 
+
+opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(http.cookiejar.CookieJar()))
 
 def request(base: str, method: str, path: str, body: dict | None = None):
     data = None if body is None else json.dumps(body).encode()
@@ -18,7 +22,7 @@ def request(base: str, method: str, path: str, body: dict | None = None):
         headers={"content-type": "application/json", "x-seoseo-csrf": "1"},
     )
     try:
-        with urllib.request.urlopen(req, timeout=15) as response:
+        with opener.open(req, timeout=15) as response:
             raw = response.read()
             content_type = response.headers.get_content_type()
             parsed = json.loads(raw) if raw and content_type == "application/json" else raw
@@ -36,8 +40,12 @@ def expect_status(actual: int, expected: int, step: str) -> None:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--api", default="http://127.0.0.1:8080/api/v1")
+    parser.add_argument("--signup", action="store_true", help="Create a disposable session on an open password-auth test stack")
     args = parser.parse_args()
     base = args.api.rstrip("/")
+    if args.signup:
+        status, _, _ = request(base, "POST", "/auth/sign-up", {"email": "m4-regression-" + uuid.uuid4().hex + "@example.com", "password": "disposable-m4-regression-password", "name": "M4 regression"})
+        expect_status(status, 201, "test sign-up")
 
     status, _, project = request(
         base, "POST", "/projects", {"name": "M4 e2e", "domain": "example.com"}

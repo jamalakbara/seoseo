@@ -2,7 +2,7 @@
 
 Every feature with an ID, OpenSEO parity reference, priority, data source, and milestone.
 Priority: **P0** MVP · **P1** parity · **P2** beyond parity · **P3** later.
-Status column is updated as we build (`todo` / `wip` / `done`). Last update: 2026-11-12 (M4 project memory and reports).
+Status column is updated as we build (`todo` / `wip` / `done`). Last update: 2026-11-12 (M4 dashboard and website onboarding).
 
 ## Workspace & identity
 | ID | Feature | OpenSEO ref | Pri | Data | MS | Status |
@@ -17,16 +17,16 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | WS-08 | Projects CRUD, archive/restore | projects.ts | P0 | — | M0 | done |
 | WS-09 | Project market (country/lang/city) | projects.location_code | P0 | GeoNames | M0 | wip (country+lang done; city picker M3) |
 | WS-10 | Project memory (sections, competitors, key pages, research log) | spec 0010 | P1 | — | M4 | done (bounded revisioned document; REST/UI/MCP; append-only research log) |
-| WS-11 | Onboarding wizard + website research | spec 0005, researchProjectWebsite | P1 | crawler + LLM | M4 | todo |
+| WS-11 | Onboarding wizard + website research | spec 0005, researchProjectWebsite | P1 | crawler + LLM | M4 | wip (auto-audit + evidence review/save done; LLM synthesis deferred) |
 | WS-12 | Team page, transfer ownership, switch org | organization.ts | P1 | — | M1 | wip (team page + remove member done; transfer ownership & org switcher UI todo) |
 | WS-13 | Settings: provider adapters & keys UI | (new) | P0 | — | M1 | done (M2: provider catalog, on/off, encrypted BYOK keys, live test, SR import) |
 
 ## Dashboard
-| DB-01 | Setup checklist | spec 0015 | P1 | — | M4 | todo |
-| DB-02 | Overview cards (health, GSC new queries, link activity, rank movers) | getDashboardOverview | P1 | GSC/links | M4 | todo |
-| DB-03 | Keywords tab (GSC new/top/striking distance) | getDashboardKeywords | P1 | GSC | M4 | todo |
+| DB-01 | Setup checklist | spec 0015 | P1 | — | M4 | done |
+| DB-02 | Overview cards (health, GSC new queries, link activity, rank movers) | getDashboardOverview | P1 | GSC/links | M4 | wip (health, queries and rank movers done; link activity awaits M5) |
+| DB-03 | Keywords tab (GSC new/top/striking distance) | getDashboardKeywords | P1 | GSC | M4 | done |
 | DB-04 | Backlinks tab (new/lost/live) | getDashboardBacklinks | P1 | link store | M5 | todo |
-| DB-05 | Refresh claims (24 h) | data_refresh_claims | P1 | — | M4 | todo |
+| DB-05 | Refresh claims (24 h) | data_refresh_claims | P1 | — | M4 | done |
 
 ## Keyword research
 | KW-01 | Seed → ideas (autocomplete a–z, questions, prepositions) | researchKeywords | P0 | autocomplete | M2 | done (Google + Bing autocomplete; a-z, questions, prepositions; en/es/de/fr/pt/id modifiers) |

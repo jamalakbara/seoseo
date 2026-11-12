@@ -562,6 +562,70 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/dashboard/checklist": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put: operations["save_checklist"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/dashboard/keywords": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["dashboard_keywords"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/dashboard/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["dashboard_overview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/dashboard/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["refresh_dashboard"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/gsc": {
         parameters: {
             query?: never;
@@ -1136,6 +1200,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/website-research": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["research_website"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/website-setup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_website_setup"];
+        put?: never;
+        post: operations["save_website_setup"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/providers": {
         parameters: {
             query?: never;
@@ -1386,6 +1482,17 @@ export interface components {
              */
             keyword_count: number;
         };
+        ChecklistInput: {
+            skipped: boolean;
+            step: string;
+        };
+        ChecklistStep: {
+            complete: boolean;
+            href: string;
+            id: string;
+            label: string;
+            skipped: boolean;
+        };
         Competitor: {
             domain: string;
             name?: string | null;
@@ -1416,6 +1523,15 @@ export interface components {
             content: string;
             key: string;
             title: string;
+        };
+        Counts: {
+            memory_ready: boolean;
+            /** Format: int64 */
+            reports: number;
+            /** Format: int64 */
+            saved_keywords: number;
+            /** Format: int64 */
+            trackers: number;
         };
         CreateApiKeyInput: {
             name: string;
@@ -1463,6 +1579,15 @@ export interface components {
             invitation: components["schemas"]["Invitation"];
             /** @description Secret token for the invite link (`/invite/{token}`). Shown once. */
             token: string;
+        };
+        DashboardOverview: {
+            checklist: components["schemas"]["ChecklistStep"][];
+            completed_audit?: components["schemas"]["Audit"] | null;
+            counts: components["schemas"]["Counts"];
+            gsc_connected: boolean;
+            keywords: components["schemas"]["KeywordDashboard"];
+            latest_audit?: components["schemas"]["Audit"] | null;
+            rank_movers: components["schemas"]["RankMover"][];
         };
         DeleteSavedInput: {
             ids: string[];
@@ -1618,6 +1743,18 @@ export interface components {
             topic?: string | null;
             url: string;
         };
+        KeywordDashboard: {
+            error?: string | null;
+            /** Format: date-time */
+            fetched_at?: string | null;
+            /** Format: uuid */
+            job_id?: string | null;
+            /** Format: date-time */
+            next_attempt_at?: string | null;
+            refreshing: boolean;
+            site_url?: string | null;
+            snapshot?: components["schemas"]["KeywordSnapshot"] | null;
+        };
         KeywordIdea: {
             /**
              * Format: int64
@@ -1684,6 +1821,19 @@ export interface components {
             status: string;
             /** @description Human-readable notes: skipped or rate-limited providers, missing setup. */
             warnings: string[];
+        };
+        KeywordSnapshot: {
+            baseline_end_date: string;
+            baseline_start_date: string;
+            end_date: string;
+            new_queries: components["schemas"]["PerformanceRow"][];
+            note: string;
+            recent_start_date: string;
+            site_url: string;
+            start_date: string;
+            striking_distance: components["schemas"]["PerformanceRow"][];
+            top: components["schemas"]["PerformanceRow"][];
+            truncated: boolean;
         };
         LinkRow: {
             anchor?: string | null;
@@ -2050,6 +2200,21 @@ export interface components {
             ready: boolean;
             /** Format: date-time */
             updated_at?: string | null;
+        };
+        RankMover: {
+            /** Format: int32 */
+            change: number;
+            /** Format: date-time */
+            checked_at: string;
+            exact: boolean;
+            keyword: string;
+            /** Format: int32 */
+            position: number;
+            /** Format: int32 */
+            previous_position: number;
+            provider: string;
+            /** Format: uuid */
+            tracker_id: string;
         };
         RankPoint: {
             /** Format: date-time */
@@ -2524,6 +2689,33 @@ export interface components {
             id: string;
             is_instance_admin: boolean;
             name: string;
+        };
+        WebsitePage: {
+            description?: string | null;
+            h1?: string | null;
+            title?: string | null;
+            url: string;
+        };
+        WebsiteResearchInput: {
+            /** @description Optional root URL, useful for HTTP-only sites. Must match the project's host. */
+            start_url?: string | null;
+        };
+        WebsiteSetupInput: {
+            business_overview: string;
+            current_goal: string;
+            /** @description Website shown during review. Reject a save if the project website changed meanwhile. */
+            expected_domain: string;
+            /** @description Selected evidence URLs only; preserve existing pages with the same URL. */
+            key_pages?: string[];
+            /** Format: int64 */
+            revision: number;
+        };
+        WebsiteSetupView: {
+            audit?: components["schemas"]["Audit"] | null;
+            context: components["schemas"]["ProjectContext"];
+            evidence: components["schemas"]["WebsitePage"][];
+            note: string;
+            suggested_overview?: string | null;
         };
     };
     responses: never;
@@ -3595,6 +3787,92 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    save_checklist: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChecklistInput"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    dashboard_keywords: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["KeywordDashboard"];
+                };
+            };
+        };
+    };
+    dashboard_overview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DashboardOverview"];
+                };
+            };
+        };
+    };
+    refresh_dashboard: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["KeywordDashboard"];
                 };
             };
         };
@@ -4885,6 +5163,77 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    research_website: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WebsiteResearchInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Audit"];
+                };
+            };
+        };
+    };
+    get_website_setup: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WebsiteSetupView"];
+                };
+            };
+        };
+    };
+    save_website_setup: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["WebsiteSetupInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectContext"];
                 };
             };
         };

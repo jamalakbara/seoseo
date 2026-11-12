@@ -36,6 +36,7 @@ use utoipa_scalar::{Scalar, Servable};
         (name = "api-keys", description = "Organization-bound API keys"),
         (name = "projects", description = "Projects and their default market"),
         (name = "project-memory", description = "Revisioned project context for people and agents"),
+        (name = "dashboard", description = "Project dashboard and website onboarding"),
         (name = "jobs", description = "Background jobs"),
         (name = "audits", description = "Site audits: crawl, issues, pages"),
         (name = "team", description = "Workspace members and invitations"),
@@ -96,9 +97,16 @@ pub fn router(state: AppState) -> Router {
         .merge(mcp_mount::router(&state))
         .layer(axum::middleware::from_fn(middleware::track_metrics))
         // OAuth callback queries contain authorization codes; never put them in spans.
-        .layer(TraceLayer::new_for_http().make_span_with(|request: &axum::http::Request<axum::body::Body>| {
-            tracing::info_span!("http_request", method = %request.method(), path = %request.uri().path())
-        }))
+        .layer(TraceLayer::new_for_http().make_span_with(
+            |request: &axum::http::Request<axum::body::Body>| {
+                let path = request
+                    .extensions()
+                    .get::<axum::extract::MatchedPath>()
+                    .map(|path| path.as_str())
+                    .unwrap_or("unmatched");
+                tracing::info_span!("http_request", method = %request.method(), path)
+            },
+        ))
         .layer(PropagateRequestIdLayer::x_request_id())
         .layer(SetRequestIdLayer::x_request_id(MakeRequestUuid))
         .layer(CompressionLayer::new())

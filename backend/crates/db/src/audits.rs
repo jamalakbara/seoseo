@@ -42,6 +42,62 @@ pub struct Audit {
     pub created_at: DateTime<Utc>,
 }
 
+pub struct StartAudit<'a> {
+    pub org: Uuid,
+    pub project: Uuid,
+    pub user: Uuid,
+    pub url: &'a str,
+    pub config: serde_json::Value,
+    /// Onboarding reuses an existing audit of this domain. Manual starts pass None.
+    pub first_domain: Option<&'a str>,
+}
+
+pub async fn start_with_job(pool: &PgPool, input: StartAudit<'_>) -> AppResult<Audit> {
+    let mut tx = pool.begin().await.map_err(internal)?;
+    let domain: Option<String> = sqlx::query_scalar("SELECT domain::text FROM projects WHERE organization_id=$1 AND id=$2 AND archived_at IS NULL FOR UPDATE")
+        .bind(input.org).bind(input.project).fetch_optional(&mut *tx).await.map_err(internal)?.ok_or(AppError::NotFound("active project"))?;
+    if let Some(expected) = input.first_domain {
+        if domain.as_deref() != Some(expected) {
+            return Err(AppError::Conflict(
+                "website changed; reload onboarding".into(),
+            ));
+        }
+        let existing: Option<Audit> = sqlx::query_as(concat!("SELECT ",audit_columns!()," FROM audits WHERE project_id=$1 AND lower(split_part(split_part(split_part(start_url,'://',2),'/',1),':',1))=$2 ORDER BY created_at DESC LIMIT 1"))
+            .bind(input.project).bind(expected).fetch_optional(&mut *tx).await.map_err(internal)?;
+        if let Some(audit) = existing {
+            tx.commit().await.map_err(internal)?;
+            return Ok(audit);
+        }
+    }
+    let active: bool = sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM audits WHERE project_id=$1 AND status IN ('queued','running'))")
+        .bind(input.project).fetch_one(&mut *tx).await.map_err(internal)?;
+    if active {
+        return Err(AppError::Conflict(
+            "an audit is already running for this project; wait for it or cancel it".into(),
+        ));
+    }
+    let aid = common::new_id();
+    let job = common::new_id();
+    sqlx::query("INSERT INTO jobs(id,kind,organization_id,project_id,payload,max_attempts) VALUES($1,'site_audit',$2,$3,$4,3)")
+        .bind(job).bind(input.org).bind(input.project).bind(serde_json::json!({"audit_id":aid})).execute(&mut *tx).await.map_err(internal)?;
+    let audit = sqlx::query_as(concat!("INSERT INTO audits(id,project_id,started_by,start_url,config,job_id) VALUES($1,$2,$3,$4,$5,$6) RETURNING ",audit_columns!()))
+        .bind(aid).bind(input.project).bind(input.user).bind(input.url).bind(input.config).bind(job).fetch_one(&mut *tx).await.map_err(internal)?;
+    tx.commit().await.map_err(internal)?;
+    Ok(audit)
+}
+
+pub async fn latest_for_domain(
+    pool: &PgPool,
+    org: Uuid,
+    project: Uuid,
+    domain: &str,
+    completed: bool,
+) -> AppResult<Option<Audit>> {
+    // Project scope is verified inside this query, not only by the service.
+    sqlx::query_as(concat!("SELECT ",audit_columns!()," FROM audits WHERE project_id=$2 AND EXISTS(SELECT 1 FROM projects WHERE id=$2 AND organization_id=$1) AND lower(split_part(split_part(split_part(start_url,'://',2),'/',1),':',1))=$3 AND (NOT $4 OR status='completed') ORDER BY created_at DESC LIMIT 1"))
+        .bind(org).bind(project).bind(domain).bind(completed).fetch_optional(pool).await.map_err(internal)
+}
+
 pub async fn insert(
     pool: &PgPool,
     id: Uuid,

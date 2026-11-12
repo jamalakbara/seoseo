@@ -1,11 +1,11 @@
 //! Site audits: start, inspect and manage audits of a project's website.
 
 use crate::actor::{Actor, Role};
-use common::{AppError, AppResult, new_id};
+use common::{AppError, AppResult};
 use crawler::UrlPolicy;
 use crawler::rules::{CATALOG, IssueType};
 use db::audits::{self, Audit, IssueCount, IssueRow, LinkRow, PageDetail, PageFilter, PageRow};
-use jobs::site_audit::{AuditConfig, KIND};
+use jobs::site_audit::AuditConfig;
 use serde::{Deserialize, Serialize};
 use sqlx::PgPool;
 use url::Url;
@@ -41,6 +41,48 @@ pub async fn start(
     policy: UrlPolicy,
     renderer_available: bool,
     input: StartAuditInput,
+) -> AppResult<Audit> {
+    start_inner(
+        pool,
+        actor,
+        project_id,
+        policy,
+        renderer_available,
+        input,
+        false,
+    )
+    .await
+}
+
+pub async fn start_first(
+    pool: &PgPool,
+    actor: &Actor,
+    project_id: Uuid,
+    policy: UrlPolicy,
+    renderer_available: bool,
+    input: StartAuditInput,
+) -> AppResult<Audit> {
+    actor.require(Role::Admin)?;
+    start_inner(
+        pool,
+        actor,
+        project_id,
+        policy,
+        renderer_available,
+        input,
+        true,
+    )
+    .await
+}
+
+async fn start_inner(
+    pool: &PgPool,
+    actor: &Actor,
+    project_id: Uuid,
+    policy: UrlPolicy,
+    renderer_available: bool,
+    input: StartAuditInput,
+    first: bool,
 ) -> AppResult<Audit> {
     actor.require(Role::Member)?;
     let project = db::projects::get(pool, actor.org_id, project_id).await?;
@@ -133,37 +175,27 @@ pub async fn start(
         exclude_paths: exclude,
     };
 
-    if audits::count_active(pool, project_id).await? > 0 {
-        return Err(AppError::Conflict(
-            "an audit is already running for this project; wait for it or cancel it".into(),
+    if first && url.host_str() != project.domain.as_deref() {
+        return Err(AppError::Validation(
+            "research URL must belong to the project website".into(),
         ));
     }
-    let audit_id = new_id();
-    let audit = audits::insert(
+    audits::start_with_job(
         pool,
-        audit_id,
-        project_id,
-        actor.user_id,
-        url.as_str(),
-        serde_json::to_value(&cfg).map_err(AppError::internal)?,
+        audits::StartAudit {
+            org: actor.org_id,
+            project: project_id,
+            user: actor.user_id,
+            url: url.as_str(),
+            config: serde_json::to_value(&cfg).map_err(AppError::internal)?,
+            first_domain: if first {
+                project.domain.as_deref()
+            } else {
+                None
+            },
+        },
     )
-    .await?;
-    // Audits run for a long time; allow a couple of resumes after worker crashes.
-    let job = db::jobs::enqueue(
-        pool,
-        new_id(),
-        KIND,
-        Some(actor.org_id),
-        Some(project_id),
-        serde_json::json!({ "audit_id": audit_id }),
-        3,
-    )
-    .await?;
-    audits::set_job(pool, audit_id, job.id).await?;
-    Ok(Audit {
-        job_id: Some(job.id),
-        ..audit
-    })
+    .await
 }
 
 async fn project_scope(pool: &PgPool, actor: &Actor, project_id: Uuid) -> AppResult<()> {
