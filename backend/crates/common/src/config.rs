@@ -97,4 +97,30 @@ pub struct Config {
         default_value = "https://searchconsole.googleapis.com/v1/urlInspection/index:inspect"
     )]
     pub gsc_inspection_url: String,
+
+    #[arg(
+        long,
+        env = "GA4_ADMIN_URL",
+        default_value = "https://analyticsadmin.googleapis.com/v1beta"
+    )]
+    pub ga4_admin_url: String,
+    #[arg(
+        long,
+        env = "GA4_DATA_URL",
+        default_value = "https://analyticsdata.googleapis.com/v1beta"
+    )]
+    pub ga4_data_url: String,
+    #[arg(
+        long,
+        env = "INDEXNOW_URL",
+        default_value = "https://api.indexnow.org/indexnow"
+    )]
+    pub indexnow_url: String,
+    /// Operator-controlled local/OpenAI-compatible model endpoint; never set from project input.
+    #[arg(long, env = "OPENAI_COMPAT_BASE_URL")]
+    pub openai_compat_base_url: Option<String>,
+    #[arg(long, env = "OPENAI_COMPAT_API_KEY", hide_env_values = true)]
+    pub openai_compat_api_key: Option<String>,
+    #[arg(long, env = "LLM_MODEL")]
+    pub llm_model: Option<String>,
 }

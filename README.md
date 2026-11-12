@@ -2,7 +2,7 @@
 
 Free, open-source, self-hostable SEO platform — an alternative to Semrush, Ahrefs and OpenSEO that works **without paid API keys**.
 
-> Status: **M1** — site audit (crawler with 38 issue checks, live progress, issues/pages explorer, CSV export), team invitations, plus the M0 foundation (accounts, workspaces, projects, API keys, job queue, OpenAPI, Docker). More SEO tools land milestone by milestone ([roadmap](docs/07-roadmap.md)).
+> Status: **M4 implemented** — site audits, keyword research, rank tracking, Search Console, dashboard, project memory/reports, GA4, IndexNow, reviewed model-assisted onboarding and MCP OAuth. Self-hosted Google/model integrations require operator configuration. See the [roadmap](docs/07-roadmap.md) and [integration setup](docs/13-m4-integrations-and-oauth.md).
 
 ## Quick start (Docker)
 

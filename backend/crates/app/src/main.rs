@@ -101,6 +101,7 @@ async fn main() -> anyhow::Result<()> {
             let registry = jobs::saved_refresh::register(registry, pctx.clone());
             let registry = jobs::rank_check::register(registry, pctx.clone());
             let registry = jobs::cc_ranks::register(registry, pctx);
+            let registry = domain::dashboard::register(registry, cfg);
             jobs::run_worker(pool, registry, concurrency, rx).await?;
         }
         Command::Migrate { database_url } => {

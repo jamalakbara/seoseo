@@ -1,0 +1,12 @@
+# Use after compose.test.yaml and compose.gsc-test.yaml on a disposable stack.
+services:
+  badseo:
+    networks:
+      default:
+        aliases: [badseo.test]
+  api:
+    environment:
+      RENDERER_URL: ""
+  worker:
+    environment:
+      RENDERER_URL: ""

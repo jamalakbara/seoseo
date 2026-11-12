@@ -57,6 +57,8 @@ function SettingsCard({ project }: { project: Project }) {
       ),
     onSuccess: (p) => {
       qc.setQueryData(keys.project(p.id), p);
+      qc.removeQueries({ queryKey: ["dashboard", p.id] });
+      qc.removeQueries({ queryKey: ["website-setup", p.id] });
       qc.invalidateQueries({ queryKey: ["projects"] });
       toast.success("Saved");
     },
@@ -99,6 +101,8 @@ function DangerCard({ project }: { project: Project }) {
         : unwrap(api.POST("/api/v1/projects/{project_id}/archive", path)),
     onSuccess: (p) => {
       qc.setQueryData(keys.project(p.id), p);
+      qc.removeQueries({ queryKey: ["dashboard", p.id] });
+      qc.removeQueries({ queryKey: ["website-setup", p.id] });
       qc.invalidateQueries({ queryKey: ["projects"] });
       toast.success(p.archived_at ? "Project archived" : "Project restored");
     },

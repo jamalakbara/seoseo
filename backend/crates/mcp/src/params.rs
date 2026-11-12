@@ -5,6 +5,22 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct WebsiteResearch {
+    pub project_id: String,
+    pub start_url: Option<String>,
+}
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct WebsiteSetup {
+    pub project_id: String,
+    pub revision: i64,
+    pub expected_domain: String,
+    pub business_overview: String,
+    pub current_goal: String,
+    #[serde(default)]
+    pub key_pages: Vec<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct GscSite {
     pub project_id: String,
     /// Exact property URL from list_search_console_sites.
@@ -59,6 +75,86 @@ pub struct CreateProject {
     pub country_code: Option<String>,
     /// ISO 639-1 language of the default market (default en).
     pub language_code: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct MemorySection {
+    pub key: String,
+    pub title: String,
+    pub content: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct MemoryCompetitor {
+    pub domain: String,
+    pub name: Option<String>,
+    pub notes: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct MemoryKeyPage {
+    pub url: String,
+    /// hub, spoke, money, or other.
+    pub role: String,
+    pub topic: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct UpdateProjectContext {
+    pub project_id: String,
+    /// Revision returned by get_project_context. Use 0 before the first save.
+    pub revision: i64,
+    #[serde(default)]
+    pub sections: Vec<MemorySection>,
+    #[serde(default)]
+    pub competitors: Vec<MemoryCompetitor>,
+    #[serde(default)]
+    pub key_pages: Vec<MemoryKeyPage>,
+    /// Optional immutable research note to append.
+    pub research_note: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct SaveReport {
+    pub project_id: String,
+    /// Omit to create; provide an existing report id to replace it.
+    pub report_id: Option<String>,
+    pub title: String,
+    pub summary: Option<String>,
+    /// Complete self-contained HTML document, at most 500 KiB.
+    pub html: String,
+    pub skill: Option<String>,
+    pub template_id: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ReportRef {
+    pub project_id: String,
+    pub report_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct SaveReportTemplate {
+    pub project_id: String,
+    /// Omit to create; provide an existing template id to replace it.
+    pub template_id: Option<String>,
+    pub name: String,
+    pub description: Option<String>,
+    pub instructions: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ReportTemplateRef {
+    pub project_id: String,
+    pub template_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct SetReportSharing {
+    pub project_id: String,
+    pub report_id: String,
+    /// Enable with a new secret token, or revoke the current token.
+    pub enabled: bool,
 }
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
@@ -265,4 +361,35 @@ pub struct GetRankHistory {
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct JobRef {
     pub job_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct Ga4PropertySelection {
+    pub project_id: String,
+    pub property_id: String,
+}
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct Ga4PropertyPage {
+    pub project_id: String,
+    pub page_token: Option<String>,
+}
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct Ga4ReportParams {
+    pub project_id: String,
+    pub start_date: String,
+    pub end_date: String,
+    pub limit: Option<u32>,
+    pub offset: Option<u32>,
+}
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct IndexNowUrls {
+    pub project_id: String,
+    pub urls: Vec<String>,
+}
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct LinkObservationInput {
+    pub project_id: String,
+    pub source_url: String,
+    pub target_url: String,
+    pub state: String,
 }

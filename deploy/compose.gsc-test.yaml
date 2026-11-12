@@ -8,7 +8,7 @@ services:
     ports:
       - "127.0.0.1:3101:8080"
   api:
-    environment:
+    environment: &gsc-fixture-env
       GOOGLE_CLIENT_ID: fixture-client
       GOOGLE_CLIENT_SECRET: fixture-secret
       APP_ENCRYPTION_KEY: AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=
@@ -16,3 +16,5 @@ services:
       GOOGLE_TOKEN_URL: http://gsc-fixture:8080/token
       GSC_API_URL: http://gsc-fixture:8080/webmasters/v3
       GSC_INSPECTION_URL: http://gsc-fixture:8080/inspect
+  worker:
+    environment: *gsc-fixture-env

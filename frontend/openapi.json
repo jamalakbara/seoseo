@@ -386,6 +386,54 @@
         ]
       }
     },
+    "/api/v1/ga4/oauth/callback": {
+      "get": {
+        "tags": [
+          "analytics"
+        ],
+        "operationId": "ga4_callback",
+        "parameters": [
+          {
+            "name": "state",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "code",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "error",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "303": {}
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
     "/api/v1/gsc/oauth/callback": {
       "get": {
         "tags": [
@@ -731,6 +779,128 @@
           },
           {
             "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/oauth/consent": {
+      "post": {
+        "tags": [
+          "oauth"
+        ],
+        "operationId": "oauth_consent",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConsentInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsentResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/v1/oauth/grants": {
+      "get": {
+        "tags": [
+          "oauth"
+        ],
+        "operationId": "oauth_grants",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GrantView"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/v1/oauth/grants/{id}": {
+      "delete": {
+        "tags": [
+          "oauth"
+        ],
+        "operationId": "oauth_revoke_grant",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {}
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/v1/oauth/preview": {
+      "post": {
+        "tags": [
+          "oauth"
+        ],
+        "operationId": "oauth_preview",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Authorization"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConsentView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
           }
         ]
       }
@@ -1711,6 +1881,522 @@
         ]
       }
     },
+    "/api/v1/projects/{project_id}/context": {
+      "get": {
+        "tags": [
+          "project-memory"
+        ],
+        "operationId": "get_project_context",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectContext"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "project-memory"
+        ],
+        "operationId": "update_project_context",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProjectContextInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectContext"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/dashboard/checklist": {
+      "put": {
+        "tags": [
+          "dashboard"
+        ],
+        "operationId": "save_checklist",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChecklistInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {}
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/dashboard/keywords": {
+      "get": {
+        "tags": [
+          "dashboard"
+        ],
+        "operationId": "dashboard_keywords",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KeywordDashboard"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/dashboard/overview": {
+      "get": {
+        "tags": [
+          "dashboard"
+        ],
+        "operationId": "dashboard_overview",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardOverview"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/dashboard/refresh": {
+      "post": {
+        "tags": [
+          "dashboard"
+        ],
+        "operationId": "refresh_dashboard",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KeywordDashboard"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/ga4": {
+      "get": {
+        "tags": [
+          "analytics"
+        ],
+        "operationId": "ga4_status",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ga4ConnectionView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "analytics"
+        ],
+        "operationId": "ga4_disconnect",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {}
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/ga4/connect": {
+      "post": {
+        "tags": [
+          "analytics"
+        ],
+        "operationId": "ga4_connect",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ga4ConnectUrl"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/ga4/properties": {
+      "get": {
+        "tags": [
+          "analytics"
+        ],
+        "operationId": "ga4_properties",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "page_token",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ga4Properties"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/ga4/property": {
+      "put": {
+        "tags": [
+          "analytics"
+        ],
+        "operationId": "ga4_set_property",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Ga4PropertyInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ga4ConnectionView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/ga4/reports/{kind}": {
+      "post": {
+        "tags": [
+          "analytics"
+        ],
+        "operationId": "ga4_report",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "kind",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Ga4ReportKind"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Ga4ReportInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Ga4ReportView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/projects/{project_id}/gsc": {
       "get": {
         "tags": [
@@ -2036,6 +2722,133 @@
                   "items": {
                     "$ref": "#/components/schemas/Site"
                   }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/indexnow/setup": {
+      "post": {
+        "tags": [
+          "integrations"
+        ],
+        "operationId": "indexnow_setup_route",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IndexNowSettings"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/indexnow/submit": {
+      "post": {
+        "tags": [
+          "integrations"
+        ],
+        "operationId": "indexnow_submit_route",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IndexNowInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/IndexNowResult"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/indexnow/verify": {
+      "post": {
+        "tags": [
+          "integrations"
+        ],
+        "operationId": "indexnow_verify_route",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IndexNowResult"
                 }
               }
             }
@@ -2496,6 +3309,93 @@
               "text/csv": {
                 "schema": {
                   "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/links": {
+      "get": {
+        "tags": [
+          "integrations"
+        ],
+        "operationId": "link_list_route",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LinkObservation"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "integrations"
+        ],
+        "operationId": "link_save_route",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LinkInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinkObservation"
                 }
               }
             }
@@ -3213,6 +4113,588 @@
         ]
       }
     },
+    "/api/v1/projects/{project_id}/report-templates": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "operationId": "list_report_templates",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReportTemplate"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "reports"
+        ],
+        "operationId": "create_report_template",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveReportTemplateInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportTemplate"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/report-templates/{template_id}": {
+      "put": {
+        "tags": [
+          "reports"
+        ],
+        "operationId": "update_report_template",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "template_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveReportTemplateInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReportTemplate"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "reports"
+        ],
+        "operationId": "delete_report_template",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "template_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {}
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/reports": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "operationId": "list_reports",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ReportListItem"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "reports"
+        ],
+        "operationId": "create_report",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveReportInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Report"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/reports/{report_id}": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "operationId": "get_report",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "report_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Report"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "reports"
+        ],
+        "operationId": "update_report",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "report_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveReportInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Report"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "reports"
+        ],
+        "operationId": "delete_report",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "report_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {},
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/reports/{report_id}/raw": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "operationId": "get_report_raw",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "report_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/reports/{report_id}/share": {
+      "post": {
+        "tags": [
+          "reports"
+        ],
+        "operationId": "share_report",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "report_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ShareReportResult"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "reports"
+        ],
+        "operationId": "unshare_report",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "report_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Report"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/projects/{project_id}/restore": {
       "post": {
         "tags": [
@@ -3753,6 +5235,176 @@
         ]
       }
     },
+    "/api/v1/projects/{project_id}/website-research": {
+      "post": {
+        "tags": [
+          "dashboard"
+        ],
+        "operationId": "research_website",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebsiteResearchInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Audit"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/website-setup": {
+      "get": {
+        "tags": [
+          "dashboard"
+        ],
+        "operationId": "get_website_setup",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebsiteSetupView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "dashboard"
+        ],
+        "operationId": "save_website_setup",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebsiteSetupInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectContext"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/website-synthesis": {
+      "post": {
+        "tags": [
+          "integrations"
+        ],
+        "operationId": "website_synthesize_route",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebsiteSynthesis"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/providers": {
       "get": {
         "tags": [
@@ -3904,6 +5556,73 @@
             "bearer": []
           }
         ]
+      }
+    },
+    "/api/v1/shared-reports/{token}": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "operationId": "get_shared_report",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SharedReportView"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/shared-reports/{token}/raw": {
+      "get": {
+        "tags": [
+          "reports"
+        ],
+        "operationId": "get_shared_report_raw",
+        "parameters": [
+          {
+            "name": "token",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/html": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/api/v1/team/invitations": {
@@ -4110,6 +5829,7 @@
         "enum": [
           "session",
           "api_key",
+          "o_auth",
           "no_auth"
         ]
       },
@@ -4339,6 +6059,49 @@
           }
         }
       },
+      "Authorization": {
+        "type": "object",
+        "required": [
+          "client_id",
+          "redirect_uri",
+          "response_type",
+          "code_challenge",
+          "code_challenge_method",
+          "resource"
+        ],
+        "properties": {
+          "client_id": {
+            "type": "string"
+          },
+          "code_challenge": {
+            "type": "string"
+          },
+          "code_challenge_method": {
+            "type": "string"
+          },
+          "redirect_uri": {
+            "type": "string"
+          },
+          "resource": {
+            "type": "string"
+          },
+          "response_type": {
+            "type": "string"
+          },
+          "scope": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "state": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
       "ChangeResult": {
         "type": "object",
         "required": [
@@ -4356,6 +6119,94 @@
             "type": "integer",
             "format": "int64",
             "description": "Keywords now on the tracker."
+          }
+        }
+      },
+      "ChecklistInput": {
+        "type": "object",
+        "required": [
+          "step",
+          "skipped"
+        ],
+        "properties": {
+          "skipped": {
+            "type": "boolean"
+          },
+          "step": {
+            "type": "string"
+          }
+        }
+      },
+      "ChecklistStep": {
+        "type": "object",
+        "required": [
+          "id",
+          "label",
+          "href",
+          "complete",
+          "skipped"
+        ],
+        "properties": {
+          "complete": {
+            "type": "boolean"
+          },
+          "href": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "skipped": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Competitor": {
+        "type": "object",
+        "required": [
+          "domain"
+        ],
+        "properties": {
+          "domain": {
+            "type": "string"
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "CompetitorInput": {
+        "type": "object",
+        "required": [
+          "domain"
+        ],
+        "properties": {
+          "domain": {
+            "type": "string"
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
@@ -4395,6 +6246,123 @@
               "string",
               "null"
             ]
+          }
+        }
+      },
+      "ConsentInput": {
+        "type": "object",
+        "required": [
+          "authorization",
+          "allow"
+        ],
+        "properties": {
+          "allow": {
+            "type": "boolean"
+          },
+          "authorization": {
+            "$ref": "#/components/schemas/Authorization"
+          }
+        }
+      },
+      "ConsentResult": {
+        "type": "object",
+        "required": [
+          "redirect_uri"
+        ],
+        "properties": {
+          "redirect_uri": {
+            "type": "string"
+          }
+        }
+      },
+      "ConsentView": {
+        "type": "object",
+        "required": [
+          "client_name",
+          "redirect_uri",
+          "resource",
+          "scope"
+        ],
+        "properties": {
+          "client_name": {
+            "type": "string"
+          },
+          "redirect_uri": {
+            "type": "string"
+          },
+          "resource": {
+            "type": "string"
+          },
+          "scope": {
+            "type": "string"
+          }
+        }
+      },
+      "ContextSection": {
+        "type": "object",
+        "required": [
+          "key",
+          "title",
+          "content",
+          "updated_by"
+        ],
+        "properties": {
+          "content": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "updated_by": {
+            "type": "string"
+          }
+        }
+      },
+      "ContextSectionInput": {
+        "type": "object",
+        "required": [
+          "key",
+          "title",
+          "content"
+        ],
+        "properties": {
+          "content": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      },
+      "Counts": {
+        "type": "object",
+        "required": [
+          "saved_keywords",
+          "trackers",
+          "reports",
+          "memory_ready"
+        ],
+        "properties": {
+          "memory_ready": {
+            "type": "boolean"
+          },
+          "reports": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "saved_keywords": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "trackers": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },
@@ -4550,6 +6518,66 @@
           }
         }
       },
+      "DashboardOverview": {
+        "type": "object",
+        "required": [
+          "checklist",
+          "link_activity",
+          "counts",
+          "rank_movers",
+          "gsc_connected",
+          "keywords"
+        ],
+        "properties": {
+          "checklist": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChecklistStep"
+            }
+          },
+          "completed_audit": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Audit"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "counts": {
+            "$ref": "#/components/schemas/Counts"
+          },
+          "gsc_connected": {
+            "type": "boolean"
+          },
+          "keywords": {
+            "$ref": "#/components/schemas/KeywordDashboard"
+          },
+          "latest_audit": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Audit"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "link_activity": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LinkObservation"
+            }
+          },
+          "rank_movers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RankMover"
+            }
+          }
+        }
+      },
       "DeleteSavedInput": {
         "type": "object",
         "required": [
@@ -4628,6 +6656,184 @@
           }
         }
       },
+      "Ga4ConnectUrl": {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "Ga4ConnectionView": {
+        "type": "object",
+        "required": [
+          "configured",
+          "connected"
+        ],
+        "properties": {
+          "configured": {
+            "type": "boolean"
+          },
+          "connected": {
+            "type": "boolean"
+          },
+          "connected_by": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "property_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "Ga4Properties": {
+        "type": "object",
+        "required": [
+          "properties"
+        ],
+        "properties": {
+          "next_page_token": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "properties": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ga4Property"
+            }
+          }
+        }
+      },
+      "Ga4Property": {
+        "type": "object",
+        "required": [
+          "property",
+          "display_name"
+        ],
+        "properties": {
+          "display_name": {
+            "type": "string"
+          },
+          "property": {
+            "type": "string"
+          }
+        }
+      },
+      "Ga4PropertyInput": {
+        "type": "object",
+        "required": [
+          "property_id"
+        ],
+        "properties": {
+          "property_id": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ga4ReportInput": {
+        "type": "object",
+        "required": [
+          "start_date",
+          "end_date"
+        ],
+        "properties": {
+          "end_date": {
+            "type": "string"
+          },
+          "limit": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "offset": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "start_date": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Ga4ReportKind": {
+        "type": "string",
+        "enum": [
+          "organic_overview",
+          "organic_landing_pages",
+          "page_performance",
+          "traffic_acquisition",
+          "key_events",
+          "ecommerce_performance",
+          "site_search",
+          "audience_breakdown",
+          "measurement_health"
+        ]
+      },
+      "Ga4ReportView": {
+        "type": "object",
+        "required": [
+          "property_id",
+          "report",
+          "channel",
+          "data",
+          "note"
+        ],
+        "properties": {
+          "channel": {
+            "type": "string"
+          },
+          "data": {},
+          "note": {
+            "type": "string"
+          },
+          "property_id": {
+            "type": "string"
+          },
+          "report": {
+            "$ref": "#/components/schemas/Ga4ReportKind"
+          }
+        }
+      },
+      "GrantView": {
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "created_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
       "ImportAuthorityInput": {
         "type": "object",
         "properties": {
@@ -4639,6 +6845,78 @@
             "format": "int32",
             "description": "How many top domains to import (1,000–20,000,000; default 1,000,000 ≈ 30 MB download).",
             "minimum": 0
+          }
+        }
+      },
+      "IndexNowInput": {
+        "type": "object",
+        "required": [
+          "urls"
+        ],
+        "properties": {
+          "urls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
+      },
+      "IndexNowResult": {
+        "type": "object",
+        "required": [
+          "host",
+          "key_url",
+          "verified",
+          "accepted",
+          "note"
+        ],
+        "properties": {
+          "accepted": {
+            "type": "boolean"
+          },
+          "host": {
+            "type": "string"
+          },
+          "key_url": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "status": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "verified": {
+            "type": "boolean"
+          }
+        }
+      },
+      "IndexNowSettings": {
+        "type": "object",
+        "required": [
+          "domain",
+          "key"
+        ],
+        "properties": {
+          "domain": {
+            "type": "string"
+          },
+          "key": {
+            "type": "string"
+          },
+          "last_submitted_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
           }
         }
       },
@@ -4993,6 +7271,103 @@
           }
         }
       },
+      "KeyPage": {
+        "type": "object",
+        "required": [
+          "url",
+          "role"
+        ],
+        "properties": {
+          "role": {
+            "type": "string"
+          },
+          "topic": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "KeyPageInput": {
+        "type": "object",
+        "required": [
+          "url",
+          "role"
+        ],
+        "properties": {
+          "role": {
+            "type": "string",
+            "description": "hub, spoke, money, or other."
+          },
+          "topic": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "KeywordDashboard": {
+        "type": "object",
+        "required": [
+          "refreshing"
+        ],
+        "properties": {
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "fetched_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "job_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "next_attempt_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "refreshing": {
+            "type": "boolean"
+          },
+          "site_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "snapshot": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/KeywordSnapshot"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
       "KeywordIdea": {
         "type": "object",
         "required": [
@@ -5190,6 +7565,115 @@
               "type": "string"
             },
             "description": "Human-readable notes: skipped or rate-limited providers, missing setup."
+          }
+        }
+      },
+      "KeywordSnapshot": {
+        "type": "object",
+        "required": [
+          "site_url",
+          "start_date",
+          "end_date",
+          "recent_start_date",
+          "baseline_start_date",
+          "baseline_end_date",
+          "top",
+          "new_queries",
+          "striking_distance",
+          "truncated",
+          "note"
+        ],
+        "properties": {
+          "baseline_end_date": {
+            "type": "string"
+          },
+          "baseline_start_date": {
+            "type": "string"
+          },
+          "end_date": {
+            "type": "string"
+          },
+          "new_queries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PerformanceRow"
+            }
+          },
+          "note": {
+            "type": "string"
+          },
+          "recent_start_date": {
+            "type": "string"
+          },
+          "site_url": {
+            "type": "string"
+          },
+          "start_date": {
+            "type": "string"
+          },
+          "striking_distance": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PerformanceRow"
+            }
+          },
+          "top": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PerformanceRow"
+            }
+          },
+          "truncated": {
+            "type": "boolean"
+          }
+        }
+      },
+      "LinkInput": {
+        "type": "object",
+        "required": [
+          "source_url",
+          "target_url",
+          "state"
+        ],
+        "properties": {
+          "source_url": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "target_url": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "LinkObservation": {
+        "type": "object",
+        "required": [
+          "id",
+          "source_url",
+          "target_url",
+          "state",
+          "observed_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "source_url": {
+            "type": "string"
+          },
+          "state": {
+            "type": "string"
+          },
+          "target_url": {
+            "type": "string"
           }
         }
       },
@@ -6305,6 +8789,59 @@
           }
         }
       },
+      "ProjectContext": {
+        "type": "object",
+        "required": [
+          "project_id",
+          "revision",
+          "sections",
+          "competitors",
+          "key_pages",
+          "research_log"
+        ],
+        "properties": {
+          "competitors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Competitor"
+            }
+          },
+          "key_pages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KeyPage"
+            }
+          },
+          "project_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "research_log": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ResearchLogEntry"
+            }
+          },
+          "revision": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Send this value as `revision` when updating. Stale updates are rejected."
+          },
+          "sections": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContextSection"
+            }
+          },
+          "updated_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
       "ProviderInfo": {
         "type": "object",
         "required": [
@@ -6435,6 +8972,50 @@
             }
           }
         ]
+      },
+      "RankMover": {
+        "type": "object",
+        "required": [
+          "tracker_id",
+          "keyword",
+          "position",
+          "previous_position",
+          "change",
+          "provider",
+          "exact",
+          "checked_at"
+        ],
+        "properties": {
+          "change": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "checked_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "exact": {
+            "type": "boolean"
+          },
+          "keyword": {
+            "type": "string"
+          },
+          "position": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "previous_position": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "tracker_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
       },
       "RankPoint": {
         "type": "object",
@@ -6769,6 +9350,198 @@
           }
         }
       },
+      "Report": {
+        "type": "object",
+        "required": [
+          "id",
+          "project_id",
+          "title",
+          "html",
+          "created_by",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "html": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "project_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "shared_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "skill": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "summary": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "template_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ReportListItem": {
+        "type": "object",
+        "required": [
+          "id",
+          "project_id",
+          "title",
+          "created_by",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "created_by": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "project_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "shared_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "skill": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "summary": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "template_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ReportTemplate": {
+        "type": "object",
+        "required": [
+          "id",
+          "project_id",
+          "name",
+          "instructions",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "instructions": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "project_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ResearchLogEntry": {
+        "type": "object",
+        "required": [
+          "id",
+          "created_at",
+          "summary",
+          "updated_by"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "summary": {
+            "type": "string"
+          },
+          "updated_by": {
+            "type": "string"
+          }
+        }
+      },
       "Role": {
         "type": "string",
         "enum": [
@@ -6889,6 +9662,62 @@
             "type": "integer",
             "format": "int64",
             "minimum": 0
+          }
+        }
+      },
+      "SaveReportInput": {
+        "type": "object",
+        "required": [
+          "title",
+          "html"
+        ],
+        "properties": {
+          "html": {
+            "type": "string",
+            "description": "A complete, self-contained HTML document. External scripts are rejected."
+          },
+          "skill": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "summary": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "template_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          }
+        }
+      },
+      "SaveReportTemplateInput": {
+        "type": "object",
+        "required": [
+          "name",
+          "instructions"
+        ],
+        "properties": {
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "instructions": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
           }
         }
       },
@@ -7175,6 +10004,49 @@
           "info"
         ]
       },
+      "ShareReportResult": {
+        "type": "object",
+        "required": [
+          "token",
+          "report"
+        ],
+        "properties": {
+          "report": {
+            "$ref": "#/components/schemas/Report"
+          },
+          "token": {
+            "type": "string",
+            "description": "Secret URL token. It is shown only when sharing is enabled."
+          }
+        }
+      },
+      "SharedReportView": {
+        "type": "object",
+        "required": [
+          "title",
+          "created_at",
+          "updated_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "summary": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
       "SignInInput": {
         "type": "object",
         "required": [
@@ -7427,6 +10299,44 @@
           }
         }
       },
+      "UpdateProjectContextInput": {
+        "type": "object",
+        "required": [
+          "revision"
+        ],
+        "properties": {
+          "competitors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CompetitorInput"
+            }
+          },
+          "key_pages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KeyPageInput"
+            }
+          },
+          "research_note": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Optional immutable research-log entry appended by the server."
+          },
+          "revision": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Revision returned by the last GET. Use 0 for a context that has never been saved."
+          },
+          "sections": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ContextSectionInput"
+            }
+          }
+        }
+      },
       "UpdateProjectInput": {
         "type": "object",
         "description": "Partial update. Send `null` for nullable fields to clear them; omit to keep.",
@@ -7556,6 +10466,137 @@
             "type": "string"
           }
         }
+      },
+      "WebsitePage": {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "description": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "h1": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "title": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "WebsiteResearchInput": {
+        "type": "object",
+        "properties": {
+          "start_url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Optional root URL, useful for HTTP-only sites. Must match the project's host."
+          }
+        }
+      },
+      "WebsiteSetupInput": {
+        "type": "object",
+        "required": [
+          "revision",
+          "expected_domain",
+          "business_overview",
+          "current_goal"
+        ],
+        "properties": {
+          "business_overview": {
+            "type": "string"
+          },
+          "current_goal": {
+            "type": "string"
+          },
+          "expected_domain": {
+            "type": "string",
+            "description": "Website shown during review. Reject a save if the project website changed meanwhile."
+          },
+          "key_pages": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Selected evidence URLs only; preserve existing pages with the same URL."
+          },
+          "revision": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
+      "WebsiteSetupView": {
+        "type": "object",
+        "required": [
+          "evidence",
+          "context",
+          "note"
+        ],
+        "properties": {
+          "audit": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Audit"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "context": {
+            "$ref": "#/components/schemas/ProjectContext"
+          },
+          "evidence": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WebsitePage"
+            }
+          },
+          "note": {
+            "type": "string"
+          },
+          "suggested_overview": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "WebsiteSynthesis": {
+        "type": "object",
+        "required": [
+          "business_overview",
+          "suggested_goal",
+          "note"
+        ],
+        "properties": {
+          "business_overview": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "suggested_goal": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
       }
     },
     "securitySchemes": {
@@ -7588,6 +10629,14 @@
       "description": "Projects and their default market"
     },
     {
+      "name": "project-memory",
+      "description": "Revisioned project context for people and agents"
+    },
+    {
+      "name": "dashboard",
+      "description": "Project dashboard and website onboarding"
+    },
+    {
       "name": "jobs",
       "description": "Background jobs"
     },
@@ -7610,6 +10659,10 @@
     {
       "name": "rank-tracking",
       "description": "Rank trackers, scheduled checks and position history"
+    },
+    {
+      "name": "reports",
+      "description": "Stored HTML reports, templates and public sharing"
     }
   ]
 }

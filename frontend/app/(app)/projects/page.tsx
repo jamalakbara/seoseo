@@ -117,11 +117,23 @@ function CreateProjectDialog({
           },
         }),
       ),
-    onSuccess: (project) => {
+    onSuccess: async (project, values) => {
       qc.invalidateQueries({ queryKey: keys.projects() });
       onOpenChange(false);
       toast.success("Project created");
-      router.push(`/p/${project.id}`);
+      if (project.domain) {
+        try {
+          await unwrap(api.POST("/api/v1/projects/{project_id}/website-research", {
+            params: { path: { project_id: project.id } },
+            body: { start_url: values.domain.includes("://") ? values.domain : null },
+          }));
+        } catch (error) {
+          toast.error(`Project saved; initial audit could not start: ${error instanceof Error ? error.message : "Open website setup to retry."}`);
+        }
+        router.push(`/p/${project.id}/onboarding`);
+      } else {
+        router.push(`/p/${project.id}`);
+      }
     },
     onError: (e) => toast.error(e instanceof ApiError ? e.message : "Could not create project"),
   });
@@ -138,7 +150,7 @@ function CreateProjectDialog({
         >
           <DialogHeader>
             <DialogTitle>New project</DialogTitle>
-            <DialogDescription>You can change these settings later.</DialogDescription>
+            <DialogDescription>Adding a website starts its first 50-page audit. Next, review the findings and set your SEO goal. You can change settings later.</DialogDescription>
           </DialogHeader>
           {open && <ProjectFields initial={emptyProject} onChange={setValues} />}
           <DialogFooter>

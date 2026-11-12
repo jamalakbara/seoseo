@@ -129,10 +129,10 @@ Transport: Streamable HTTP at `/mcp`. Each tool: zod-like JSON Schema input, dis
 
 `*` = new beyond OpenSEO. Cost-estimate tools return request counts & provider quota impact instead of credits.
 
-### Implemented (M3)
+### Implemented (M3 + first M4 delivery)
 GSC REST routes, OAuth setup, access rules and limits: [Search Console](10-search-console.md).
 
-`whoami`, `list_projects`, `create_project`, `research_keywords`, `list_keyword_research`, `get_keyword_research`, `save_keywords`, `list_saved_keywords`, `remove_saved_keywords`, `get_serp_results`, `get_domain_authority`, `list_data_providers`, `run_site_audit`, `list_site_audits`, `get_audit_status`, `get_audit_issues`, `get_audit_pages`, `delete_site_audit`, `create_rank_tracker`, `list_rank_trackers`, `get_rank_tracker`, `add_rank_tracking_keywords`, `remove_rank_tracking_keywords`, `pin_rank_tracking_keywords`, `estimate_rank_tracker_cost`, `run_rank_tracker`, `get_rank_history`, `list_jobs`, `get_job`, `list_search_console_sites`, `set_search_console_site`, `get_search_console_performance`, `inspect_urls` (33 tools).
+The M3 set plus `get_project_context`, `update_project_context`, `save_report`, `get_report`, `list_reports`, `delete_report`, `save_report_template`, `list_report_templates`, `delete_report_template`, and `set_report_sharing` (43 tools total before the dashboard/onboarding delivery).
 
 - Endpoint: `POST /mcp` (also reachable through the web app origin). Stateless: no session ids, JSON responses, any API replica can answer.
 - Auth: `Authorization: Bearer seo_…` API key (or the built-in admin in `AUTH_MODE=none`). 401 carries `WWW-Authenticate: Bearer`.
@@ -142,3 +142,13 @@ GSC REST routes, OAuth setup, access rules and limits: [Search Console](10-searc
 
 ## 3. Agent skills to ship (`skills/`)
 Port & adapt (MIT-licensed upstream — keep attribution): seo-project-setup, keyword-research, keyword-clustering, competitor-analysis, competitive-landscape, link-prospecting, local-seo, seo-audit, ai-prompt-research, ai-visibility-audit, seo-report, seo-coach. New: content-brief, technical-fix-plan.
+
+### Dashboard and website onboarding (M4 continuation)
+
+Six additional MCP tools (49 total): `get_dashboard_overview`, `get_dashboard_keywords`, `refresh_dashboard`, `research_project_website`, `get_project_website_setup`, `save_project_website_setup`.
+
+REST: `GET /projects/{pid}/dashboard/overview`, `GET /projects/{pid}/dashboard/keywords`, `POST /projects/{pid}/dashboard/refresh`, `PUT /projects/{pid}/dashboard/checklist`, `GET/POST /projects/{pid}/website-setup`, `POST /projects/{pid}/website-research`. All use existing tenant authentication; research/setup writes need admin. Saved setup uses the existing revisioned `/context` document, preserving other sections, competitors and pages. See [Dashboard and onboarding](12-dashboard-and-onboarding.md).
+
+### M4 completion
+
+MCP now exposes 66 tools: the previous 49 plus property discovery/selection, nine Analytics report tools, IndexNow setup/verification/submission, website synthesis and link-observation list/save. OAuth discovery/DCR/PKCE/consent and rotating resource-bound tokens complement existing API keys. Feature endpoints and protocol details are documented in [M4 integrations and OAuth](13-m4-integrations-and-oauth.md).

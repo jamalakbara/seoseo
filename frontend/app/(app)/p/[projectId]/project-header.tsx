@@ -18,11 +18,14 @@ export function ProjectHeader() {
     { href: `${base}/rank`, label: "Rank tracking" },
     { href: `${base}/gsc`, label: "Search Console" },
     { href: `${base}/audit`, label: "Site audit" },
+    { href: `${base}/memory`, label: "Memory" },
+    { href: `${base}/reports`, label: "Reports" },
+    { href: `${base}/integrations`, label: "Integrations" },
     { href: `${base}/settings`, label: "Settings" },
   ];
 
   return (
-    <div className="grid gap-4 border-b">
+    <div className="grid min-w-0 grid-cols-1 gap-4 border-b">
       {project.data ? (
         <div>
           <h1 className="text-2xl font-semibold tracking-tight">{project.data.name}</h1>
@@ -37,7 +40,7 @@ export function ProjectHeader() {
       )}
       <nav className="-mb-px flex gap-4 overflow-x-auto whitespace-nowrap text-sm">
         {tabs.map((t) => {
-          const active = t.exact ? pathname === t.href : pathname.startsWith(t.href);
+          const active = t.exact ? pathname === t.href || pathname.startsWith(`${base}/dashboard/`) : pathname.startsWith(t.href);
           return (
             <Link
               key={t.href}

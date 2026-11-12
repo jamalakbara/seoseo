@@ -27,6 +27,7 @@ impl Role {
 pub enum ActorVia {
     Session,
     ApiKey,
+    OAuth,
     NoAuth,
 }
 

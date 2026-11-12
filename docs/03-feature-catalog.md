@@ -2,7 +2,7 @@
 
 Every feature with an ID, OpenSEO parity reference, priority, data source, and milestone.
 Priority: **P0** MVP · **P1** parity · **P2** beyond parity · **P3** later.
-Status column is updated as we build (`todo` / `wip` / `done`). Last update: 2026-11-11 (M3 rank tracking, MCP, job dashboard).
+Status column is updated as we build (`todo` / `wip` / `done`). Last update: 2026-11-12 (M4 integrations, onboarding synthesis and MCP OAuth).
 
 ## Workspace & identity
 | ID | Feature | OpenSEO ref | Pri | Data | MS | Status |
@@ -16,17 +16,17 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | WS-07 | Account deletion w/ grace period | account-deletion | P2 | — | M7 | todo |
 | WS-08 | Projects CRUD, archive/restore | projects.ts | P0 | — | M0 | done |
 | WS-09 | Project market (country/lang/city) | projects.location_code | P0 | GeoNames | M0 | wip (country+lang done; city picker M3) |
-| WS-10 | Project memory (sections, competitors, key pages, research log) | spec 0010 | P1 | — | M4 | todo |
-| WS-11 | Onboarding wizard + website research | spec 0005, researchProjectWebsite | P1 | crawler + LLM | M4 | todo |
+| WS-10 | Project memory (sections, competitors, key pages, research log) | spec 0010 | P1 | — | M4 | done (bounded revisioned document; REST/UI/MCP; append-only research log) |
+| WS-11 | Onboarding wizard + website research | spec 0005, researchProjectWebsite | P1 | crawler + LLM | M4 | done |
 | WS-12 | Team page, transfer ownership, switch org | organization.ts | P1 | — | M1 | wip (team page + remove member done; transfer ownership & org switcher UI todo) |
 | WS-13 | Settings: provider adapters & keys UI | (new) | P0 | — | M1 | done (M2: provider catalog, on/off, encrypted BYOK keys, live test, SR import) |
 
 ## Dashboard
-| DB-01 | Setup checklist | spec 0015 | P1 | — | M4 | todo |
-| DB-02 | Overview cards (health, GSC new queries, link activity, rank movers) | getDashboardOverview | P1 | GSC/links | M4 | todo |
-| DB-03 | Keywords tab (GSC new/top/striking distance) | getDashboardKeywords | P1 | GSC | M4 | todo |
+| DB-01 | Setup checklist | spec 0015 | P1 | — | M4 | done |
+| DB-02 | Overview cards (health, GSC new queries, link activity, rank movers) | getDashboardOverview | P1 | GSC/links | M4 | done (recorded link evidence; automatic discovery in M5) |
+| DB-03 | Keywords tab (GSC new/top/striking distance) | getDashboardKeywords | P1 | GSC | M4 | done |
 | DB-04 | Backlinks tab (new/lost/live) | getDashboardBacklinks | P1 | link store | M5 | todo |
-| DB-05 | Refresh claims (24 h) | data_refresh_claims | P1 | — | M4 | todo |
+| DB-05 | Refresh claims (24 h) | data_refresh_claims | P1 | — | M4 | done |
 
 ## Keyword research
 | KW-01 | Seed → ideas (autocomplete a–z, questions, prepositions) | researchKeywords | P0 | autocomplete | M2 | done (Google + Bing autocomplete; a-z, questions, prepositions; en/es/de/fr/pt/id modifiers) |
@@ -109,15 +109,15 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 ## Integrations
 | IN-01 | GSC OAuth + property + performance explorer + export | spec 0003 | P0 | GSC API | M3 | done (project grant, PKCE/state, encrypted tokens, verified property, bounded queries, CSV; live Google client setup required) |
 | IN-02 | GSC URL inspection | inspect_urls | P1 | GSC API | M3 | done (1–10 URLs, indexed-version results, partial URL errors, REST/UI/MCP) |
-| IN-03 | GA4 connection + 9 reports | spec 0007 | P1 | GA4 Data API | M4 | todo |
+| IN-03 | GA4 connection + 9 reports | spec 0007 | P1 | GA4 Data API | M4 | done |
 | IN-04 | Bing Webmaster Tools | (new) | P2 | Bing API | M6 | todo |
-| IN-05 | IndexNow setup/verify/submit | spec 0016 | P1 | IndexNow | M4 | todo |
+| IN-05 | IndexNow setup/verify/submit | spec 0016 | P1 | IndexNow | M4 | done |
 | IN-06 | Webhooks / Slack / Discord | (new) | P2 | — | M7 | todo |
 
 ## Reports
-| RP-01 | Report store + sandboxed viewer | spec 0012 | P1 | — | M4 | todo |
-| RP-02 | Templates (≤10/project, branding) | spec 0013 | P1 | — | M4 | todo |
-| RP-03 | Public share links | spec 0014 | P1 | — | M4 | todo |
+| RP-01 | Report store + sandboxed viewer | spec 0012 | P1 | — | M4 | done (500 KiB self-contained HTML; REST/UI/MCP; CSP + iframe sandbox) |
+| RP-02 | Templates (≤10/project, branding) | spec 0013 | P1 | — | M4 | done (CRUD instruction briefs, maximum 10/project; branding encoded in template instructions) |
+| RP-03 | Public share links | spec 0014 | P1 | — | M4 | done (192-bit hashed revocable tokens; editing revokes; noindex public viewer) |
 | RP-04 | Built-in report generators (audit, rank, kw, links, AI) | (new) | P2 | — | M7 | todo |
 | RP-05 | PDF export (headless Chromium) | print | P2 | renderer | M7 | todo |
 | RP-06 | Scheduled email digests | (new) | P2 | SMTP | M7 | todo |
@@ -129,8 +129,8 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 
 ## MCP / API / skills
 | MC-01 | MCP streamable HTTP + API-key auth | mcp server | P0 | — | M3 | done (stateless Streamable HTTP at /mcp, API-key or session auth, Host allow-list) |
-| MC-02 | MCP OAuth 2.1 (DCR, PKCE, consent, org-bound) | workers-oauth-provider | P1 | — | M4 | todo |
-| MC-03 | Tool parity (~90 tools) | mcp/tools | P1 | — | M3–M6 | wip (29 tools: projects, keywords, SERP, authority, site audit, rank tracking, jobs) |
+| MC-02 | MCP OAuth 2.1 (DCR, PKCE, consent, org-bound) | workers-oauth-provider | P1 | — | M4 | done |
+| MC-03 | Tool parity (~90 tools) | mcp/tools | P1 | — | M3–M6 | wip (43 tools: existing M3 set plus project memory and report/template/sharing tools) |
 | MC-04 | MCP Apps widgets (SERP/GSC views) | widget-tools | P3 | — | M8 | todo |
 | MC-05 | Agent skills (12 ported + new) | plugins/openseo/skills | P1 | — | M5 | todo |
 | AP-01 | REST API + OpenAPI 3.1 (utoipa) | — | P0 | — | M0 | done |

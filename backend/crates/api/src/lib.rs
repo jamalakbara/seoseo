@@ -4,6 +4,7 @@ mod auth;
 mod error;
 mod mcp_mount;
 mod middleware;
+mod oauth;
 mod routes;
 mod state;
 
@@ -35,12 +36,15 @@ use utoipa_scalar::{Scalar, Servable};
         (name = "auth", description = "Accounts, sessions and workspaces"),
         (name = "api-keys", description = "Organization-bound API keys"),
         (name = "projects", description = "Projects and their default market"),
+        (name = "project-memory", description = "Revisioned project context for people and agents"),
+        (name = "dashboard", description = "Project dashboard and website onboarding"),
         (name = "jobs", description = "Background jobs"),
         (name = "audits", description = "Site audits: crawl, issues, pages"),
         (name = "team", description = "Workspace members and invitations"),
         (name = "providers", description = "Data providers, API keys and domain authority"),
         (name = "keywords", description = "Keyword research, saved keywords and SERP analysis"),
-        (name = "rank-tracking", description = "Rank trackers, scheduled checks and position history")
+        (name = "rank-tracking", description = "Rank trackers, scheduled checks and position history"),
+        (name = "reports", description = "Stored HTML reports, templates and public sharing")
     )
 )]
 struct ApiDoc;
@@ -70,14 +74,27 @@ pub fn router(state: AppState) -> Router {
         .nest("/api/v1", routes::v1())
         .split_for_parts();
 
+    let web_origin: axum::http::HeaderValue = state
+        .cfg
+        .web_base_url
+        .parse()
+        .expect("WEB_BASE_URL must be a valid origin");
+    let mcp_browser_auth = state.cfg.auth_mode != common::AuthMode::None;
     let cors = CorsLayer::new()
-        .allow_origin(AllowOrigin::exact(
-            state
-                .cfg
-                .web_base_url
-                .parse()
-                .expect("WEB_BASE_URL must be a valid origin"),
-        ))
+        .allow_origin(AllowOrigin::predicate(move |origin, request| {
+            origin == web_origin
+                || (mcp_browser_auth && request.uri.path() == "/mcp")
+                || matches!(
+                    request.uri.path(),
+                    "/oauth/token"
+                        | "/oauth/register"
+                        | "/oauth/revoke"
+                        | "/oauth/authorize"
+                        | "/.well-known/oauth-authorization-server"
+                        | "/.well-known/oauth-protected-resource"
+                        | "/.well-known/oauth-protected-resource/mcp"
+                )
+        }))
         .allow_credentials(true)
         .allow_methods(tower_http::cors::AllowMethods::mirror_request())
         .allow_headers(tower_http::cors::AllowHeaders::mirror_request());
@@ -91,12 +108,20 @@ pub fn router(state: AppState) -> Router {
             axum::routing::get(move || async move { axum::Json(openapi_json) }),
         )
         .merge(routes::system())
+        .merge(oauth::public())
         .merge(mcp_mount::router(&state))
         .layer(axum::middleware::from_fn(middleware::track_metrics))
         // OAuth callback queries contain authorization codes; never put them in spans.
-        .layer(TraceLayer::new_for_http().make_span_with(|request: &axum::http::Request<axum::body::Body>| {
-            tracing::info_span!("http_request", method = %request.method(), path = %request.uri().path())
-        }))
+        .layer(TraceLayer::new_for_http().make_span_with(
+            |request: &axum::http::Request<axum::body::Body>| {
+                let path = request
+                    .extensions()
+                    .get::<axum::extract::MatchedPath>()
+                    .map(|path| path.as_str())
+                    .unwrap_or("unmatched");
+                tracing::info_span!("http_request", method = %request.method(), path)
+            },
+        ))
         .layer(PropagateRequestIdLayer::x_request_id())
         .layer(SetRequestIdLayer::x_request_id(MakeRequestUuid))
         .layer(CompressionLayer::new())

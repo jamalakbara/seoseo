@@ -3,15 +3,18 @@
 
 pub mod api_keys;
 pub mod audits;
+pub mod dashboard;
 pub mod gsc;
 pub mod invitations;
 pub mod jobs;
 pub mod keywords;
+pub mod memory;
 pub mod models;
 pub mod orgs;
 pub mod projects;
 pub mod providers;
 pub mod rank;
+pub mod reports;
 pub mod serp;
 pub mod sessions;
 pub mod settings;
@@ -58,3 +61,9 @@ pub(crate) fn escape_like(s: &str) -> String {
         .replace('%', "\\%")
         .replace('_', "\\_")
 }
+
+pub mod ga4;
+
+pub mod oauth;
+
+pub mod integrations;
