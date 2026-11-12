@@ -471,6 +471,22 @@ export interface paths {
         patch: operations["update_project"];
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/ai-prompt-research": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["research_ai_prompts"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/ai-trackers": {
         parameters: {
             query?: never;
@@ -530,6 +546,38 @@ export interface paths {
         put?: never;
         post?: never;
         delete: operations["delete_ai_run"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/ai-trackers/{tracker_id}/schedule": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch: operations["save_ai_schedule"];
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/ai-trackers/{tracker_id}/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ai_visibility_summary"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -706,6 +754,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/backlink-discoveries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_backlink_discoveries"];
+        put?: never;
+        post: operations["start_backlink_discovery"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/backlink-snapshots": {
         parameters: {
             query?: never;
@@ -738,6 +802,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/competitive-volumes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["import_competitive_volumes"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/context": {
         parameters: {
             query?: never;
@@ -747,6 +827,22 @@ export interface paths {
         };
         get: operations["get_project_context"];
         put: operations["update_project_context"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/dashboard/backlinks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["dashboard_backlinks"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -1787,9 +1883,12 @@ export interface components {
         };
         AiAnswerView: {
             answer?: string | null;
+            citations: components["schemas"]["AiCitation"][];
             /** Format: date-time */
             created_at: string;
+            engine: string;
             error?: string | null;
+            grounding: string;
             mentions?: string[] | null;
             model: string;
             /** Format: int32 */
@@ -1801,11 +1900,29 @@ export interface components {
             /** Format: double */
             mention_rate_pct?: number | null;
             mentioned_answers: number;
+            /**
+             * Format: double
+             * @description Share of all tracked brand-answer matches; undefined when no tracked term matched.
+             */
+            share_of_voice_pct?: number | null;
+        };
+        AiCitation: {
+            title?: string | null;
+            url: string;
         };
         AiModelAvailability: {
             models: string[];
             note?: string | null;
             ready: boolean;
+        };
+        AiPromptDraft: {
+            model: string;
+            note: string;
+            prompts: string[];
+        };
+        AiPromptResearchInput: {
+            model?: string | null;
+            topic: string;
         };
         AiReportedSource: {
             domain: string;
@@ -1822,6 +1939,13 @@ export interface components {
             source: string;
             successful_answers: number;
         };
+        AiScheduleInput: {
+            /** Format: int32 */
+            hour_utc: number;
+            schedule: string;
+            /** Format: int32 */
+            weekday: number;
+        };
         AiTrackerConfig: {
             brands: string[];
             country: string;
@@ -1832,6 +1956,17 @@ export interface components {
         AiTrackerView: {
             runs: components["schemas"]["AiVisibilityRun"][];
             tracker: components["schemas"]["AiVisibilityTracker"];
+        };
+        AiTrendPoint: {
+            brand_rates: components["schemas"]["AiBrandRate"][];
+            /** Format: date-time */
+            created_at: string;
+            expected: number;
+            gateway_id: string;
+            /** Format: uuid */
+            run_id: string;
+            status: string;
+            successful: number;
         };
         AiVisibilityRun: {
             config: components["schemas"]["AiTrackerConfig"];
@@ -1849,16 +1984,29 @@ export interface components {
             /** Format: uuid */
             tracker_id: string;
         };
+        AiVisibilitySummary: {
+            citation_domains: components["schemas"]["BacklinkGroup"][];
+            note: string;
+            trend: components["schemas"]["AiTrendPoint"][];
+        };
         AiVisibilityTracker: {
             config: components["schemas"]["AiTrackerConfig"];
             /** Format: date-time */
             created_at: string;
             domain: string;
+            /** Format: int32 */
+            hour_utc: number;
             /** Format: uuid */
             id: string;
             name: string;
+            /** Format: date-time */
+            next_run_at?: string | null;
             /** Format: uuid */
             project_id: string;
+            schedule: string;
+            schedule_error?: string | null;
+            /** Format: int32 */
+            weekday: number;
         };
         ApiKey: {
             /** Format: date-time */
@@ -1943,14 +2091,36 @@ export interface components {
             anchor?: string | null;
             links: number;
         };
+        BacklinkDiscovery: {
+            config: components["schemas"]["DiscoveryConfig"];
+            /** Format: date-time */
+            created_at: string;
+            domain: string;
+            error?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            job_id?: string | null;
+            /** Format: uuid */
+            project_id: string;
+            /** Format: uuid */
+            snapshot_id?: string | null;
+            status: string;
+        };
         BacklinkEvidence: {
             anchor?: string | null;
             /** @description Null means the imported sample did not specify the link relation. */
             nofollow?: boolean | null;
             source_domain: string;
             source_url: string;
+            spam_reasons: unknown;
+            /** Format: int32 */
+            spam_score?: number | null;
             state: string;
             target_url: string;
+            verification: string;
+            /** Format: date-time */
+            verified_at?: string | null;
         };
         BacklinkGroup: {
             links: number;
@@ -1964,6 +2134,7 @@ export interface components {
              * @description Previous import for this dataset/domain. Kept as provenance even if it is deleted.
              */
             comparison_id?: string | null;
+            coverage: unknown;
             /** Format: date-time */
             created_at: string;
             dataset: string;
@@ -1976,6 +2147,7 @@ export interface components {
             lost_count: number;
             /** Format: int32 */
             new_count: number;
+            source: string;
         };
         BacklinkSnapshotView: {
             anchors: components["schemas"]["BacklinkAnchorGroup"][];
@@ -1987,11 +2159,13 @@ export interface components {
             referring_domains: components["schemas"]["BacklinkGroup"][];
             snapshot: components["schemas"]["BacklinkSnapshot"];
             source: string;
+            spam_method: string;
             /**
              * Format: int32
              * @description Unknown until an independently supported scoring source is available.
              */
             spam_score?: number | null;
+            spam_scored_pairs: number;
             top_pages: components["schemas"]["BacklinkGroup"][];
             total: number;
         };
@@ -2017,6 +2191,17 @@ export interface components {
             id: string;
             label: string;
             skipped: boolean;
+        };
+        CompetitiveVolumeInput: {
+            country?: string | null;
+            language?: string | null;
+            rows: components["schemas"]["CompetitiveVolumeRow"][];
+            source_label: string;
+        };
+        CompetitiveVolumeRow: {
+            keyword: string;
+            /** Format: int64 */
+            monthly_search_volume: number;
         };
         Competitor: {
             domain: string;
@@ -2127,6 +2312,10 @@ export interface components {
             /** @description Secret token for the invite link (`/invite/{token}`). Shown once. */
             token: string;
         };
+        DashboardBacklinks: {
+            history: components["schemas"]["BacklinkSnapshot"][];
+            latest?: components["schemas"]["BacklinkSnapshotView"] | null;
+        };
         DashboardOverview: {
             checklist: components["schemas"]["ChecklistStep"][];
             completed_audit?: components["schemas"]["Audit"] | null;
@@ -2143,6 +2332,14 @@ export interface components {
         DeleteSavedResult: {
             /** Format: int64 */
             deleted: number;
+        };
+        DiscoveryConfig: {
+            country: string;
+            /** Format: uuid */
+            created_by: string;
+            language: string;
+            search: boolean;
+            source_urls: string[];
         };
         DomainAge: {
             /**
@@ -2189,13 +2386,13 @@ export interface components {
             domain: string;
             /**
              * Format: int64
-             * @description Unavailable: the local sample cannot establish monthly domain traffic.
+             * @description Rounded observed-sample clicks only when every matched keyword has eligible exact rank/volume evidence; never total domain traffic.
              */
             estimated_monthly_traffic?: number | null;
             exact_keywords: number;
             /** @description Requested-domain keywords where the project's domain was not observed, capped at 100. */
             keyword_gaps: string[];
-            /** @description Best result per keyword, capped at 100; totals/distribution use the full sample. */
+            /** @description Paginated best results per keyword; totals/distribution use the full bounded sample. */
             keywords: components["schemas"]["RankedKeyword"][];
             language: string;
             matched_keywords: number;
@@ -2203,12 +2400,16 @@ export interface components {
             newest_snapshot_at?: string | null;
             /** Format: date-time */
             oldest_snapshot_at?: string | null;
+            /** Format: double */
+            partial_sample_estimated_clicks?: number | null;
             project_domain?: string | null;
             sampled_keywords: number;
             scope_keywords: number;
             source: string;
             /** @description Best-result URLs, capped at 100. */
             top_pages: components["schemas"]["TopPage"][];
+            traffic_keywords_with_volume: number;
+            traffic_method: string;
             warnings: string[];
         };
         Ga4ConnectUrl: {
@@ -3036,10 +3237,14 @@ export interface components {
             top3: number;
         };
         RankedKeyword: {
+            /** Format: double */
+            estimated_sample_clicks?: number | null;
             exact: boolean;
             /** Format: date-time */
             fetched_at: string;
             keyword: string;
+            /** Format: int64 */
+            monthly_search_volume?: number | null;
             /** Format: int32 */
             position: number;
             /**
@@ -3049,6 +3254,7 @@ export interface components {
             project_position?: number | null;
             provider: string;
             url: string;
+            volume_source?: string | null;
         };
         RdapRecord: {
             /** Format: date-time */
@@ -3343,6 +3549,11 @@ export interface components {
             respect_robots?: boolean | null;
             /** @description Defaults to `https://{project domain}/`. */
             start_url?: string | null;
+        };
+        StartDiscoveryInput: {
+            expected_domain: string;
+            search: boolean;
+            source_urls: string[];
         };
         StartResearchInput: {
             /** @description ISO 3166-1 alpha-2; defaults to the project's market. */
@@ -4262,6 +4473,31 @@ export interface operations {
             };
         };
     };
+    research_ai_prompts: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AiPromptResearchInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiPromptDraft"];
+                };
+            };
+        };
+    };
     list_ai_trackers: {
         parameters: {
             query?: never;
@@ -4433,6 +4669,54 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    save_ai_schedule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                tracker_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AiScheduleInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiVisibilityTracker"];
+                };
+            };
+        };
+    };
+    ai_visibility_summary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                tracker_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiVisibilitySummary"];
+                };
             };
         };
     };
@@ -4762,6 +5046,52 @@ export interface operations {
             };
         };
     };
+    list_backlink_discoveries: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BacklinkDiscovery"][];
+                };
+            };
+        };
+    };
+    start_backlink_discovery: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartDiscoveryInput"];
+            };
+        };
+        responses: {
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BacklinkDiscovery"];
+                };
+            };
+        };
+    };
     list_backlink_snapshots: {
         parameters: {
             query?: never;
@@ -4871,6 +5201,31 @@ export interface operations {
             };
         };
     };
+    import_competitive_volumes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CompetitiveVolumeInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
     get_project_context: {
         parameters: {
             query?: never;
@@ -4937,6 +5292,27 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    dashboard_backlinks: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DashboardBacklinks"];
                 };
             };
         };
@@ -5083,6 +5459,8 @@ export interface operations {
                 domain?: string | null;
                 country?: string | null;
                 language?: string | null;
+                limit?: number | null;
+                offset?: number | null;
             };
             header?: never;
             path: {

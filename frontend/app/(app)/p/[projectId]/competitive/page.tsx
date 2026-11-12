@@ -1,11 +1,12 @@
 "use client";
 
+import { CompetitiveVolumes } from "@/components/m5-research";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { api, unwrap } from "@/lib/api/client";
-import { useProject } from "@/lib/queries";
+import { useMe, useProject } from "@/lib/queries";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,6 +29,8 @@ import {
 export default function CompetitivePage() {
   const { projectId } = useParams<{ projectId: string }>();
   const project = useProject(projectId);
+  const me = useMe();
+  const [offset, setOffset] = useState(0);
   const [input, setInput] = useState<string | null>(null);
   const [selection, setSelection] = useState<{
     domain: string;
@@ -37,17 +40,21 @@ export default function CompetitivePage() {
   const [country, setCountry] = useState<string | null>(null);
   const [language, setLanguage] = useState<string | null>(null);
   const result = useQuery({
-    queryKey: ["domain-overview", projectId, selection],
+    queryKey: ["domain-overview", projectId, selection, offset],
     enabled: selection !== null,
     queryFn: () =>
       unwrap(
         api.GET("/api/v1/projects/{project_id}/domain-overview", {
-          params: { path: { project_id: projectId }, query: selection ?? {} },
+          params: {
+            path: { project_id: projectId },
+            query: { ...selection, offset, limit: 100 },
+          },
         }),
       ),
   });
   const data = result.data;
   function inspect(domain: string) {
+    setOffset(0);
     setInput(domain);
     setSelection({
       domain,
@@ -131,6 +138,18 @@ export default function CompetitivePage() {
           </p>
         </CardContent>
       </Card>
+      {(me.data?.role === "admin" || me.data?.role === "owner") &&
+        !project.data?.archived_at && (
+          <CompetitiveVolumes
+            projectId={projectId}
+            country={country ?? project.data?.country_code ?? "US"}
+            language={language ?? project.data?.language_code ?? "en"}
+            onImported={() => {
+              setOffset(0);
+              result.refetch();
+            }}
+          />
+        )}
       {result.isFetching && <p role="status">Loading domain evidence…</p>}
       {result.error && (
         <p role="alert" className="text-destructive">
@@ -173,9 +192,12 @@ export default function CompetitivePage() {
                 </div>
                 <div>
                   <dt className="text-sm text-muted-foreground">
-                    Monthly traffic
+                    Monthly sample clicks
                   </dt>
-                  <dd className="text-2xl font-semibold">Unknown</dd>
+                  <dd className="text-2xl font-semibold">
+                    {data.estimated_monthly_traffic?.toLocaleString() ??
+                      "Unknown"}
+                  </dd>
                 </div>
               </dl>
               <p className="text-sm text-muted-foreground">
@@ -186,6 +208,13 @@ export default function CompetitivePage() {
                   ? ` · ${data.authority.release}`
                   : " · no rank available"}
                 .
+              </p>
+              <p className="text-sm text-muted-foreground">
+                {data.traffic_method} | Eligible volume coverage{" "}
+                {data.traffic_keywords_with_volume}/{data.matched_keywords}.
+                Partial sample estimate:{" "}
+                {data.partial_sample_estimated_clicks?.toFixed(1) ?? "Unknown"}{" "}
+                clicks.
               </p>
               {data.oldest_snapshot_at && (
                 <p className="text-sm text-muted-foreground">
@@ -222,7 +251,7 @@ export default function CompetitivePage() {
             <CardHeader>
               <CardTitle>Observed ranking keywords</CardTitle>
               <CardDescription>
-                Best result per keyword, up to 100 rows. “Absent” means the
+                Best result per keyword, 100 rows per page. “Absent” means the
                 project website was absent from that sampled page.
               </CardDescription>
             </CardHeader>
@@ -231,7 +260,7 @@ export default function CompetitivePage() {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Keyword</TableHead>
-                    <TableHead>Position</TableHead>
+                    <TableHead>Position / sample clicks</TableHead>
                     <TableHead>Project position</TableHead>
                     <TableHead>Result URL</TableHead>
                     <TableHead>Evidence</TableHead>
@@ -248,7 +277,17 @@ export default function CompetitivePage() {
                   {data.keywords.map((k) => (
                     <TableRow key={k.keyword}>
                       <TableCell>{k.keyword}</TableCell>
-                      <TableCell>{k.position}</TableCell>
+                      <TableCell>
+                        {k.position}
+                        <div className="text-xs">
+                          {k.estimated_sample_clicks?.toFixed(1) ?? "Unknown"}{" "}
+                          estimated clicks
+                        </div>
+                        <div className="text-xs text-muted-foreground">
+                          {k.monthly_search_volume ?? "Unknown"} monthly
+                          searches | {k.volume_source ?? "No volume source"}
+                        </div>
+                      </TableCell>
                       <TableCell>
                         {data.project_domain
                           ? (k.project_position ?? "Absent")
@@ -267,6 +306,30 @@ export default function CompetitivePage() {
                   ))}
                 </TableBody>
               </Table>
+              <div className="mt-4 flex flex-wrap items-center gap-3">
+                <Button
+                  variant="outline"
+                  disabled={offset === 0}
+                  onClick={() => setOffset(Math.max(0, offset - 100))}
+                >
+                  Previous keywords
+                </Button>
+                <span className="whitespace-nowrap text-sm">
+                  {data.matched_keywords ? offset + 1 : 0} through{" "}
+                  {Math.min(
+                    offset + data.keywords.length,
+                    data.matched_keywords,
+                  )}{" "}
+                  of {data.matched_keywords}
+                </span>
+                <Button
+                  variant="outline"
+                  disabled={offset + 100 >= data.matched_keywords}
+                  onClick={() => setOffset(offset + 100)}
+                >
+                  Next keywords
+                </Button>
+              </div>
             </CardContent>
           </Card>
           <div className="grid gap-6 lg:grid-cols-2">

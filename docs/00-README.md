@@ -17,9 +17,11 @@ Free, open-source, self-hostable SEO platform. Rust (axum) backend · Next.js 16
 | 11 | [Memory and reports](11-memory-and-reports.md) | Project context, reports/templates, public sharing, isolation and regression tests |
 | 12 | [Dashboard and onboarding](12-dashboard-and-onboarding.md) | Checklist, evidence review, cached GSC keywords, refresh lifecycle and regression tests |
 | 13 | [M4 integrations and OAuth](13-m4-integrations-and-oauth.md) | GA4, IndexNow, optional model drafts, link observations, MCP OAuth and fixture verification |
-| 14 | [Competitive research](14-competitive-research.md) | First M5 delivery: project SERP evidence, domain overview, competitors and keyword gaps |
+| 14 | [Competitive research](14-competitive-research.md) | Project SERP samples, volume-based sample-click estimates, competitors, gaps and RDAP |
 | 15 | [Backlink snapshots](15-backlink-snapshots.md) | Imported evidence, sample diffs, referring domains, pages/anchors, retention and tests |
 | 16 | [AI visibility](16-ai-visibility.md) | Manual model comparisons, durable runs, literal mentions, coverage, setup and tests |
 
 Reference source: `reference/open-seo/` (git-ignored clone; re-clone with `git clone https://github.com/every-app/open-seo reference/open-seo`).
 Upstream design records worth re-reading before building a feature: `reference/open-seo/docs/maintainers/specs/00xx-*.md`.
+
+M5 implementation and verification: [Acceptance record](17-m5-acceptance.md). Portable [agent workflows](../plugins/seoseo/README.md) contain 14 skills for the self-hosted MCP server.

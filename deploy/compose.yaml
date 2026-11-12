@@ -28,8 +28,20 @@ x-backend: &backend
     OPENAI_COMPAT_API_KEY: ${OPENAI_COMPAT_API_KEY:-}
     LLM_MODEL: ${LLM_MODEL:-}
     AI_VISIBILITY_MODELS: ${AI_VISIBILITY_MODELS:-}
+    AI_OLLAMA_URL: ${AI_OLLAMA_URL:-http://ollama:11434/v1}
+    AI_OLLAMA_MODELS: ${AI_OLLAMA_MODELS:-}
+    AI_ANTHROPIC_MODEL: ${AI_ANTHROPIC_MODEL:-}
+    AI_ANTHROPIC_API_KEY: ${AI_ANTHROPIC_API_KEY:-}
+    AI_GEMINI_MODEL: ${AI_GEMINI_MODEL:-}
+    AI_GEMINI_API_KEY: ${AI_GEMINI_API_KEY:-}
 
 services:
+  ollama:
+    image: ollama/ollama:latest
+    profiles: ["ollama"]
+    restart: unless-stopped
+    volumes: ["ollama-models:/root/.ollama"]
+    mem_limit: 3g
   db:
     image: postgres:18-alpine
     restart: unless-stopped
@@ -40,7 +52,11 @@ services:
     volumes:
       - pgdata:/var/lib/postgresql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-seoseo} -d ${POSTGRES_DB:-seoseo}"]
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U ${POSTGRES_USER:-seoseo} -d ${POSTGRES_DB:-seoseo}",
+        ]
       interval: 5s
       timeout: 5s
       retries: 20
@@ -138,5 +154,6 @@ networks:
   egress:
 
 volumes:
+  ollama-models:
   pgdata:
   valkeydata:

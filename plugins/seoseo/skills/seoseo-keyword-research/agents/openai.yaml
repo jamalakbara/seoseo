@@ -1,0 +1,4 @@
+interface:
+  display_name: "SeoSeo Keyword Research"
+  short_description: "SeoSeo workflow for keyword research"
+  default_prompt: "Use $seoseo-keyword-research for this SeoSeo workflow."

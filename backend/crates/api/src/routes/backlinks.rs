@@ -17,6 +17,39 @@ pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::new()
         .routes(routes!(list_backlink_snapshots, import_backlink_snapshot))
         .routes(routes!(get_backlink_snapshot, delete_backlink_snapshot))
+        .routes(routes!(list_backlink_discoveries, start_backlink_discovery))
+        .routes(routes!(dashboard_backlinks))
+}
+
+#[utoipa::path(get,path="/projects/{project_id}/backlink-discoveries",tag="backlinks",params(("project_id"=Uuid,Path)),responses((status=OK,body=Vec<db::backlink_discovery::BacklinkDiscovery>)),security(("session"=[]),("bearer"=[])))]
+async fn list_backlink_discoveries(
+    State(s): State<AppState>,
+    Auth(a): Auth,
+    Path(pid): Path<Uuid>,
+) -> ApiResult<Json<Vec<db::backlink_discovery::BacklinkDiscovery>>> {
+    Ok(Json(
+        domain::backlinks::discoveries(&s.pool, &a, pid).await?,
+    ))
+}
+#[utoipa::path(post,path="/projects/{project_id}/backlink-discoveries",tag="backlinks",params(("project_id"=Uuid,Path)),request_body=domain::backlinks::StartDiscoveryInput,responses((status=ACCEPTED,body=db::backlink_discovery::BacklinkDiscovery)),security(("session"=[]),("bearer"=[])))]
+async fn start_backlink_discovery(
+    State(s): State<AppState>,
+    Auth(a): Auth,
+    Path(pid): Path<Uuid>,
+    Json(input): Json<domain::backlinks::StartDiscoveryInput>,
+) -> ApiResult<(StatusCode, Json<db::backlink_discovery::BacklinkDiscovery>)> {
+    Ok((
+        StatusCode::ACCEPTED,
+        Json(domain::backlinks::discover(&s.pool, &a, pid, &s.providers, input).await?),
+    ))
+}
+#[utoipa::path(get,path="/projects/{project_id}/dashboard/backlinks",tag="backlinks",params(("project_id"=Uuid,Path)),responses((status=OK,body=domain::backlinks::DashboardBacklinks)),security(("session"=[]),("bearer"=[])))]
+async fn dashboard_backlinks(
+    State(s): State<AppState>,
+    Auth(a): Auth,
+    Path(pid): Path<Uuid>,
+) -> ApiResult<Json<domain::backlinks::DashboardBacklinks>> {
+    Ok(Json(domain::backlinks::dashboard(&s.pool, &a, pid).await?))
 }
 
 #[utoipa::path(get,path="/projects/{project_id}/backlink-snapshots",tag="backlinks",params(("project_id"=Uuid,Path)),responses((status=OK,body=Vec<BacklinkSnapshot>)),security(("session"=[]),("bearer"=[])))]

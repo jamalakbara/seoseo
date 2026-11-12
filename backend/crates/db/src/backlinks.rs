@@ -18,9 +18,11 @@ pub struct BacklinkSnapshot {
     pub new_count: i32,
     pub lost_count: i32,
     pub created_at: DateTime<Utc>,
+    pub source: String,
+    pub coverage: serde_json::Value,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize, ToSchema, sqlx::FromRow, PartialEq, Eq)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize, ToSchema, sqlx::FromRow, PartialEq, Eq)]
 pub struct BacklinkEvidence {
     pub source_url: String,
     pub target_url: String,
@@ -29,11 +31,15 @@ pub struct BacklinkEvidence {
     /// Null means the imported sample did not specify the link relation.
     pub nofollow: Option<bool>,
     pub state: String,
+    pub verification: String,
+    pub verified_at: Option<DateTime<Utc>>,
+    pub spam_score: Option<i32>,
+    pub spam_reasons: serde_json::Value,
 }
 
 macro_rules! cols {
     () => {
-        "id,domain,dataset,comparison_id,comparison_at,live_count,new_count,lost_count,created_at"
+        "id,domain,dataset,comparison_id,comparison_at,live_count,new_count,lost_count,created_at,source,coverage"
     };
 }
 
@@ -55,7 +61,7 @@ pub async fn get(
         .map_err(internal)?;
     let snapshot=sqlx::query_as(concat!("SELECT ",cols!()," FROM backlink_snapshots WHERE id=$3 AND project_id=$2 AND domain=(SELECT domain::text FROM projects WHERE organization_id=$1 AND id=$2)"))
         .bind(org).bind(pid).bind(id).fetch_optional(&mut *tx).await.map_err(internal)?.ok_or(AppError::NotFound("backlink snapshot"))?;
-    let rows=sqlx::query_as("SELECT source_url,target_url,source_domain,anchor,nofollow,state FROM backlink_snapshot_links WHERE snapshot_id=$1 ORDER BY source_url,target_url")
+    let rows=sqlx::query_as("SELECT source_url,target_url,source_domain,anchor,nofollow,state,verification,verified_at,spam_score,spam_reasons FROM backlink_snapshot_links WHERE snapshot_id=$1 ORDER BY source_url,target_url")
         .bind(id).fetch_all(&mut *tx).await.map_err(internal)?;
     tx.commit().await.map_err(internal)?;
     Ok((snapshot, rows))
@@ -66,6 +72,8 @@ pub struct ImportSnapshot<'a> {
     pub dataset: &'a str,
     pub links: Vec<BacklinkEvidence>,
     pub created_by: Uuid,
+    pub discovery_coverage: Option<serde_json::Value>,
+    pub discovery_id: Option<Uuid>,
 }
 
 /// Serialize imports/deletions/domain changes with the project row. Baseline selection,
@@ -101,25 +109,37 @@ pub async fn import(
             "Snapshot limit reached (100/project); delete an old snapshot before importing".into(),
         ));
     }
-    let previous: Option<BacklinkSnapshot> = sqlx::query_as(concat!("SELECT ",cols!()," FROM backlink_snapshots WHERE project_id=$1 AND domain=$2 AND dataset=$3 ORDER BY created_at DESC,id DESC LIMIT 1"))
-        .bind(pid).bind(input.expected_domain).bind(input.dataset).fetch_optional(&mut *tx).await.map_err(internal)?;
+    let source = if input.discovery_coverage.is_some() {
+        "serp_crawl"
+    } else {
+        "user_import"
+    };
+    let previous: Option<BacklinkSnapshot> = sqlx::query_as(concat!("SELECT ",cols!()," FROM backlink_snapshots WHERE project_id=$1 AND domain=$2 AND dataset=$3 AND source=$4 ORDER BY created_at DESC,id DESC LIMIT 1"))
+        .bind(pid).bind(input.expected_domain).bind(input.dataset).bind(source).fetch_optional(&mut *tx).await.map_err(internal)?;
     let before: Vec<BacklinkEvidence> = if let Some(prev) = &previous {
-        sqlx::query_as("SELECT source_url,target_url,source_domain,anchor,nofollow,state FROM backlink_snapshot_links WHERE snapshot_id=$1 AND state<>'lost'")
+        sqlx::query_as("SELECT source_url,target_url,source_domain,anchor,nofollow,state,verification,verified_at,spam_score,spam_reasons FROM backlink_snapshot_links WHERE snapshot_id=$1 AND state<>'lost'")
             .bind(prev.id).fetch_all(&mut *tx).await.map_err(internal)?
     } else {
         Vec::new()
     };
-    let rows = diff(input.links, before, previous.is_some());
+    let mut rows = diff(input.links, before, previous.is_some());
+    if input.discovery_coverage.is_some() {
+        for row in rows.iter_mut().filter(|r| r.state == "lost") {
+            row.verification = "missing".into();
+            row.spam_score = None;
+            row.spam_reasons = serde_json::json!([]);
+        }
+    }
     let live = rows.iter().filter(|r| r.state != "lost").count() as i32;
     let added = rows.iter().filter(|r| r.state == "new").count() as i32;
     let lost = rows.iter().filter(|r| r.state == "lost").count() as i32;
     let id = new_id();
-    let snapshot = sqlx::query_as(concat!("INSERT INTO backlink_snapshots(id,project_id,domain,dataset,comparison_id,comparison_at,live_count,new_count,lost_count,created_by) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) RETURNING ",cols!()))
+    let snapshot = sqlx::query_as(concat!("INSERT INTO backlink_snapshots(id,project_id,domain,dataset,comparison_id,comparison_at,live_count,new_count,lost_count,created_by,source,coverage) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,(SELECT id FROM users WHERE id=$10),$11,$12) RETURNING ",cols!()))
         .bind(id).bind(pid).bind(input.expected_domain).bind(input.dataset).bind(previous.as_ref().map(|p|p.id)).bind(previous.as_ref().map(|p|p.created_at))
-        .bind(live).bind(added).bind(lost).bind(input.created_by).fetch_one(&mut *tx).await.map_err(internal)?;
+        .bind(live).bind(added).bind(lost).bind(input.created_by).bind(source).bind(input.discovery_coverage.unwrap_or(serde_json::json!({}))).fetch_one(&mut *tx).await.map_err(internal)?;
     if !rows.is_empty() {
         let mut query: QueryBuilder<Postgres> = QueryBuilder::new(
-            "INSERT INTO backlink_snapshot_links(snapshot_id,link_key,source_url,target_url,source_domain,anchor,nofollow,state) ",
+            "INSERT INTO backlink_snapshot_links(snapshot_id,link_key,source_url,target_url,source_domain,anchor,nofollow,state,verification,verified_at,spam_score,spam_reasons) ",
         );
         query.push_values(&rows, |mut b, r| {
             let key = common::token::sha256_hex(&format!("{}\n{}", r.source_url, r.target_url));
@@ -130,9 +150,17 @@ pub async fn import(
                 .push_bind(&r.source_domain)
                 .push_bind(&r.anchor)
                 .push_bind(r.nofollow)
-                .push_bind(&r.state);
+                .push_bind(&r.state)
+                .push_bind(&r.verification)
+                .push_bind(r.verified_at)
+                .push_bind(r.spam_score)
+                .push_bind(&r.spam_reasons);
         });
         query.build().execute(&mut *tx).await.map_err(internal)?;
+    }
+    if let Some(discovery_id) = input.discovery_id {
+        sqlx::query("UPDATE backlink_discoveries SET status='completed',snapshot_id=$2,error=NULL WHERE id=$1 AND project_id=$3 AND domain=$4")
+            .bind(discovery_id).bind(id).bind(pid).bind(input.expected_domain).execute(&mut *tx).await.map_err(internal)?;
     }
     tx.commit().await.map_err(internal)?;
     Ok(snapshot)
@@ -197,6 +225,7 @@ mod tests {
             anchor: None,
             nofollow: None,
             state: "live".into(),
+            ..Default::default()
         }
     }
     #[test]

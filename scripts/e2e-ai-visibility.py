@@ -65,7 +65,7 @@ project = api("/projects", "POST", {"name": "AI answer comparisons", "domain": "
 pid = project["id"]
 root = "/projects/" + pid + "/ai-trackers"
 models = api("/ai-visibility/models")
-assert models["ready"] and models["models"] == ["fixture-a", "fixture-b", "fixture-c"], models
+assert models["ready"] and all(m in models["models"] for m in ["fixture-a", "fixture-b", "fixture-c"]), models
 
 
 def payload(name="Comparison", prompts=None, models=None):

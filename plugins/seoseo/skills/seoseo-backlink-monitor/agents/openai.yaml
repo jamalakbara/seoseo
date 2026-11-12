@@ -1,0 +1,4 @@
+interface:
+  display_name: "SeoSeo Backlink Monitor"
+  short_description: "SeoSeo workflow for backlink monitor"
+  default_prompt: "Use $seoseo-backlink-monitor for this SeoSeo workflow."

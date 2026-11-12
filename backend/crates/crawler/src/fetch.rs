@@ -157,6 +157,15 @@ impl Fetcher {
 
     /// Read an ownership file without following redirects, using the guarded DNS resolver.
     pub async fn get_exact_bytes(&self, url: &Url, max: usize) -> Result<(u16, Vec<u8>), String> {
+        let (status, _, body) = self.get_exact_resource(url, max).await?;
+        Ok((status, body))
+    }
+    /// Bounded direct resource fetch, preserving content type without following redirects.
+    pub async fn get_exact_resource(
+        &self,
+        url: &Url,
+        max: usize,
+    ) -> Result<(u16, Option<String>, Vec<u8>), String> {
         self.policy.check_url(url).map_err(|e| e.to_string())?;
         let mut response = self
             .client
@@ -165,6 +174,18 @@ impl Fetcher {
             .await
             .map_err(|_| "ownership check could not reach host".to_string())?;
         let status = response.status().as_u16();
+        if response
+            .headers()
+            .get("cf-mitigated")
+            .is_some_and(|v| v.as_bytes().eq_ignore_ascii_case(b"challenge"))
+        {
+            return Err("bot challenge; request stopped".into());
+        }
+        let content_type = response
+            .headers()
+            .get(header::CONTENT_TYPE)
+            .and_then(|v| v.to_str().ok())
+            .map(str::to_string);
         let mut bytes = Vec::new();
         while let Some(chunk) = response
             .chunk()
@@ -176,7 +197,7 @@ impl Fetcher {
             }
             bytes.extend_from_slice(&chunk);
         }
-        Ok((status, bytes))
+        Ok((status, content_type, bytes))
     }
 
     /// Fetch a page for the audit. Redirects that leave `scope` stop with `RedirectOffsite`.

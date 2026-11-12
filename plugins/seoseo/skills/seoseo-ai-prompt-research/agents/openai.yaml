@@ -1,0 +1,4 @@
+interface:
+  display_name: "SeoSeo Ai Prompt Research"
+  short_description: "SeoSeo workflow for ai prompt research"
+  default_prompt: "Use $seoseo-ai-prompt-research for this SeoSeo workflow."

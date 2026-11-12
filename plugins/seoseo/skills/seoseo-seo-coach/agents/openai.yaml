@@ -1,0 +1,4 @@
+interface:
+  display_name: "SeoSeo Seo Coach"
+  short_description: "SeoSeo workflow for seo coach"
+  default_prompt: "Use $seoseo-seo-coach for this SeoSeo workflow."

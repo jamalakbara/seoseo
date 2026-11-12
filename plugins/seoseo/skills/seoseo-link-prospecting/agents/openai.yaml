@@ -1,0 +1,4 @@
+interface:
+  display_name: "SeoSeo Link Prospecting"
+  short_description: "SeoSeo workflow for link prospecting"
+  default_prompt: "Use $seoseo-link-prospecting for this SeoSeo workflow."

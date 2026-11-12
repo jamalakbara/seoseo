@@ -5,6 +5,42 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct BacklinkDiscoveryParams {
+    pub project_id: String,
+    pub expected_domain: String,
+    pub search: bool,
+    pub source_urls: Vec<String>,
+}
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CompetitiveVolumeItem {
+    pub keyword: String,
+    pub monthly_search_volume: i64,
+}
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CompetitiveVolumeParams {
+    pub project_id: String,
+    pub country: Option<String>,
+    pub language: Option<String>,
+    pub source_label: String,
+    pub rows: Vec<CompetitiveVolumeItem>,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct AiScheduleParams {
+    pub project_id: String,
+    pub tracker_id: String,
+    pub schedule: String,
+    pub hour_utc: i16,
+    pub weekday: i16,
+}
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct AiPromptResearchParams {
+    pub project_id: String,
+    pub topic: String,
+    pub model: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct CreateAiTrackerParams {
     pub project_id: String,
     pub expected_domain: String,
@@ -79,6 +115,8 @@ pub struct DomainOverviewParams {
     pub domain: Option<String>,
     pub country: Option<String>,
     pub language: Option<String>,
+    pub limit: Option<usize>,
+    pub offset: Option<usize>,
 }
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]

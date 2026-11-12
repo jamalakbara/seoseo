@@ -160,3 +160,7 @@ Imported backlink snapshots add `list_backlink_snapshots`, `import_backlink_snap
 Manual AI visibility adds eight model/tracker/run tools (80 tools total), model availability at `/ai-visibility/models`, and `/projects/{project_id}/ai-trackers` tracker/run routes. See [AI visibility](16-ai-visibility.md) for operator setup, answer-sample semantics, durable jobs and limits.
 
 MCP now exposes 66 tools: the previous 49 plus property discovery/selection, nine Analytics report tools, IndexNow setup/verification/submission, website synthesis and link-observation list/save. OAuth discovery/DCR/PKCE/consent and rotating resource-bound tokens complement existing API keys. Feature endpoints and protocol details are documented in [M4 integrations and OAuth](13-m4-integrations-and-oauth.md).
+
+### M5 completion (87 tools)
+
+The runtime MCP schemas and generated OpenAPI are authoritative. Added `import_competitive_search_volumes`; `discover_backlinks`, `list_backlink_discoveries`, `get_dashboard_backlinks`; `set_ai_visibility_schedule`, `research_ai_visibility_prompts`, `get_ai_visibility_summary`. Domain overview accepts `limit`/`offset`. REST paths and payloads are documented in guides 14–16. Fourteen portable skills ship in `plugins/seoseo/skills`; see its install guide. Cloud adapters are fixture-verified; the three-live-engine acceptance gate remains pending credentials.

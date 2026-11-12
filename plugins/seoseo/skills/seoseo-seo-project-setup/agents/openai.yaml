@@ -1,0 +1,4 @@
+interface:
+  display_name: "SeoSeo Seo Project Setup"
+  short_description: "SeoSeo workflow for seo project setup"
+  default_prompt: "Use $seoseo-seo-project-setup for this SeoSeo workflow."

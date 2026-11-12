@@ -1193,6 +1193,54 @@
         ]
       }
     },
+    "/api/v1/projects/{project_id}/ai-prompt-research": {
+      "post": {
+        "tags": [
+          "ai-visibility"
+        ],
+        "operationId": "research_ai_prompts",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AiPromptResearchInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiPromptDraft"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/projects/{project_id}/ai-trackers": {
       "get": {
         "tags": [
@@ -1530,6 +1578,110 @@
         ],
         "responses": {
           "204": {}
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/ai-trackers/{tracker_id}/schedule": {
+      "patch": {
+        "tags": [
+          "ai-visibility"
+        ],
+        "operationId": "save_ai_schedule",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tracker_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AiScheduleInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiVisibilityTracker"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/ai-trackers/{tracker_id}/summary": {
+      "get": {
+        "tags": [
+          "ai-visibility"
+        ],
+        "operationId": "ai_visibility_summary",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tracker_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiVisibilitySummary"
+                }
+              }
+            }
+          }
         },
         "security": [
           {
@@ -2256,6 +2408,93 @@
         ]
       }
     },
+    "/api/v1/projects/{project_id}/backlink-discoveries": {
+      "get": {
+        "tags": [
+          "backlinks"
+        ],
+        "operationId": "list_backlink_discoveries",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BacklinkDiscovery"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "backlinks"
+        ],
+        "operationId": "start_backlink_discovery",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartDiscoveryInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BacklinkDiscovery"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/projects/{project_id}/backlink-snapshots": {
       "get": {
         "tags": [
@@ -2481,6 +2720,52 @@
         ]
       }
     },
+    "/api/v1/projects/{project_id}/competitive-volumes": {
+      "post": {
+        "tags": [
+          "competitive"
+        ],
+        "operationId": "import_competitive_volumes",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompetitiveVolumeInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/projects/{project_id}/context": {
       "get": {
         "tags": [
@@ -2577,6 +2862,44 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/dashboard/backlinks": {
+      "get": {
+        "tags": [
+          "backlinks"
+        ],
+        "operationId": "dashboard_backlinks",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DashboardBacklinks"
                 }
               }
             }
@@ -2869,6 +3192,30 @@
                 "string",
                 "null"
               ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0
             }
           }
         ],
@@ -6608,7 +6955,10 @@
         "required": [
           "prompt_index",
           "model",
-          "created_at"
+          "created_at",
+          "engine",
+          "grounding",
+          "citations"
         ],
         "properties": {
           "answer": {
@@ -6617,15 +6967,27 @@
               "null"
             ]
           },
+          "citations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AiCitation"
+            }
+          },
           "created_at": {
             "type": "string",
             "format": "date-time"
+          },
+          "engine": {
+            "type": "string"
           },
           "error": {
             "type": [
               "string",
               "null"
             ]
+          },
+          "grounding": {
+            "type": "string"
           },
           "mentions": {
             "type": [
@@ -6674,6 +7036,31 @@
           "mentioned_answers": {
             "type": "integer",
             "minimum": 0
+          },
+          "share_of_voice_pct": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double",
+            "description": "Share of all tracked brand-answer matches; undefined when no tracked term matched."
+          }
+        }
+      },
+      "AiCitation": {
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "title": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "url": {
+            "type": "string"
           }
         }
       },
@@ -6700,6 +7087,46 @@
             "type": "boolean"
           }
         }
+      },
+      "AiPromptDraft": {
+        "type": "object",
+        "required": [
+          "prompts",
+          "model",
+          "note"
+        ],
+        "properties": {
+          "model": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "prompts": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "AiPromptResearchInput": {
+        "type": "object",
+        "required": [
+          "topic"
+        ],
+        "properties": {
+          "model": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "topic": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
       },
       "AiReportedSource": {
         "type": "object",
@@ -6768,6 +7195,28 @@
           }
         }
       },
+      "AiScheduleInput": {
+        "type": "object",
+        "required": [
+          "schedule",
+          "hour_utc",
+          "weekday"
+        ],
+        "properties": {
+          "hour_utc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "schedule": {
+            "type": "string"
+          },
+          "weekday": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "AiTrackerConfig": {
         "type": "object",
         "required": [
@@ -6819,6 +7268,48 @@
           },
           "tracker": {
             "$ref": "#/components/schemas/AiVisibilityTracker"
+          }
+        }
+      },
+      "AiTrendPoint": {
+        "type": "object",
+        "required": [
+          "run_id",
+          "created_at",
+          "status",
+          "gateway_id",
+          "successful",
+          "expected",
+          "brand_rates"
+        ],
+        "properties": {
+          "brand_rates": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AiBrandRate"
+            }
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "expected": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "gateway_id": {
+            "type": "string"
+          },
+          "run_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string"
+          },
+          "successful": {
+            "type": "integer",
+            "minimum": 0
           }
         }
       },
@@ -6876,6 +7367,31 @@
           }
         }
       },
+      "AiVisibilitySummary": {
+        "type": "object",
+        "required": [
+          "trend",
+          "citation_domains",
+          "note"
+        ],
+        "properties": {
+          "citation_domains": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BacklinkGroup"
+            }
+          },
+          "note": {
+            "type": "string"
+          },
+          "trend": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AiTrendPoint"
+            }
+          }
+        }
+      },
       "AiVisibilityTracker": {
         "type": "object",
         "required": [
@@ -6884,7 +7400,10 @@
           "domain",
           "name",
           "config",
-          "created_at"
+          "created_at",
+          "schedule",
+          "hour_utc",
+          "weekday"
         ],
         "properties": {
           "config": {
@@ -6897,6 +7416,10 @@
           "domain": {
             "type": "string"
           },
+          "hour_utc": {
+            "type": "integer",
+            "format": "int32"
+          },
           "id": {
             "type": "string",
             "format": "uuid"
@@ -6904,9 +7427,29 @@
           "name": {
             "type": "string"
           },
+          "next_run_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
           "project_id": {
             "type": "string",
             "format": "uuid"
+          },
+          "schedule": {
+            "type": "string"
+          },
+          "schedule_error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "weekday": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -7174,13 +7717,69 @@
           }
         }
       },
+      "BacklinkDiscovery": {
+        "type": "object",
+        "required": [
+          "id",
+          "project_id",
+          "domain",
+          "status",
+          "config",
+          "created_at"
+        ],
+        "properties": {
+          "config": {
+            "$ref": "#/components/schemas/DiscoveryConfig"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "domain": {
+            "type": "string"
+          },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "job_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "project_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "snapshot_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
       "BacklinkEvidence": {
         "type": "object",
         "required": [
           "source_url",
           "target_url",
           "source_domain",
-          "state"
+          "state",
+          "verification",
+          "spam_reasons"
         ],
         "properties": {
           "anchor": {
@@ -7202,11 +7801,29 @@
           "source_url": {
             "type": "string"
           },
+          "spam_reasons": {},
+          "spam_score": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
           "state": {
             "type": "string"
           },
           "target_url": {
             "type": "string"
+          },
+          "verification": {
+            "type": "string"
+          },
+          "verified_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
           }
         }
       },
@@ -7235,7 +7852,9 @@
           "live_count",
           "new_count",
           "lost_count",
-          "created_at"
+          "created_at",
+          "source",
+          "coverage"
         ],
         "properties": {
           "comparison_at": {
@@ -7253,6 +7872,7 @@
             "format": "uuid",
             "description": "Previous import for this dataset/domain. Kept as provenance even if it is deleted."
           },
+          "coverage": {},
           "created_at": {
             "type": "string",
             "format": "date-time"
@@ -7278,6 +7898,9 @@
           "new_count": {
             "type": "integer",
             "format": "int32"
+          },
+          "source": {
+            "type": "string"
           }
         }
       },
@@ -7288,6 +7911,8 @@
           "source",
           "confidence",
           "note",
+          "spam_scored_pairs",
+          "spam_method",
           "referring_domain_count",
           "referring_domains",
           "top_pages",
@@ -7331,6 +7956,9 @@
           "source": {
             "type": "string"
           },
+          "spam_method": {
+            "type": "string"
+          },
           "spam_score": {
             "type": [
               "integer",
@@ -7338,6 +7966,10 @@
             ],
             "format": "int32",
             "description": "Unknown until an independently supported scoring source is available."
+          },
+          "spam_scored_pairs": {
+            "type": "integer",
+            "minimum": 0
           },
           "top_pages": {
             "type": "array",
@@ -7412,6 +8044,54 @@
             "type": "boolean"
           }
         }
+      },
+      "CompetitiveVolumeInput": {
+        "type": "object",
+        "required": [
+          "source_label",
+          "rows"
+        ],
+        "properties": {
+          "country": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "language": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CompetitiveVolumeRow"
+            }
+          },
+          "source_label": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CompetitiveVolumeRow": {
+        "type": "object",
+        "required": [
+          "keyword",
+          "monthly_search_volume"
+        ],
+        "properties": {
+          "keyword": {
+            "type": "string"
+          },
+          "monthly_search_volume": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
       },
       "Competitor": {
         "type": "object",
@@ -7816,6 +8496,30 @@
           }
         }
       },
+      "DashboardBacklinks": {
+        "type": "object",
+        "required": [
+          "history"
+        ],
+        "properties": {
+          "history": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BacklinkSnapshot"
+            }
+          },
+          "latest": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/BacklinkSnapshotView"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
       "DashboardOverview": {
         "type": "object",
         "required": [
@@ -7901,6 +8605,37 @@
             "type": "integer",
             "format": "int64",
             "minimum": 0
+          }
+        }
+      },
+      "DiscoveryConfig": {
+        "type": "object",
+        "required": [
+          "search",
+          "source_urls",
+          "country",
+          "language",
+          "created_by"
+        ],
+        "properties": {
+          "country": {
+            "type": "string"
+          },
+          "created_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "language": {
+            "type": "string"
+          },
+          "search": {
+            "type": "boolean"
+          },
+          "source_urls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
@@ -8008,6 +8743,8 @@
           "source",
           "confidence",
           "authority",
+          "traffic_keywords_with_volume",
+          "traffic_method",
           "scope_keywords",
           "sampled_keywords",
           "checked_keywords",
@@ -8052,7 +8789,7 @@
               "null"
             ],
             "format": "int64",
-            "description": "Unavailable: the local sample cannot establish monthly domain traffic."
+            "description": "Rounded observed-sample clicks only when every matched keyword has eligible exact rank/volume evidence; never total domain traffic."
           },
           "exact_keywords": {
             "type": "integer",
@@ -8070,7 +8807,7 @@
             "items": {
               "$ref": "#/components/schemas/RankedKeyword"
             },
-            "description": "Best result per keyword, capped at 100; totals/distribution use the full sample."
+            "description": "Paginated best results per keyword; totals/distribution use the full bounded sample."
           },
           "language": {
             "type": "string"
@@ -8092,6 +8829,13 @@
               "null"
             ],
             "format": "date-time"
+          },
+          "partial_sample_estimated_clicks": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
           },
           "project_domain": {
             "type": [
@@ -8116,6 +8860,13 @@
               "$ref": "#/components/schemas/TopPage"
             },
             "description": "Best-result URLs, capped at 100."
+          },
+          "traffic_keywords_with_volume": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "traffic_method": {
+            "type": "string"
           },
           "warnings": {
             "type": "array",
@@ -10903,6 +11654,13 @@
           "fetched_at"
         ],
         "properties": {
+          "estimated_sample_clicks": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
           "exact": {
             "type": "boolean"
           },
@@ -10912,6 +11670,13 @@
           },
           "keyword": {
             "type": "string"
+          },
+          "monthly_search_volume": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
           },
           "position": {
             "type": "integer",
@@ -10930,6 +11695,12 @@
           },
           "url": {
             "type": "string"
+          },
+          "volume_source": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
@@ -11872,6 +12643,29 @@
             "description": "Defaults to `https://{project domain}/`."
           }
         }
+      },
+      "StartDiscoveryInput": {
+        "type": "object",
+        "required": [
+          "expected_domain",
+          "search",
+          "source_urls"
+        ],
+        "properties": {
+          "expected_domain": {
+            "type": "string"
+          },
+          "search": {
+            "type": "boolean"
+          },
+          "source_urls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": false
       },
       "StartResearchInput": {
         "type": "object",

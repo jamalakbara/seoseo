@@ -1,5 +1,6 @@
 "use client";
 
+import { BacklinkDiscovery } from "@/components/m5-research";
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -84,20 +85,18 @@ export default function BacklinksPage() {
         <CardHeader>
           <CardTitle>Backlink evidence</CardTitle>
           <CardDescription>
-            Import comparable samples and track their changes. These links have
-            not been independently crawled or verified.
+            Discover source-page links, import comparable samples and track
+            changes with verification provenance.
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-3 text-sm">
           <p>
-            Each dataset has a separate history for the current website. “New”
-            and “lost” describe changes in imported sample membership; they do
-            not establish whether a source page or link is live. The first
-            import is a baseline.
+            Each source and dataset has a separate history for the current website. New and lost describe sample changes. Check each pair’s verification to distinguish live HTML evidence from imports or unavailable pages. The first snapshot is a baseline.
           </p>
           <p className="text-muted-foreground">
-            Automatic backlink discovery and spam scoring are not available yet.
-            Existing individual link observations remain separate.
+            Crawl samples verify only the pages successfully checked. Risk
+            scores are explainable HTML heuristics, not a malware or
+            search-engine penalty verdict. Imported rows remain unverified.
           </p>
           {snapshots.isPending && (
             <p role="status">Loading snapshot history…</p>
@@ -114,6 +113,14 @@ export default function BacklinksPage() {
           )}
         </CardContent>
       </Card>
+      {project.data?.domain && (
+        <BacklinkDiscovery
+          key={`${projectId}:${project.data.domain}`}
+          projectId={projectId}
+          domain={project.data.domain}
+          writable={!!writable}
+        />
+      )}
       {writable && project.data?.domain && (
         <ImportCard
           key={`${projectId}:${project.data.domain}`}
@@ -171,7 +178,7 @@ export default function BacklinksPage() {
                     {new Date(s.created_at).toLocaleString()}
                   </TableCell>
                   <TableCell>
-                    {s.dataset}
+                    {s.dataset} | {s.source}
                     <div className="text-xs text-muted-foreground">
                       {s.domain}
                     </div>
@@ -286,7 +293,7 @@ function ImportCard({
               id="backlink-dataset"
               required
               maxLength={40}
-            pattern={"[a-z0-9_\\-]+"}
+              pattern={"[a-z0-9_\\-]+"}
               value={dataset}
               onChange={(e) => {
                 setDataset(e.target.value);
@@ -403,21 +410,28 @@ function SnapshotDetail({
         <>
           <Card>
             <CardHeader>
-              <CardTitle>{data.snapshot.dataset} · Imported sample</CardTitle>
+              <CardTitle>
+                {data.snapshot.dataset} | {data.snapshot.source}
+              </CardTitle>
               <CardDescription>{data.note}</CardDescription>
             </CardHeader>
             <CardContent className="grid gap-3">
               <p className="text-sm">
                 {data.snapshot.live_count} in sample · {data.snapshot.new_count}{" "}
-                new · {data.snapshot.lost_count} absent since previous import ·{" "}
-                {data.referring_domain_count} referring domains · Spam score:
-                unknown
+                new · {data.snapshot.lost_count} absent since previous snapshot ·{" "}
+                {data.referring_domain_count} referring domains · Spam score: {" "}
+                {data.spam_score?.toFixed(1) ?? "Unknown"} (
+                {data.spam_scored_pairs} scored pairs)
               </p>
               <p className="text-xs text-muted-foreground">
-                Source: user import · Relative confidence ·{" "}
+                {data.spam_method}
+              </p>
+              <CrawlCoverage value={data.snapshot.coverage} />
+              <p className="text-xs text-muted-foreground">
+                Source: {data.snapshot.source} | Relative confidence ·{" "}
                 {data.snapshot.comparison_at
-                  ? `Compared with import at ${new Date(data.snapshot.comparison_at).toLocaleString()}`
-                  : "Baseline; no prior comparable import"}
+                  ? `Compared with snapshot at ${new Date(data.snapshot.comparison_at).toLocaleString()}`
+                  : "Baseline; no prior comparable snapshot"}
               </p>
             </CardContent>
           </Card>
@@ -454,12 +468,13 @@ function SnapshotDetail({
                     <TableHead>Anchor</TableHead>
                     <TableHead>nofollow</TableHead>
                     <TableHead>Sample state</TableHead>
+                    <TableHead>Verification / risk</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
                   {data.items.length === 0 && (
                     <TableRow>
-                      <TableCell colSpan={5}>No pairs in this view.</TableCell>
+                      <TableCell colSpan={6}>No pairs in this view.</TableCell>
                     </TableRow>
                   )}
                   {data.items.map((r) => (
@@ -492,6 +507,22 @@ function SnapshotDetail({
                           : r.state === "new"
                             ? "New"
                             : "Present"}
+                      </TableCell>
+                      <TableCell className="max-w-xs whitespace-normal">
+                        {r.verification}
+                        {r.verified_at && (
+                          <div className="text-xs">
+                            {new Date(r.verified_at).toLocaleString()}
+                          </div>
+                        )}
+                        <div className="text-xs">
+                          Risk: {r.spam_score ?? "Unknown"}
+                        </div>
+                        <div className="text-xs">
+                          {Array.isArray(r.spam_reasons)
+                            ? r.spam_reasons.join(" | ")
+                            : ""}
+                        </div>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -531,7 +562,7 @@ function SnapshotDetail({
               title="Anchors"
               rows={data.anchors.map((a) => ({
                 value:
-                    a.anchor == null
+                  a.anchor == null
                     ? "Unknown"
                     : a.anchor === ""
                       ? "(empty anchor)"
@@ -588,4 +619,11 @@ function GroupCard({
       </CardContent>
     </Card>
   );
+}
+
+function CrawlCoverage({ value }: { value: unknown }) {
+  if (!value || typeof value !== "object" || !("candidates" in value)) return null;
+  const coverage = value as Record<string, unknown>;
+  const count = (key: string) => typeof coverage[key] === "number" ? coverage[key] : "Unknown";
+  return <p className="text-sm text-muted-foreground">Source pages: {String(count("candidates"))} sampled, {String(count("definitive_sources"))} conclusively checked, {String(count("inconclusive_sources"))} unavailable. Retained unconfirmed pairs: {String(count("retained_unconfirmed_pairs"))}. Candidate source: {typeof coverage.provider === "string" ? coverage.provider.replaceAll("_", " ") : "Unknown"}.</p>;
 }

@@ -23,6 +23,11 @@ pub struct AiVisibilityTracker {
     #[sqlx(json)]
     pub config: AiTrackerConfig,
     pub created_at: DateTime<Utc>,
+    pub schedule: String,
+    pub hour_utc: i16,
+    pub weekday: i16,
+    pub next_run_at: Option<DateTime<Utc>>,
+    pub schedule_error: Option<String>,
 }
 #[derive(Debug, Clone, Serialize, ToSchema, sqlx::FromRow)]
 pub struct AiVisibilityRun {
@@ -46,10 +51,13 @@ pub struct AiAnswerRow {
     pub sources: Option<serde_json::Value>,
     pub error: Option<String>,
     pub created_at: DateTime<Utc>,
+    pub engine: String,
+    pub grounding: String,
+    pub citations: serde_json::Value,
 }
 macro_rules! tracker_cols {
     () => {
-        "id,project_id,domain,name,config,created_at"
+        "id,project_id,domain,name,config,created_at,schedule,hour_utc,weekday,next_run_at,schedule_error"
     };
 }
 macro_rules! run_cols {
@@ -138,6 +146,44 @@ pub async fn start(
     expected_domain: &str,
     gateway_id: &str,
 ) -> AppResult<AiVisibilityRun> {
+    start_inner(pool, org, pid, tid, expected_domain, gateway_id, None)
+        .await?
+        .ok_or_else(|| AppError::Conflict("Run was not queued".into()))
+}
+#[derive(Clone, Copy)]
+pub struct ScheduleClaim {
+    pub expected: DateTime<Utc>,
+    pub next: DateTime<Utc>,
+}
+pub async fn start_scheduled(
+    pool: &PgPool,
+    org: Uuid,
+    pid: Uuid,
+    tid: Uuid,
+    expected_domain: &str,
+    gateway_id: &str,
+    claim: ScheduleClaim,
+) -> AppResult<Option<AiVisibilityRun>> {
+    start_inner(
+        pool,
+        org,
+        pid,
+        tid,
+        expected_domain,
+        gateway_id,
+        Some(claim),
+    )
+    .await
+}
+async fn start_inner(
+    pool: &PgPool,
+    org: Uuid,
+    pid: Uuid,
+    tid: Uuid,
+    expected_domain: &str,
+    gateway_id: &str,
+    claim: Option<ScheduleClaim>,
+) -> AppResult<Option<AiVisibilityRun>> {
     reconcile(pool, org, pid).await?;
     let mut tx = pool.begin().await.map_err(internal)?;
     let p = project_lock(&mut tx, org, pid).await?;
@@ -158,9 +204,29 @@ pub async fn start(
     .await
     .map_err(internal)?
     .ok_or(AppError::NotFound("AI tracker"))?;
+    if let Some(claim) = claim {
+        if t.schedule == "manual"
+            || t.next_run_at != Some(claim.expected)
+            || claim.expected > Utc::now()
+        {
+            return Ok(None);
+        }
+        sqlx::query(
+            "UPDATE ai_visibility_trackers SET next_run_at=$2,schedule_error=NULL WHERE id=$1",
+        )
+        .bind(tid)
+        .bind(claim.next)
+        .execute(&mut *tx)
+        .await
+        .map_err(internal)?;
+    }
     let active:i64=sqlx::query_scalar("SELECT count(*) FROM ai_visibility_runs r JOIN ai_visibility_trackers t ON t.id=r.tracker_id WHERE t.project_id=$1 AND r.status IN ('queued','running')").bind(pid).fetch_one(&mut *tx).await.map_err(internal)?;
     let own_active:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM ai_visibility_runs WHERE tracker_id=$1 AND status IN ('queued','running'))").bind(tid).fetch_one(&mut *tx).await.map_err(internal)?;
     if active >= 2 || own_active {
+        if claim.is_some() {
+            tx.commit().await.map_err(internal)?;
+            return Ok(None);
+        }
         return Err(AppError::Conflict(
             "An AI run is already active for this tracker, or two are active in this project"
                 .into(),
@@ -168,11 +234,20 @@ pub async fn start(
     }
     let (count,recent):(i64,bool)=sqlx::query_as("SELECT count(*),COALESCE(bool_or(created_at>clock_timestamp()-interval '1 minute'),false) FROM ai_visibility_runs WHERE tracker_id=$1").bind(tid).fetch_one(&mut *tx).await.map_err(internal)?;
     if count >= 20 {
+        if claim.is_some() {
+            sqlx::query("UPDATE ai_visibility_trackers SET next_run_at=NULL,schedule_error='Retention limit reached; delete an old run and save the schedule to resume' WHERE id=$1").bind(tid).execute(&mut *tx).await.map_err(internal)?;
+            tx.commit().await.map_err(internal)?;
+            return Ok(None);
+        }
         return Err(AppError::Conflict(
             "Limit of 20 runs per tracker; delete an old run first".into(),
         ));
     }
     if recent {
+        if claim.is_some() {
+            tx.commit().await.map_err(internal)?;
+            return Ok(None);
+        }
         return Err(AppError::Conflict(
             "Wait one minute between runs of this tracker".into(),
         ));
@@ -184,7 +259,52 @@ pub async fn start(
     let row=sqlx::query_as(concat!("INSERT INTO ai_visibility_runs(id,tracker_id,job_id,config,gateway_id) VALUES($1,$2,$3,$4,$5) RETURNING ",run_cols!()))
         .bind(id).bind(tid).bind(job_id).bind(sqlx::types::Json(t.config)).bind(gateway_id).fetch_one(&mut *tx).await.map_err(internal)?;
     tx.commit().await.map_err(internal)?;
-    Ok(row)
+    Ok(Some(row))
+}
+
+pub struct AiSchedule<'a> {
+    pub schedule: &'a str,
+    pub hour: i16,
+    pub weekday: i16,
+    pub next: Option<DateTime<Utc>>,
+}
+pub async fn set_schedule(
+    pool: &PgPool,
+    org: Uuid,
+    pid: Uuid,
+    tid: Uuid,
+    input: AiSchedule<'_>,
+) -> AppResult<()> {
+    let mut tx = pool.begin().await.map_err(internal)?;
+    let p = project_lock(&mut tx, org, pid).await?;
+    let r=sqlx::query("UPDATE ai_visibility_trackers SET schedule=$4,hour_utc=$5,weekday=$6,next_run_at=$7,schedule_error=NULL WHERE project_id=$1 AND id=$2 AND domain=$3")
+        .bind(pid).bind(tid).bind(p.domain).bind(input.schedule).bind(input.hour).bind(input.weekday).bind(input.next).execute(&mut *tx).await.map_err(internal)?;
+    if r.rows_affected() == 0 {
+        return Err(AppError::NotFound("current-website AI tracker"));
+    }
+    tx.commit().await.map_err(internal)?;
+    Ok(())
+}
+pub async fn due(pool: &PgPool) -> AppResult<Vec<AiVisibilityTracker>> {
+    sqlx::query_as(concat!("SELECT ",tracker_cols!()," FROM ai_visibility_trackers t WHERE next_run_at<=clock_timestamp() AND schedule<>'manual' AND EXISTS(SELECT 1 FROM projects p WHERE p.id=t.project_id AND p.archived_at IS NULL AND p.domain::text=t.domain) ORDER BY next_run_at,id LIMIT 50"))
+        .fetch_all(pool).await.map_err(internal)
+}
+pub async fn project_org(pool: &PgPool, pid: Uuid) -> AppResult<Uuid> {
+    sqlx::query_scalar("SELECT organization_id FROM projects WHERE id=$1")
+        .bind(pid)
+        .fetch_one(pool)
+        .await
+        .map_err(internal)
+}
+pub async fn pause_schedule(
+    pool: &PgPool,
+    tid: Uuid,
+    expected: DateTime<Utc>,
+    message: &str,
+) -> AppResult<()> {
+    sqlx::query("UPDATE ai_visibility_trackers SET next_run_at=NULL,schedule_error=$3 WHERE id=$1 AND next_run_at=$2 AND next_run_at<=clock_timestamp()")
+        .bind(tid).bind(expected).bind(message).execute(pool).await.map_err(internal)?;
+    Ok(())
 }
 
 pub async fn runs(
@@ -229,8 +349,23 @@ pub async fn current(pool: &PgPool, org: Uuid, pid: Uuid, run: &AiVisibilityRun)
     Ok(())
 }
 pub async fn answers(pool: &PgPool, id: Uuid) -> AppResult<Vec<AiAnswerRow>> {
-    sqlx::query_as("SELECT prompt_index,model,answer,mentions,sources,error,created_at FROM ai_visibility_answers WHERE run_id=$1 ORDER BY prompt_index,model")
+    sqlx::query_as("SELECT prompt_index,model,answer,mentions,sources,error,created_at,engine,grounding,citations FROM ai_visibility_answers WHERE run_id=$1 ORDER BY prompt_index,model")
         .bind(id).fetch_all(pool).await.map_err(internal)
+}
+#[derive(sqlx::FromRow)]
+pub struct AiAnswerWithRun {
+    pub run_id: Uuid,
+    #[sqlx(flatten)]
+    pub row: AiAnswerRow,
+}
+pub async fn tracker_answers(
+    pool: &PgPool,
+    org: Uuid,
+    pid: Uuid,
+    tid: Uuid,
+) -> AppResult<Vec<AiAnswerWithRun>> {
+    sqlx::query_as("SELECT a.run_id,a.prompt_index,a.model,a.answer,a.mentions,a.sources,a.error,a.created_at,a.engine,a.grounding,a.citations FROM ai_visibility_answers a JOIN ai_visibility_runs r ON r.id=a.run_id JOIN ai_visibility_trackers t ON t.id=r.tracker_id JOIN projects p ON p.id=t.project_id WHERE p.organization_id=$1 AND p.id=$2 AND t.id=$3 AND t.domain=p.domain::text ORDER BY a.run_id,a.prompt_index,a.model")
+        .bind(org).bind(pid).bind(tid).fetch_all(pool).await.map_err(internal)
 }
 pub async fn status(pool: &PgPool, id: Uuid, status: &str, error: Option<&str>) -> AppResult<()> {
     sqlx::query("UPDATE ai_visibility_runs SET status=$2,error=$3,finished_at=CASE WHEN $2 IN ('completed','failed') THEN clock_timestamp() END WHERE id=$1")
@@ -245,10 +380,13 @@ pub struct NewAiAnswer<'a> {
     pub mentions: Option<serde_json::Value>,
     pub sources: Option<serde_json::Value>,
     pub error: Option<&'a str>,
+    pub engine: &'a str,
+    pub grounding: &'a str,
+    pub citations: serde_json::Value,
 }
 pub async fn save_answer(pool: &PgPool, row: NewAiAnswer<'_>) -> AppResult<()> {
-    sqlx::query("INSERT INTO ai_visibility_answers(run_id,prompt_index,model,answer,mentions,sources,error) VALUES($1,$2,$3,$4,$5,$6,$7) ON CONFLICT(run_id,prompt_index,model) DO NOTHING")
-        .bind(row.run_id).bind(row.prompt_index).bind(row.model).bind(row.answer).bind(row.mentions).bind(row.sources).bind(row.error).execute(pool).await.map_err(internal)?;
+    sqlx::query("INSERT INTO ai_visibility_answers(run_id,prompt_index,model,answer,mentions,sources,error,engine,grounding,citations) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10) ON CONFLICT(run_id,prompt_index,model) DO NOTHING")
+        .bind(row.run_id).bind(row.prompt_index).bind(row.model).bind(row.answer).bind(row.mentions).bind(row.sources).bind(row.error).bind(row.engine).bind(row.grounding).bind(row.citations).execute(pool).await.map_err(internal)?;
     Ok(())
 }
 pub async fn delete(

@@ -1,0 +1,4 @@
+interface:
+  display_name: "SeoSeo Competitor Analysis"
+  short_description: "SeoSeo workflow for competitor analysis"
+  default_prompt: "Use $seoseo-competitor-analysis for this SeoSeo workflow."

@@ -1,5 +1,9 @@
 "use client";
-
+import {
+  AiSchedule,
+  AiSummary,
+  PromptResearch,
+} from "@/components/m5-research";
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -24,14 +28,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-
 const active = (status: string) => status === "queued" || status === "running";
 const lines = (text: string) =>
   text
     .split("\n")
     .map((s) => s.trim())
     .filter(Boolean);
-
 export default function AiVisibilityPage() {
   const { projectId } = useParams<{ projectId: string }>();
   const project = useProject(projectId);
@@ -76,14 +78,16 @@ export default function AiVisibilityPage() {
           <CardTitle>AI visibility · Model answer comparisons</CardTitle>
           <CardDescription>
             Ask the same prompts across approved models and inspect literal
-            brand mentions. Runs start only when you request them.
+            brand mentions, provider citations and visibility trends. Choose
+            manual or scheduled collection.
           </CardDescription>
         </CardHeader>
         <CardContent className="grid gap-3 text-sm">
           <p>
-            These are model API answers without web-search tools. They represent
-            a prompt sample, not consumer chat visibility or verified
-            recommendations. Country and language are requested context.
+            Native Anthropic requests web grounding; Gemini, compatible and
+            local engines have no web tools. Answers represent a prompt sample,
+            not consumer chat visibility or verified recommendations. Country
+            and language are requested context.
           </p>
           {!models.data?.ready && (
             <p>{models.data?.note ?? "Loading model availability…"}</p>
@@ -199,7 +203,6 @@ export default function AiVisibilityPage() {
     </div>
   );
 }
-
 function CreateCard({
   projectId,
   domain,
@@ -234,7 +237,7 @@ function CreateCard({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Create a manual tracker</CardTitle>
+        <CardTitle>Create a tracker</CardTitle>
         <CardDescription>
           1–10 prompts, 1–10 literal brand terms and 1–3 models. Tracker
           creation makes no model requests.
@@ -280,6 +283,11 @@ function CreateCard({
               placeholder="Which tools help with technical SEO?"
             />
           </div>
+          <PromptResearch
+            projectId={projectId}
+            models={models}
+            onApply={setPrompts}
+          />
           <fieldset className="grid gap-2">
             <legend className="mb-2 text-sm font-medium">
               Approved models
@@ -320,7 +328,6 @@ function CreateCard({
     </Card>
   );
 }
-
 function TrackerDetail({
   projectId,
   trackerId,
@@ -488,6 +495,18 @@ function TrackerDetail({
           </Table>
         </CardContent>
       </Card>
+      <AiSchedule
+        key={`${t.id}:${t.schedule}:${t.hour_utc}:${t.weekday}`}
+        projectId={projectId}
+        tracker={t}
+        writable={writable}
+      />
+      <AiSummary
+        projectId={projectId}
+        trackerId={trackerId}
+        version={tracker.data.runs.map((r) => `${r.id}:${r.status}`).join(",")}
+        busy={busy}
+      />
       {rid && (
         <RunDetail
           key={rid}
@@ -499,7 +518,6 @@ function TrackerDetail({
     </div>
   );
 }
-
 function RunDetail({
   projectId,
   trackerId,
@@ -563,7 +581,9 @@ function RunDetail({
               data.failed_answers}{" "}
             not collected
           </p>
-          <p className="text-xs text-muted-foreground">Source: model API · Relative confidence for visibility comparisons</p>
+          <p className="text-xs text-muted-foreground">
+            Source: model API · Relative confidence for visibility comparisons
+          </p>
           {data.run.error && (
             <p role="alert" className="text-destructive">
               {data.run.error}
@@ -575,6 +595,7 @@ function RunDetail({
                 <TableHead>Tracked term</TableHead>
                 <TableHead>Answers mentioning term</TableHead>
                 <TableHead>Mention rate</TableHead>
+                <TableHead>Share of tracked mentions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -586,6 +607,11 @@ function RunDetail({
                     {b.mention_rate_pct == null
                       ? "Unknown"
                       : `${b.mention_rate_pct.toFixed(1)}%`}
+                  </TableCell>
+                  <TableCell>
+                    {b.share_of_voice_pct == null
+                      ? "Unknown"
+                      : `${b.share_of_voice_pct.toFixed(1)}%`}
                   </TableCell>
                 </TableRow>
               ))}
@@ -627,6 +653,11 @@ function RunDetail({
                   </summary>
                   <div className="mt-3 grid min-w-0 gap-3 text-sm">
                     <p className="whitespace-pre-wrap break-words">{prompt}</p>
+                    {answer && (
+                      <p className="text-xs text-muted-foreground">
+                        Engine: {answer.engine} · Grounding: {answer.grounding}
+                      </p>
+                    )}
                     {answer?.error && (
                       <p className="text-destructive">{answer.error}</p>
                     )}
@@ -643,6 +674,19 @@ function RunDetail({
                           Saved {new Date(answer.created_at).toLocaleString()}
                         </p>
                         <ul className="list-disc space-y-1 break-all pl-5">
+                          {answer.citations.map((c) => (
+                            <li key={`citation:${c.url}`}>
+                              Provider citation:{" "}
+                              <a
+                                className="underline"
+                                href={c.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                {c.title ?? c.url}
+                              </a>
+                            </li>
+                          ))}
                           {answer.sources?.map((s) => (
                             <li key={s.url}>{s.url}</li>
                           ))}

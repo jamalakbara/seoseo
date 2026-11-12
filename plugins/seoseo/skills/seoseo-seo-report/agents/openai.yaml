@@ -1,0 +1,4 @@
+interface:
+  display_name: "SeoSeo Seo Report"
+  short_description: "SeoSeo workflow for seo report"
+  default_prompt: "Use $seoseo-seo-report for this SeoSeo workflow."

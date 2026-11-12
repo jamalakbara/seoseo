@@ -1,0 +1,4 @@
+interface:
+  display_name: "SeoSeo Rank Tracking"
+  short_description: "SeoSeo workflow for rank tracking"
+  default_prompt: "Use $seoseo-rank-tracking for this SeoSeo workflow."

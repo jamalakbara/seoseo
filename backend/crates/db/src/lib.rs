@@ -4,6 +4,7 @@
 pub mod ai_visibility;
 pub mod api_keys;
 pub mod audits;
+pub mod backlink_discovery;
 pub mod backlinks;
 pub mod competitive;
 pub mod dashboard;

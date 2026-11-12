@@ -1,13 +1,12 @@
 use crate::JobCtx;
 use common::{AppError, AppResult, Config};
 use db::ai_visibility::{self as repo, NewAiAnswer};
+use providers::ai_engines::{EngineGateway, NativeEngine};
 use providers::ai_visibility::{ModelGateway, mentioned, sources};
 use serde_json::json;
 use std::collections::BTreeSet;
 
-pub fn gateway(cfg: &Config) -> AppResult<ModelGateway> {
-    let base=cfg.openai_compat_base_url.as_deref().filter(|s|!s.trim().is_empty())
-        .ok_or_else(||AppError::Conflict("Configure OPENAI_COMPAT_BASE_URL and AI_VISIBILITY_MODELS (or LLM_MODEL), for example a local Ollama /v1 endpoint".into()))?;
+pub fn gateway(cfg: &Config) -> AppResult<EngineGateway> {
     let mut models: Vec<String> = cfg
         .ai_visibility_models
         .iter()
@@ -22,10 +21,62 @@ pub fn gateway(cfg: &Config) -> AppResult<ModelGateway> {
             .filter(|s| !s.is_empty())
             .collect();
     }
-    ModelGateway::new(base, cfg.openai_compat_api_key.clone(), models)
-        .map_err(crate::provider_ctx::provider_err)
+    let compatible = match cfg
+        .openai_compat_base_url
+        .as_deref()
+        .filter(|s| !s.trim().is_empty())
+    {
+        Some(base) if !models.is_empty() => Some(
+            ModelGateway::new(base, cfg.openai_compat_api_key.clone(), models)
+                .map_err(crate::provider_ctx::provider_err)?,
+        ),
+        _ => None,
+    };
+    let mut native = Vec::new();
+    for model in cfg
+        .ai_ollama_models
+        .iter()
+        .map(|s| s.trim())
+        .filter(|s| !s.is_empty())
+    {
+        native.push(
+            NativeEngine::new("ollama", model, &cfg.ai_ollama_url, None)
+                .map_err(crate::provider_ctx::provider_err)?,
+        );
+    }
+    if let Some(model) = cfg
+        .ai_anthropic_model
+        .as_deref()
+        .filter(|s| !s.trim().is_empty())
+    {
+        native.push(
+            NativeEngine::new(
+                "anthropic",
+                model,
+                &cfg.ai_anthropic_url,
+                cfg.ai_anthropic_api_key.clone(),
+            )
+            .map_err(crate::provider_ctx::provider_err)?,
+        );
+    }
+    if let Some(model) = cfg
+        .ai_gemini_model
+        .as_deref()
+        .filter(|s| !s.trim().is_empty())
+    {
+        native.push(
+            NativeEngine::new(
+                "gemini",
+                model,
+                &cfg.ai_gemini_url,
+                cfg.ai_gemini_api_key.clone(),
+            )
+            .map_err(crate::provider_ctx::provider_err)?,
+        );
+    }
+    EngineGateway::new(compatible, native).map_err(crate::provider_ctx::provider_err)
 }
-pub fn gateway_id(gateway: &ModelGateway) -> String {
+pub fn gateway_id(gateway: &EngineGateway) -> String {
     common::token::sha256_hex(gateway.identity())
 }
 
@@ -34,6 +85,58 @@ pub fn register(registry: crate::Registry, cfg: Config) -> crate::Registry {
         let cfg = cfg.clone();
         async move { run(ctx, &cfg).await }
     })
+}
+pub async fn schedule_due(pool: &sqlx::PgPool, cfg: &Config) -> AppResult<usize> {
+    let due = repo::due(pool).await?;
+    let mut started = 0;
+    for tracker in due {
+        let Some(expected) = tracker.next_run_at else {
+            continue;
+        };
+        let gateway = match gateway(cfg) {
+            Ok(g) => g,
+            Err(error) => {
+                repo::pause_schedule(pool, tracker.id, expected, &error.to_string()).await?;
+                continue;
+            }
+        };
+        if tracker
+            .config
+            .models
+            .iter()
+            .any(|m| !gateway.models().contains(m))
+        {
+            repo::pause_schedule(pool,tracker.id,expected,"Selected engine/model is no longer approved; create a tracker with current engines").await?;
+            continue;
+        }
+        let Some(next) = crate::rank_check::next_run(
+            &tracker.schedule,
+            tracker.hour_utc as u32,
+            tracker.weekday as u32,
+            chrono::Utc::now(),
+        ) else {
+            continue;
+        };
+        let org = repo::project_org(pool, tracker.project_id).await?;
+        match repo::start_scheduled(
+            pool,
+            org,
+            tracker.project_id,
+            tracker.id,
+            &tracker.domain,
+            &gateway_id(&gateway),
+            repo::ScheduleClaim { expected, next },
+        )
+        .await
+        {
+            Ok(Some(_)) => started += 1,
+            Ok(None) => {}
+            Err(error) => {
+                repo::pause_schedule(pool, tracker.id, expected, &error.to_string()).await?;
+            }
+        }
+    }
+    Ok(started)
 }
 async fn run(ctx: JobCtx, cfg: &Config) -> anyhow::Result<()> {
     let id = ctx.job.payload["run_id"]
@@ -106,7 +209,7 @@ async fn collect(ctx: &JobCtx, cfg: &Config, run: &repo::AiVisibilityRun) -> App
                         .config
                         .brands
                         .iter()
-                        .filter(|brand| mentioned(&answer, brand))
+                        .filter(|brand| mentioned(&answer.text, brand))
                         .collect();
                     repo::save_answer(
                         &ctx.pool,
@@ -114,9 +217,12 @@ async fn collect(ctx: &JobCtx, cfg: &Config, run: &repo::AiVisibilityRun) -> App
                             run_id: run.id,
                             prompt_index: index as i32,
                             model,
-                            answer: Some(&answer),
+                            answer: Some(&answer.text),
                             mentions: Some(json!(matches)),
-                            sources: Some(json!(sources(&answer))),
+                            sources: Some(json!(sources(&answer.text))),
+                            engine: answer.engine,
+                            grounding: answer.grounding,
+                            citations: json!(answer.citations),
                             error: None,
                         },
                     )
@@ -134,6 +240,9 @@ async fn collect(ctx: &JobCtx, cfg: &Config, run: &repo::AiVisibilityRun) -> App
                             mentions: None,
                             sources: None,
                             error: Some(&message),
+                            engine: gateway.engine(model),
+                            grounding: "none",
+                            citations: json!([]),
                         },
                     )
                     .await?;

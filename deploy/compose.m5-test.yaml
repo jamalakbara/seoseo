@@ -1,0 +1,37 @@
+# Disposable M5 acceptance only. Never use with production data or public access.
+# Disables crawler private-network protection for the local source-page fixture.
+x-m5-env: &m5-env
+  ALLOW_SIGNUP: "true"
+  OPENAI_COMPAT_BASE_URL: http://model-fixture:8080/v1
+  OPENAI_COMPAT_API_KEY: ""
+  LLM_MODEL: ""
+  AI_VISIBILITY_MODELS: fixture-a,fixture-b,fixture-c
+  AI_OLLAMA_URL: http://ollama:11434/v1
+  AI_OLLAMA_MODELS: smollm2:135m
+  AI_ANTHROPIC_MODEL: fixture-claude
+  AI_ANTHROPIC_API_KEY: fixture-key
+  AI_ANTHROPIC_URL: http://model-fixture:8080/v1
+  AI_GEMINI_MODEL: fixture-gemini
+  AI_GEMINI_API_KEY: fixture-key
+  AI_GEMINI_URL: http://model-fixture:8080/v1beta
+  SEARXNG_URL: http://research-fixture
+  CRAWLER_ALLOW_PRIVATE: "true"
+
+services:
+  model-fixture:
+    image: python:3.12-alpine
+    command: ["python", "/fixture.py"]
+    volumes: ["../scripts/ai-model-fixture.py:/fixture.py:ro"]
+    ports: ["127.0.0.1:${M5_MODEL_PORT:-3402}:8080"]
+  research-fixture:
+    image: python:3.12-alpine
+    command: ["python", "/fixture.py"]
+    volumes: ["../scripts/m5-research-fixture.py:/fixture.py:ro"]
+    ports: ["127.0.0.1:${M5_RESEARCH_PORT:-3403}:80"]
+    networks:
+      default:
+        aliases: [source-one.example, source-two.example, robots-source.example]
+  api:
+    environment: *m5-env
+  worker:
+    environment: *m5-env

@@ -100,10 +100,29 @@ async fn main() -> anyhow::Result<()> {
             let registry = jobs::keyword_research::register(registry, pctx.clone());
             let registry = jobs::saved_refresh::register(registry, pctx.clone());
             let registry = jobs::rank_check::register(registry, pctx.clone());
+            let registry = jobs::backlink_discovery::register(registry, cfg.clone(), pctx.clone());
             let registry = jobs::cc_ranks::register(registry, pctx);
             let registry = jobs::ai_visibility::register(registry, cfg.clone());
+            let sched_cfg = cfg.clone();
+            let sched_pool = pool.clone();
+            let mut sched_rx = rx.clone();
+            let scheduler = tokio::spawn(async move {
+                loop {
+                    if *sched_rx.borrow() {
+                        break;
+                    }
+                    if let Err(error) =
+                        jobs::ai_visibility::schedule_due(&sched_pool, &sched_cfg).await
+                    {
+                        tracing::error!(%error,"AI scheduler failed");
+                    }
+                    tokio::select! {_=tokio::time::sleep(std::time::Duration::from_secs(60))=>{},_=sched_rx.changed()=>break,}
+                }
+            });
             let registry = domain::dashboard::register(registry, cfg);
-            jobs::run_worker(pool, registry, concurrency, rx).await?;
+            let result = jobs::run_worker(pool, registry, concurrency, rx).await;
+            scheduler.abort();
+            result?;
         }
         Command::Migrate { database_url } => {
             let pool = db::connect(&database_url, 2).await?;

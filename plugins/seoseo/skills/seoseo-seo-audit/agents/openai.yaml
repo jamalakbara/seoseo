@@ -1,0 +1,4 @@
+interface:
+  display_name: "SeoSeo Seo Audit"
+  short_description: "SeoSeo workflow for seo audit"
+  default_prompt: "Use $seoseo-seo-audit for this SeoSeo workflow."

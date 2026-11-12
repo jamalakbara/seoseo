@@ -1,0 +1,4 @@
+interface:
+  display_name: "SeoSeo Ai Visibility Audit"
+  short_description: "SeoSeo workflow for ai visibility audit"
+  default_prompt: "Use $seoseo-ai-visibility-audit for this SeoSeo workflow."

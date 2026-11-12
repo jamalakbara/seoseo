@@ -15,6 +15,8 @@ pub struct DomainQuery {
     pub domain: Option<String>,
     pub country: Option<String>,
     pub language: Option<String>,
+    pub limit: Option<usize>,
+    pub offset: Option<usize>,
 }
 
 #[derive(Debug, Serialize, ToSchema)]
@@ -27,6 +29,9 @@ pub struct RankedKeyword {
     pub fetched_at: DateTime<Utc>,
     /// Null means the project website was absent from this sampled results page.
     pub project_position: Option<i32>,
+    pub monthly_search_volume: Option<i64>,
+    pub volume_source: Option<String>,
+    pub estimated_sample_clicks: Option<f64>,
 }
 
 #[derive(Debug, Serialize, ToSchema)]
@@ -60,8 +65,11 @@ pub struct DomainOverview {
     pub source: &'static str,
     pub confidence: &'static str,
     pub authority: DomainAuthority,
-    /// Unavailable: the local sample cannot establish monthly domain traffic.
+    /// Rounded observed-sample clicks only when every matched keyword has eligible exact rank/volume evidence; never total domain traffic.
     pub estimated_monthly_traffic: Option<i64>,
+    pub traffic_keywords_with_volume: usize,
+    pub partial_sample_estimated_clicks: Option<f64>,
+    pub traffic_method: &'static str,
     pub scope_keywords: usize,
     pub sampled_keywords: usize,
     pub checked_keywords: usize,
@@ -70,7 +78,7 @@ pub struct DomainOverview {
     pub oldest_snapshot_at: Option<DateTime<Utc>>,
     pub newest_snapshot_at: Option<DateTime<Utc>>,
     pub distribution: PositionDistribution,
-    /// Best result per keyword, capped at 100; totals/distribution use the full sample.
+    /// Paginated best results per keyword; totals/distribution use the full bounded sample.
     pub keywords: Vec<RankedKeyword>,
     /// Best-result URLs, capped at 100.
     pub top_pages: Vec<TopPage>,
@@ -104,14 +112,14 @@ pub async fn overview(
     let rows =
         db::competitive::evidence(pool, actor.org_id, project_id, &country, &language).await?;
     let authority = crate::providers::lookup_authority(pool, &domain).await?;
-    Ok(summarize(
-        domain,
-        project_domain,
-        country,
-        language,
-        authority,
-        rows,
-    ))
+    let mut result = summarize(domain, project_domain, country, language, authority, rows);
+    result.keywords = result
+        .keywords
+        .into_iter()
+        .skip(q.offset.unwrap_or(0))
+        .take(q.limit.unwrap_or(100).clamp(1, 500))
+        .collect();
+    Ok(result)
 }
 
 fn summarize(
@@ -184,6 +192,12 @@ fn summarize(
             exact: r.exact == Some(true),
             fetched_at: at,
             project_position,
+            monthly_search_volume: r.monthly_volume,
+            volume_source: r.volume_source.clone(),
+            estimated_sample_clicks: r
+                .monthly_volume
+                .filter(|_| r.exact == Some(true))
+                .map(|v| v as f64 * ctr(position)),
         });
         let page = pages.entry(url.clone()).or_insert(TopPage {
             url: url.clone(),
@@ -201,8 +215,23 @@ fn summarize(
         }
     }
     let matched_keywords = keywords.len();
+    let traffic_keywords_with_volume = keywords
+        .iter()
+        .filter(|k| k.estimated_sample_clicks.is_some())
+        .count();
+    let partial_sample_estimated_clicks = (traffic_keywords_with_volume > 0).then(|| {
+        keywords
+            .iter()
+            .filter_map(|k| k.estimated_sample_clicks)
+            .sum::<f64>()
+    });
+    let estimated_monthly_traffic =
+        if matched_keywords > 0 && traffic_keywords_with_volume == matched_keywords {
+            partial_sample_estimated_clicks.map(|n| n.round() as i64)
+        } else {
+            None
+        };
     keywords.sort_by(|a, b| (a.position, &a.keyword).cmp(&(b.position, &b.keyword)));
-    keywords.truncate(100);
     let mut top_pages: Vec<_> = pages.into_values().collect();
     top_pages.sort_by(|a, b| b.keywords.cmp(&a.keywords).then(a.url.cmp(&b.url)));
     top_pages.truncate(100);
@@ -220,7 +249,7 @@ fn summarize(
     });
     competitors.truncate(50);
     gaps.truncate(100);
-    let mut warnings = vec!["Local sample of this project's saved/researched keywords; not an exhaustive domain index. Latest snapshot per keyword in the last 30 days, positions 1–30 only. Absence does not prove a domain does not rank.".into()];
+    let mut warnings = vec!["Local sample of this project's saved, researched, rank-tracked and volume-imported keywords; not an exhaustive domain index. Latest snapshot per keyword in the last 30 days, positions 1–30 only. Absence does not prove a domain does not rank.".into()];
     if sampled.len() < scope_keywords {
         warnings.push("Only the first 500 keywords alphabetically are sampled. Narrow the market to change the scope.".into());
     }
@@ -238,7 +267,10 @@ fn summarize(
         source: "project_serp_sample",
         confidence: "relative",
         authority,
-        estimated_monthly_traffic: None,
+        estimated_monthly_traffic,
+        traffic_keywords_with_volume,
+        partial_sample_estimated_clicks,
+        traffic_method: "Observed sample only: imported monthly search volume × heuristic CTR = 0.28 / position^1.5. Requires an exact snapshot; Wikipedia pageviews are never search volume. Full sample estimate stays null with incomplete eligible volume coverage.",
         scope_keywords,
         sampled_keywords: sampled.len(),
         checked_keywords: checked.len(),
@@ -255,6 +287,65 @@ fn summarize(
     }
 }
 
+fn ctr(position: i32) -> f64 {
+    0.28 / (position.max(1) as f64).powf(1.5)
+}
+#[derive(Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
+pub struct CompetitiveVolumeRow {
+    pub keyword: String,
+    pub monthly_search_volume: i64,
+}
+#[derive(Deserialize, ToSchema)]
+#[serde(deny_unknown_fields)]
+pub struct CompetitiveVolumeInput {
+    pub country: Option<String>,
+    pub language: Option<String>,
+    pub source_label: String,
+    pub rows: Vec<CompetitiveVolumeRow>,
+}
+pub async fn volumes(
+    pool: &PgPool,
+    a: &Actor,
+    pid: Uuid,
+    input: CompetitiveVolumeInput,
+) -> AppResult<serde_json::Value> {
+    a.require(crate::Role::Admin)?;
+    let p = db::projects::get(pool, a.org_id, pid).await?;
+    if input.rows.is_empty() || input.rows.len() > 1000 {
+        return Err(AppError::Validation(
+            "Import 1-1000 monthly search-volume rows".into(),
+        ));
+    }
+    let source = validate::non_empty("volume source label", &input.source_label, 100)?;
+    let country = validate::country(input.country.as_deref().unwrap_or(&p.country_code))?;
+    let language = validate::language(input.language.as_deref().unwrap_or(&p.language_code))?;
+    let mut rows = Vec::new();
+    let mut seen = BTreeSet::new();
+    for r in input.rows {
+        let keyword = scoring::normalize_keyword(&r.keyword);
+        if keyword.is_empty()
+            || keyword.chars().count() > 120
+            || !(0..=1_000_000_000_000).contains(&r.monthly_search_volume)
+            || !seen.insert(keyword.clone())
+        {
+            return Err(AppError::Validation(
+                "Use unique bounded keywords and monthly search volumes from 0 to 1 trillion"
+                    .into(),
+            ));
+        }
+        rows.push(db::competitive::VolumeInput {
+            keyword,
+            volume: r.monthly_search_volume,
+        });
+    }
+    db::competitive::import_volumes(pool, a.org_id, pid, &country, &language, &source, &rows)
+        .await?;
+    Ok(
+        serde_json::json!({"imported":rows.len(),"source":"user_reported_monthly_search_volume","confidence":"estimated"}),
+    )
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -269,6 +360,8 @@ mod tests {
             domain: Some(domain.into()),
             position: Some(position),
             url: Some(format!("https://{domain}/page")),
+            monthly_volume: None,
+            volume_source: None,
         }
     }
 
@@ -332,7 +425,7 @@ mod tests {
             .map(|i| row(&format!("keyword {i:03}"), "rival.com", 5))
             .collect();
         let r = report(rows);
-        assert_eq!(r.keywords.len(), 100);
+        assert_eq!(r.keywords.len(), 120);
         assert_eq!(r.keyword_gaps.len(), 100);
         assert_eq!(r.matched_keywords, 120);
         assert_eq!(r.distribution.positions_4_10, 120);

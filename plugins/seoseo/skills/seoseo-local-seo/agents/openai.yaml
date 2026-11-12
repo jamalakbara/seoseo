@@ -1,0 +1,4 @@
+interface:
+  display_name: "SeoSeo Local Seo"
+  short_description: "SeoSeo workflow for local seo"
+  default_prompt: "Use $seoseo-local-seo for this SeoSeo workflow."

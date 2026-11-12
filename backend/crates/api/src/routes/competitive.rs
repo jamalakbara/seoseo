@@ -15,6 +15,18 @@ pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::new()
         .routes(routes!(get_domain_overview))
         .routes(routes!(lookup_domain_age))
+        .routes(routes!(import_competitive_volumes))
+}
+#[utoipa::path(post,path="/projects/{project_id}/competitive-volumes",tag="competitive",params(("project_id"=Uuid,Path)),request_body=domain::competitive::CompetitiveVolumeInput,responses((status=OK,body=serde_json::Value)),security(("session"=[]),("bearer"=[])))]
+async fn import_competitive_volumes(
+    State(s): State<AppState>,
+    Auth(a): Auth,
+    Path(pid): Path<Uuid>,
+    Json(input): Json<domain::competitive::CompetitiveVolumeInput>,
+) -> ApiResult<Json<serde_json::Value>> {
+    Ok(Json(
+        domain::competitive::volumes(&s.pool, &a, pid, input).await?,
+    ))
 }
 
 #[utoipa::path(post, path="/projects/{project_id}/domain-age", tag="competitive",

@@ -25,7 +25,7 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | DB-01 | Setup checklist | spec 0015 | P1 | — | M4 | done |
 | DB-02 | Overview cards (health, GSC new queries, link activity, rank movers) | getDashboardOverview | P1 | GSC/links | M4 | done (recorded link evidence; automatic discovery in M5) |
 | DB-03 | Keywords tab (GSC new/top/striking distance) | getDashboardKeywords | P1 | GSC | M4 | done |
-| DB-04 | Backlinks tab (new/lost/live) | getDashboardBacklinks | P1 | link store | M5 | wip (Backlinks tab with imported sample history/diffs; discovery remains) |
+| DB-04 | Backlinks tab (new/lost/live) | getDashboardBacklinks | P1 | link store | M5 | done (Backlinks tab: discovery/rechecks, verified/imported samples, new/lost/live history) |
 | DB-05 | Refresh claims (24 h) | data_refresh_claims | P1 | — | M4 | done |
 
 ## Keyword research
@@ -43,21 +43,21 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | KW-12 | CPC/competition (BYOK only) | google_ads | P3 | BYOK | M8 | todo |
 
 ## Competitive research
-| DO-01 | Domain overview (SR, traffic est., kw count, distribution) | getDomainOverview | P1 | SERP index + CC graph | M5 | wip (project SERP sample + SR; traffic unknown) |
-| DO-02 | Ranked keywords table | ranked_keywords | P1 | SERP index / GSC | M5 | wip (observed project keywords with provider/age/coverage) |
-| DO-03 | Top pages | relevant_pages | P1 | SERP index | M5 | wip (best-result URLs in sample) |
-| DO-04 | SERP competitors | serp_competitors | P1 | SERP index | M5 | wip (shared observed keywords in sample) |
-| DO-05 | Domain keyword suggestions / keyword gap | getDomainKeywordSuggestions | P1 | SERP index | M5 | wip (sampled gaps against project website) |
+| DO-01 | Domain overview (SR, traffic est., kw count, distribution) | getDomainOverview | P1 | SERP index + CC graph | M5 | done (bounded project SERP sample + SR, volume/CTR sample estimate with coverage; not total traffic) |
+| DO-02 | Ranked keywords table | ranked_keywords | P1 | SERP index / GSC | M5 | done (paginated observed keywords with provider/date, eligible volumes and sample-click estimates) |
+| DO-03 | Top pages | relevant_pages | P1 | SERP index | M5 | done (best-result URLs and keyword counts in bounded sample) |
+| DO-04 | SERP competitors | serp_competitors | P1 | SERP index | M5 | done (shared observed keyword competitors) |
+| DO-05 | Domain keyword suggestions / keyword gap | getDomainKeywordSuggestions | P1 | SERP index | M5 | done (sampled gaps against project website) |
 | DO-06 | Tech stack detection | (new) | P2 | fingerprints | M6 | todo |
 | DO-07 | Domain age (RDAP) | free tool | P1 | RDAP | M5 | done (on-demand HTTPS registry metadata, 24h cache, REST/UI/MCP; unknown dates remain null) |
 
 ## Backlinks
-| BL-01 | Overview + history | backlinks summary/history | P1 | CC + Bing WMT | M5 | wip (imported evidence samples, scoped history; automatic discovery remains) |
-| BL-02 | Backlinks table | backlinks/backlinks | P1 | CC | M5 | wip (paginated imported URL pairs with anchor/nofollow metadata) |
-| BL-03 | Referring domains | referring_domains | P1 | CC | M5 | wip (current imported-sample groups) |
-| BL-04 | Top linked pages, anchors | domain_pages_summary | P1 | CC | M5 | wip (current imported-sample target/anchor groups) |
-| BL-05 | Spam score | dashboard filter | P1 | computed | M5 | todo |
-| BL-06 | New/lost via snapshot diff | backlink_snapshots | P1 | — | M5 | wip (atomic same-dataset imported sample diffs; no independent web verification) |
+| BL-01 | Overview + history | backlinks summary/history | P1 | SERP/guarded crawl + import | M5 | done (bounded source discovery/rechecks + imported snapshots and history) |
+| BL-02 | Backlinks table | backlinks/backlinks | P1 | guarded crawl + import | M5 | done (paginated URL pairs, anchor/relation, verification/date and risk reasons) |
+| BL-03 | Referring domains | referring_domains | P1 | guarded crawl + import | M5 | done (current sample referring-domain groups) |
+| BL-04 | Top linked pages, anchors | domain_pages_summary | P1 | guarded crawl + import | M5 | done (current sample target-page and anchor groups) |
+| BL-05 | Spam score | dashboard filter | P1 | computed | M5 | done (explainable 0-100 HTML heuristic and scored-pair coverage; unverified stays null) |
+| BL-06 | New/lost via snapshot diff | backlink_snapshots | P1 | — | M5 | done (atomic source/dataset/domain diffs; inconclusive crawls retain unconfirmed pairs) |
 | BL-07 | Link prospecting (link intersect) | skill link-prospecting | P2 | CC | M6 | todo |
 | BL-08 | Domain authority "SR" from CC host graph | Ahrefs DR lookup | P0 | CC host graph | M2 | done (top-N import of Common Crawl domain ranks, SR = log-scaled harmonic rank, lookup API + UI) |
 
@@ -99,10 +99,10 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | LO-06 | Categories list | list_business_categories | P2 | static list | M6 | todo |
 
 ## AI visibility
-| AI-01 | Tracker config (engines, market, schedule) | ai_trackers | P1 | — | M5 | wip (immutable manual trackers, market context, approved compatible models; scheduling remains) |
-| AI-02 | Prompt generation/research | generateAiVisibilityPrompts | P1 | LLM | M5 | todo |
-| AI-03 | Run workflow (answers, sources, matches) | AiVisibilityWorkflow | P1 | LLM APIs / Ollama | M5 | wip (durable manual runs, partial failures/resume, literal matches, unverified reported URLs; grounded engines remain) |
-| AI-04 | Results, SoV, trend, sources, answer viewer, export | getAiVisibility* | P1 | — | M5 | wip (coverage, mention rates, plain answer viewer and JSON export; SoV/trends remain) |
+| AI-01 | Tracker config (engines, market, schedule) | ai_trackers | P1 | — | M5 | done (immutable market/model trackers + manual/daily/weekly/monthly UTC schedule) |
+| AI-02 | Prompt generation/research | generateAiVisibilityPrompts | P1 | LLM | M5 | done (one-request model question drafts, review/apply before tracking; no demand claim) |
+| AI-03 | Run workflow (answers, sources, matches) | AiVisibilityWorkflow | P1 | LLM APIs / Ollama | M5 | done (durable compatible/Ollama/Anthropic/Gemini comparisons; Anthropic search/citations; cloud live access unverified) |
+| AI-04 | Results, SoV, trend, sources, answer viewer, export | getAiVisibility* | P1 | — | M5 | done (literal rates, share of tracked mentions, retained-run trends, citations, answer viewer and JSON export) |
 | AI-05 | Brand lookup, prompt explorer (own index) | brand-lookup, prompt-explorer | P2 | own index | M6 | todo |
 | AI-06 | Google AI Overview capture | google_ai_overview | P2 | SERP | M6 | todo |
 
@@ -132,7 +132,7 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | MC-02 | MCP OAuth 2.1 (DCR, PKCE, consent, org-bound) | workers-oauth-provider | P1 | — | M4 | done |
 | MC-03 | Tool parity (~90 tools) | mcp/tools | P1 | — | M3–M6 | wip (43 tools: existing M3 set plus project memory and report/template/sharing tools) |
 | MC-04 | MCP Apps widgets (SERP/GSC views) | widget-tools | P3 | — | M8 | todo |
-| MC-05 | Agent skills (12 ported + new) | plugins/openseo/skills | P1 | — | M5 | todo |
+| MC-05 | Agent skills (12 ported + new) | plugins/seoseo/skills | P1 | — | M5 | done (14 self-contained SeoSeo-prefixed skills, install guide, display metadata and tool validation) |
 | AP-01 | REST API + OpenAPI 3.1 (utoipa) | — | P0 | — | M0 | done |
 
 ## Free public tools

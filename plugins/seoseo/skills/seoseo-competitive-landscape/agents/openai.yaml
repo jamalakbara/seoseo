@@ -1,0 +1,4 @@
+interface:
+  display_name: "SeoSeo Competitive Landscape"
+  short_description: "SeoSeo workflow for competitive landscape"
+  default_prompt: "Use $seoseo-competitive-landscape for this SeoSeo workflow."

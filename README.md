@@ -2,11 +2,9 @@
 
 Free, open-source, self-hostable SEO platform — an alternative to Semrush, Ahrefs and OpenSEO that works **without paid API keys**.
 
-> Status: **M4 implemented** — site audits, keyword research, rank tracking, Search Console, dashboard, project memory/reports, GA4, IndexNow, reviewed model-assisted onboarding and MCP OAuth. Self-hosted Google/model integrations require operator configuration. See the [roadmap](docs/07-roadmap.md) and [integration setup](docs/13-m4-integrations-and-oauth.md).
+> Status: **M5 implemented; live-cloud acceptance pending**. Competitive domain samples, guarded backlink discovery/history and risk evidence, scheduled AI comparisons and 14 agent skills now accompany M0–M4. Real Ollama and offline cloud contracts are verified; the three-live-engine gate needs Anthropic/Gemini credentials. See [M5 acceptance](docs/17-m5-acceptance.md) and the [roadmap](docs/07-roadmap.md).
 
-M5 development has started with [competitive domain research](docs/14-competitive-research.md) from project keyword SERP evidence, available in the Competitive tab, REST and MCP.
-
-M5 also includes [imported backlink snapshots](docs/15-backlink-snapshots.md) and [manual AI model comparisons](docs/16-ai-visibility.md). Automatic discovery and grounded AI visibility remain in development.
+M5 guides: [competitive research](docs/14-competitive-research.md), [backlinks](docs/15-backlink-snapshots.md), [AI visibility setup](docs/16-ai-visibility.md), [agent skills](plugins/seoseo/README.md). Domain/backlink coverage is a bounded sample, and traffic estimates require eligible monthly search counts. Unknown metrics stay null.
 
 ## Quick start (Docker)
 

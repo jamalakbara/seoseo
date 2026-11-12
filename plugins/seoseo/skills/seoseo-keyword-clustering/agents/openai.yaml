@@ -1,0 +1,4 @@
+interface:
+  display_name: "SeoSeo Keyword Clustering"
+  short_description: "SeoSeo workflow for keyword clustering"
+  default_prompt: "Use $seoseo-keyword-clustering for this SeoSeo workflow."

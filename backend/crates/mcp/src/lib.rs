@@ -1097,7 +1097,177 @@ impl SeoSeoMcp {
         reply(Ok(domain::ai_visibility::models(&self.cfg)))
     }
     #[tool(
-        description = "Create an immutable manual AI visibility tracker. Needs admin, expected_domain must match the project website. Select 1-3 approved model IDs, 1-10 prompts (500 chars each), and 1-10 literal brand terms (80 chars each). No model request until an explicit run. Country/language are requested model context, not geographic verification."
+        description = "Discover backlink candidates using the configured free/default SERP provider and verify bounded external source HTML, or recheck explicit source URLs without a SERP provider. Needs admin. Obeys robots, guarded DNS, no redirects, per-host delays and blocks. Queues at most 40 source checks. Unknown/blocked sources retain prior pairs as unconfirmed; never infer loss from a changed search-result sample. Poll list_backlink_discoveries; read the completed snapshot."
+    )]
+    async fn discover_backlinks(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<BacklinkDiscoveryParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::backlinks::discover(
+                    &self.pool,
+                    &a,
+                    id("project_id", &p.project_id)?,
+                    &self.providers,
+                    domain::backlinks::StartDiscoveryInput {
+                        expected_domain: p.expected_domain,
+                        search: p.search,
+                        source_urls: p.source_urls,
+                    },
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "List current-website backlink discovery jobs and their completed snapshot IDs/errors. Search/crawl coverage is bounded; blocked and inconclusive sources are not evidence of loss."
+    )]
+    async fn list_backlink_discoveries(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<ProjectRef>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::backlinks::discoveries(&self.pool, &a, id("project_id", &p.project_id)?)
+                    .await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Read the current website's latest backlink snapshot and history for dashboard use. Inspect snapshot source, per-pair verification, coverage and relative heuristic spam flags. Imported pairs are unverified; bounded crawls are not an exhaustive inbound-link index."
+    )]
+    async fn get_dashboard_backlinks(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<ProjectRef>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::backlinks::dashboard(&self.pool, &a, id("project_id", &p.project_id)?).await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Import user-reported monthly SEARCH volume, not pageviews, for up to 1000 project keyword/market rows. Needs admin. Labels provenance and enables heuristic CTR traffic estimates only for exact observed rankings; unknown/incomplete coverage stays null. Does not validate the source externally."
+    )]
+    async fn import_competitive_search_volumes(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<CompetitiveVolumeParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::competitive::volumes(
+                    &self.pool,
+                    &a,
+                    id("project_id", &p.project_id)?,
+                    domain::competitive::CompetitiveVolumeInput {
+                        country: p.country,
+                        language: p.language,
+                        source_label: p.source_label,
+                        rows: p
+                            .rows
+                            .into_iter()
+                            .map(|r| domain::competitive::CompetitiveVolumeRow {
+                                keyword: r.keyword,
+                                monthly_search_volume: r.monthly_search_volume,
+                            })
+                            .collect(),
+                    },
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Set an AI tracker UTC schedule: manual, daily, weekly or monthly; hour_utc 0-23 and weekday 1-7. Needs admin. Enabling periodic runs authorizes recurring configured-model requests. Busy ticks skip; full retention pauses the schedule without deleting data. Saving clears a paused schedule error."
+    )]
+    async fn set_ai_visibility_schedule(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<AiScheduleParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::ai_visibility::schedule(
+                    &self.pool,
+                    &a,
+                    id("project_id", &p.project_id)?,
+                    id("tracker_id", &p.tracker_id)?,
+                    &self.cfg,
+                    domain::ai_visibility::AiScheduleInput {
+                        schedule: p.schedule,
+                        hour_utc: p.hour_utc,
+                        weekday: p.weekday,
+                    },
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Generate draft AI research questions from a topic using one approved model request. Needs admin. Returns questions for review, never saves tracker/context or measures prompt search volume. A cloud engine may use its configured search tool and operator account."
+    )]
+    async fn research_ai_visibility_prompts(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<AiPromptResearchParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::ai_visibility::prompt_research(
+                    &self.pool,
+                    &a,
+                    id("project_id", &p.project_id)?,
+                    &self.cfg,
+                    domain::ai_visibility::AiPromptResearchInput {
+                        topic: p.topic,
+                        model: p.model,
+                    },
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Summarize retained AI visibility runs: coverage-aware trend, mention rates, share of tracked brand-answer matches, and domains from structured provider citations. Compare gateway identities and inspect answer grounding; no claim of consumer UI market share."
+    )]
+    async fn get_ai_visibility_summary(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<AiTrackerRef>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::ai_visibility::summary(
+                    &self.pool,
+                    &a,
+                    id("project_id", &p.project_id)?,
+                    id("tracker_id", &p.tracker_id)?,
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Create an immutable AI visibility tracker, initially manual. Needs admin, expected_domain must match the project website. Select 1-3 approved model IDs, 1-10 prompts (500 chars each), and 1-10 literal brand terms (80 chars each). No model request on creation; explicitly start a run or configure a schedule. Country/language are requested model context, not geographic verification."
     )]
     async fn create_ai_visibility_tracker(
         &self,
@@ -1166,7 +1336,7 @@ impl SeoSeoMcp {
         )
     }
     #[tool(
-        description = "Explicitly start a manual model API comparison (up to 30 requests) using operator-configured models/credentials. Needs admin. Runs in the durable background queue with frozen prompts/brands/models. Poll get_ai_visibility_run. One active run per tracker, two per project, one-minute cooldown. No live browsing; provider failures stop collection and retain partial results."
+        description = "Explicitly start a manual model API comparison (up to 30 requests) using operator-configured models/credentials. Needs admin. Runs in the durable background queue with frozen prompts/brands/models. Poll get_ai_visibility_run. One active run per tracker, two per project, one-minute cooldown. Native Anthropic requests web grounding and preserves provider citations; Gemini/compatible/local models have no web tools. Provider failures stop collection and retain partial results."
     )]
     async fn run_ai_visibility_tracker(
         &self,
@@ -1408,6 +1578,8 @@ impl SeoSeoMcp {
                         domain: p.domain,
                         country: p.country,
                         language: p.language,
+                        limit: p.limit,
+                        offset: p.offset,
                     },
                 )
                 .await

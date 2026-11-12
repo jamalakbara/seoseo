@@ -126,4 +126,28 @@ pub struct Config {
     /// Operator-approved models for manual AI visibility comparisons; defaults to LLM_MODEL.
     #[arg(long, env = "AI_VISIBILITY_MODELS", value_delimiter = ',')]
     pub ai_visibility_models: Vec<String>,
+    #[arg(long, env = "AI_OLLAMA_URL", default_value = "http://ollama:11434/v1")]
+    pub ai_ollama_url: String,
+    #[arg(long, env = "AI_OLLAMA_MODELS", value_delimiter = ',')]
+    pub ai_ollama_models: Vec<String>,
+    #[arg(long, env = "AI_ANTHROPIC_MODEL")]
+    pub ai_anthropic_model: Option<String>,
+    #[arg(long, env = "AI_ANTHROPIC_API_KEY", hide_env_values = true)]
+    pub ai_anthropic_api_key: Option<String>,
+    #[arg(
+        long,
+        env = "AI_ANTHROPIC_URL",
+        default_value = "https://api.anthropic.com/v1"
+    )]
+    pub ai_anthropic_url: String,
+    #[arg(long, env = "AI_GEMINI_MODEL")]
+    pub ai_gemini_model: Option<String>,
+    #[arg(long, env = "AI_GEMINI_API_KEY", hide_env_values = true)]
+    pub ai_gemini_api_key: Option<String>,
+    #[arg(
+        long,
+        env = "AI_GEMINI_URL",
+        default_value = "https://generativelanguage.googleapis.com/v1beta"
+    )]
+    pub ai_gemini_url: String,
 }
