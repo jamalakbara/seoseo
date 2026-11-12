@@ -43,6 +43,7 @@ use utoipa_scalar::{Scalar, Servable};
         (name = "team", description = "Workspace members and invitations"),
         (name = "providers", description = "Data providers, API keys and domain authority"),
         (name = "keywords", description = "Keyword research, saved keywords and SERP analysis"),
+        (name = "competitive", description = "Domain research from project-scoped SERP evidence"),
         (name = "rank-tracking", description = "Rank trackers, scheduled checks and position history"),
         (name = "reports", description = "Stored HTML reports, templates and public sharing")
     )
@@ -159,6 +160,18 @@ pub fn openapi_json() -> String {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn competitive_and_memory_competitor_schemas_are_distinct() {
+        let doc: serde_json::Value = serde_json::from_str(&super::openapi_json()).unwrap();
+        let schemas = &doc["components"]["schemas"];
+        assert!(schemas["SerpCompetitor"]["properties"]["shared_keywords"].is_object());
+        assert!(schemas["Competitor"]["properties"]["notes"].is_object());
+        assert_eq!(
+            schemas["DomainOverview"]["properties"]["competitors"]["items"]["$ref"],
+            "#/components/schemas/SerpCompetitor"
+        );
+    }
+
     /// openapi-typescript keys generated operations by id, so duplicates silently clobber types.
     #[test]
     fn operation_ids_are_unique() {

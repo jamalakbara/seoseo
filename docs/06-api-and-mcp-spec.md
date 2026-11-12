@@ -151,4 +151,6 @@ REST: `GET /projects/{pid}/dashboard/overview`, `GET /projects/{pid}/dashboard/k
 
 ### M4 completion
 
+The subsequent first M5 delivery adds `get_domain_overview` (67 tools total) and `GET /projects/{project_id}/domain-overview`; see [Competitive research](14-competitive-research.md) for evidence scope and limits.
+
 MCP now exposes 66 tools: the previous 49 plus property discovery/selection, nine Analytics report tools, IndexNow setup/verification/submission, website synthesis and link-observation list/save. OAuth discovery/DCR/PKCE/consent and rotating resource-bound tokens complement existing API keys. Feature endpoints and protocol details are documented in [M4 integrations and OAuth](13-m4-integrations-and-oauth.md).

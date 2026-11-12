@@ -4,6 +4,8 @@ Free, open-source, self-hostable SEO platform — an alternative to Semrush, Ahr
 
 > Status: **M4 implemented** — site audits, keyword research, rank tracking, Search Console, dashboard, project memory/reports, GA4, IndexNow, reviewed model-assisted onboarding and MCP OAuth. Self-hosted Google/model integrations require operator configuration. See the [roadmap](docs/07-roadmap.md) and [integration setup](docs/13-m4-integrations-and-oauth.md).
 
+M5 development has started with [competitive domain research](docs/14-competitive-research.md) from project keyword SERP evidence, available in the Competitive tab, REST and MCP.
+
 ## Quick start (Docker)
 
 ```bash

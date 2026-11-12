@@ -16,6 +16,7 @@ export function ProjectHeader() {
     { href: base, label: "Overview", exact: true },
     { href: `${base}/keywords`, label: "Keywords" },
     { href: `${base}/rank`, label: "Rank tracking" },
+    { href: `${base}/competitive`, label: "Competitive" },
     { href: `${base}/gsc`, label: "Search Console" },
     { href: `${base}/audit`, label: "Site audit" },
     { href: `${base}/memory`, label: "Memory" },

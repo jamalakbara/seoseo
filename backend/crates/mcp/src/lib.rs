@@ -1090,6 +1090,33 @@ impl SeoSeoMcp {
     }
 
     #[tool(
+        description = "Research a domain from this project's saved/researched keyword SERPs: observed keywords, top pages, competing domains and gaps against the project website. Latest 30-day snapshots, up to 500 keywords and positions 1-30; not an exhaustive index. No provider requests. Traffic is unknown; inspect coverage, provider and exact flags before drawing conclusions."
+    )]
+    async fn get_domain_overview(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<DomainOverviewParams>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        reply(
+            async {
+                domain::competitive::overview(
+                    &self.pool,
+                    &actor,
+                    id("project_id", &p.project_id)?,
+                    domain::competitive::DomainQuery {
+                        domain: p.domain,
+                        country: p.country,
+                        language: p.language,
+                    },
+                )
+                .await
+            }
+            .await,
+        )
+    }
+
+    #[tool(
         description = "Data providers of this workspace and whether each is ready. Use it to explain why data is missing."
     )]
     async fn list_data_providers(&self, ctx: RequestContext<RoleServer>) -> ToolResult {

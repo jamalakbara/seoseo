@@ -43,11 +43,11 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | KW-12 | CPC/competition (BYOK only) | google_ads | P3 | BYOK | M8 | todo |
 
 ## Competitive research
-| DO-01 | Domain overview (SR, traffic est., kw count, distribution) | getDomainOverview | P1 | SERP index + CC graph | M5 | todo |
-| DO-02 | Ranked keywords table | ranked_keywords | P1 | SERP index / GSC | M5 | todo |
-| DO-03 | Top pages | relevant_pages | P1 | SERP index | M5 | todo |
-| DO-04 | SERP competitors | serp_competitors | P1 | SERP index | M5 | todo |
-| DO-05 | Domain keyword suggestions / keyword gap | getDomainKeywordSuggestions | P1 | SERP index | M5 | todo |
+| DO-01 | Domain overview (SR, traffic est., kw count, distribution) | getDomainOverview | P1 | SERP index + CC graph | M5 | wip (project SERP sample + SR; traffic unknown) |
+| DO-02 | Ranked keywords table | ranked_keywords | P1 | SERP index / GSC | M5 | wip (observed project keywords with provider/age/coverage) |
+| DO-03 | Top pages | relevant_pages | P1 | SERP index | M5 | wip (best-result URLs in sample) |
+| DO-04 | SERP competitors | serp_competitors | P1 | SERP index | M5 | wip (shared observed keywords in sample) |
+| DO-05 | Domain keyword suggestions / keyword gap | getDomainKeywordSuggestions | P1 | SERP index | M5 | wip (sampled gaps against project website) |
 | DO-06 | Tech stack detection | (new) | P2 | fingerprints | M6 | todo |
 | DO-07 | Domain age (RDAP) | free tool | P1 | RDAP | M5 | todo |
 

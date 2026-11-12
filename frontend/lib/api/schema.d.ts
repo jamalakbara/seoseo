@@ -706,6 +706,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/domain-overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_domain_overview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/ga4": {
         parameters: {
             query?: never;
@@ -1880,6 +1896,38 @@ export interface components {
              */
             sr?: number | null;
         };
+        DomainOverview: {
+            authority: components["schemas"]["DomainAuthority"];
+            checked_keywords: number;
+            competitors: components["schemas"]["SerpCompetitor"][];
+            confidence: string;
+            country: string;
+            distribution: components["schemas"]["PositionDistribution"];
+            domain: string;
+            /**
+             * Format: int64
+             * @description Unavailable: the local sample cannot establish monthly domain traffic.
+             */
+            estimated_monthly_traffic?: number | null;
+            exact_keywords: number;
+            /** @description Requested-domain keywords where the project's domain was not observed, capped at 100. */
+            keyword_gaps: string[];
+            /** @description Best result per keyword, capped at 100; totals/distribution use the full sample. */
+            keywords: components["schemas"]["RankedKeyword"][];
+            language: string;
+            matched_keywords: number;
+            /** Format: date-time */
+            newest_snapshot_at?: string | null;
+            /** Format: date-time */
+            oldest_snapshot_at?: string | null;
+            project_domain?: string | null;
+            sampled_keywords: number;
+            scope_keywords: number;
+            source: string;
+            /** @description Best-result URLs, capped at 100. */
+            top_pages: components["schemas"]["TopPage"][];
+            warnings: string[];
+        };
         Ga4ConnectUrl: {
             url: string;
         };
@@ -2460,6 +2508,12 @@ export interface components {
             /** @description Pinned keywords are listed first. Default true. */
             pinned?: boolean | null;
         };
+        PositionDistribution: {
+            positions_11_20: number;
+            positions_21_30: number;
+            positions_4_10: number;
+            top_3: number;
+        };
         /** @description RFC 9457 problem details. */
         Problem: {
             /** @description Human/agent readable explanation; often tells you what to do next. */
@@ -2682,6 +2736,21 @@ export interface components {
             /** Format: int64 */
             top3: number;
         };
+        RankedKeyword: {
+            exact: boolean;
+            /** Format: date-time */
+            fetched_at: string;
+            keyword: string;
+            /** Format: int32 */
+            position: number;
+            /**
+             * Format: int32
+             * @description Null means the project website was absent from this sampled results page.
+             */
+            project_position?: number | null;
+            provider: string;
+            url: string;
+        };
         RefreshSavedInput: {
             /** @description Omit or pass an empty list to refresh all saved keywords. Otherwise 1–1000 IDs. */
             ids?: string[];
@@ -2874,6 +2943,11 @@ export interface components {
             /** @description Fetch a fresh page instead of a cached one (cached pages are reused for 7 days). */
             refresh?: boolean | null;
         };
+        SerpCompetitor: {
+            domain: string;
+            /** @description Keywords for which both the requested domain and this domain were observed. */
+            shared_keywords: number;
+        };
         SerpRow: {
             domain: string;
             /** Format: int32 */
@@ -2978,6 +3052,12 @@ export interface components {
         SwitchOrgInput: {
             /** Format: uuid */
             organization_id: string;
+        };
+        TopPage: {
+            /** Format: int32 */
+            best_position: number;
+            keywords: number;
+            url: string;
         };
         TrackerView: {
             /** @description Latest position per keyword, pinned keywords first. */
@@ -4324,6 +4404,32 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["KeywordDashboard"];
+                };
+            };
+        };
+    };
+    get_domain_overview: {
+        parameters: {
+            query?: {
+                /** @description Domain or URL; defaults to the project's website. Subdomains roll up to the registrable domain. */
+                domain?: string | null;
+                country?: string | null;
+                language?: string | null;
+            };
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DomainOverview"];
                 };
             };
         };

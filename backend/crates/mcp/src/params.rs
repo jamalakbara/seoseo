@@ -5,6 +5,15 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct DomainOverviewParams {
+    pub project_id: String,
+    /// Defaults to the project website. Subdomains roll up to the registrable domain.
+    pub domain: Option<String>,
+    pub country: Option<String>,
+    pub language: Option<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct WebsiteResearch {
     pub project_id: String,
     pub start_url: Option<String>,

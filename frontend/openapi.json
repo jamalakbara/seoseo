@@ -2146,6 +2146,78 @@
         ]
       }
     },
+    "/api/v1/projects/{project_id}/domain-overview": {
+      "get": {
+        "tags": [
+          "competitive"
+        ],
+        "operationId": "get_domain_overview",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "domain",
+            "in": "query",
+            "description": "Domain or URL; defaults to the project's website. Subdomains roll up to the registrable domain.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DomainOverview"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/projects/{project_id}/ga4": {
       "get": {
         "tags": [
@@ -6656,6 +6728,132 @@
           }
         }
       },
+      "DomainOverview": {
+        "type": "object",
+        "required": [
+          "domain",
+          "country",
+          "language",
+          "source",
+          "confidence",
+          "authority",
+          "scope_keywords",
+          "sampled_keywords",
+          "checked_keywords",
+          "exact_keywords",
+          "matched_keywords",
+          "distribution",
+          "keywords",
+          "top_pages",
+          "competitors",
+          "keyword_gaps",
+          "warnings"
+        ],
+        "properties": {
+          "authority": {
+            "$ref": "#/components/schemas/DomainAuthority"
+          },
+          "checked_keywords": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "competitors": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SerpCompetitor"
+            }
+          },
+          "confidence": {
+            "type": "string"
+          },
+          "country": {
+            "type": "string"
+          },
+          "distribution": {
+            "$ref": "#/components/schemas/PositionDistribution"
+          },
+          "domain": {
+            "type": "string"
+          },
+          "estimated_monthly_traffic": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "Unavailable: the local sample cannot establish monthly domain traffic."
+          },
+          "exact_keywords": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "keyword_gaps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Requested-domain keywords where the project's domain was not observed, capped at 100."
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RankedKeyword"
+            },
+            "description": "Best result per keyword, capped at 100; totals/distribution use the full sample."
+          },
+          "language": {
+            "type": "string"
+          },
+          "matched_keywords": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "newest_snapshot_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "oldest_snapshot_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "project_domain": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "sampled_keywords": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "scope_keywords": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "source": {
+            "type": "string"
+          },
+          "top_pages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TopPage"
+            },
+            "description": "Best-result URLs, capped at 100."
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "Ga4ConnectUrl": {
         "type": "object",
         "required": [
@@ -8695,6 +8893,33 @@
           }
         }
       },
+      "PositionDistribution": {
+        "type": "object",
+        "required": [
+          "top_3",
+          "positions_4_10",
+          "positions_11_20",
+          "positions_21_30"
+        ],
+        "properties": {
+          "positions_11_20": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "positions_21_30": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "positions_4_10": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "top_3": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
       "Problem": {
         "type": "object",
         "description": "RFC 9457 problem details.",
@@ -9337,6 +9562,47 @@
           }
         }
       },
+      "RankedKeyword": {
+        "type": "object",
+        "required": [
+          "keyword",
+          "position",
+          "url",
+          "provider",
+          "exact",
+          "fetched_at"
+        ],
+        "properties": {
+          "exact": {
+            "type": "boolean"
+          },
+          "fetched_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "keyword": {
+            "type": "string"
+          },
+          "position": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "project_position": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Null means the project website was absent from this sampled results page."
+          },
+          "provider": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
       "RefreshSavedInput": {
         "type": "object",
         "properties": {
@@ -9958,6 +10224,23 @@
           }
         }
       },
+      "SerpCompetitor": {
+        "type": "object",
+        "required": [
+          "domain",
+          "shared_keywords"
+        ],
+        "properties": {
+          "domain": {
+            "type": "string"
+          },
+          "shared_keywords": {
+            "type": "integer",
+            "description": "Keywords for which both the requested domain and this domain were observed.",
+            "minimum": 0
+          }
+        }
+      },
       "SerpRow": {
         "type": "object",
         "required": [
@@ -10269,6 +10552,27 @@
           "organization_id": {
             "type": "string",
             "format": "uuid"
+          }
+        }
+      },
+      "TopPage": {
+        "type": "object",
+        "required": [
+          "url",
+          "keywords",
+          "best_position"
+        ],
+        "properties": {
+          "best_position": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "keywords": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "url": {
+            "type": "string"
           }
         }
       },
@@ -10655,6 +10959,10 @@
     {
       "name": "keywords",
       "description": "Keyword research, saved keywords and SERP analysis"
+    },
+    {
+      "name": "competitive",
+      "description": "Domain research from project-scoped SERP evidence"
     },
     {
       "name": "rank-tracking",

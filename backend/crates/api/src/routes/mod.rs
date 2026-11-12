@@ -1,6 +1,7 @@
 mod api_keys;
 mod audits;
 mod auth;
+mod competitive;
 mod dashboard;
 mod ga4;
 mod gsc;
@@ -33,6 +34,7 @@ pub fn v1() -> OpenApiRouter<AppState> {
         .merge(team::router())
         .merge(providers::router())
         .merge(keywords::router())
+        .merge(competitive::router())
         .merge(memory::router())
         .merge(rank::router())
         .merge(reports::router())
