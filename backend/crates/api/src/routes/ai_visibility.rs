@@ -5,7 +5,7 @@ use crate::{
 };
 use axum::{
     Json,
-    extract::{Path, State},
+    extract::{Path, Query, State},
     http::StatusCode,
 };
 use db::ai_visibility::{AiVisibilityRun, AiVisibilityTracker};
@@ -14,6 +14,7 @@ use utoipa_axum::{router::OpenApiRouter, routes};
 use uuid::Uuid;
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::new()
+        .routes(routes!(explore_ai_index))
         .routes(routes!(ai_visibility_models))
         .routes(routes!(list_ai_trackers, create_ai_tracker))
         .routes(routes!(get_ai_tracker, delete_ai_tracker))
@@ -22,6 +23,17 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(save_ai_schedule))
         .routes(routes!(research_ai_prompts))
         .routes(routes!(ai_visibility_summary))
+}
+
+#[utoipa::path(get,path="/projects/{project_id}/ai-index",tag="ai-visibility",params(("project_id"=Uuid,Path),domain::ai_index::AiIndexQuery),
+    responses((status=OK,body=domain::ai_index::AiOwnIndex),(status=NOT_FOUND,body=Problem),(status=UNPROCESSABLE_ENTITY,body=Problem)),security(("session"=[]),("bearer"=[])))]
+async fn explore_ai_index(
+    State(s): State<AppState>,
+    Auth(a): Auth,
+    Path(pid): Path<Uuid>,
+    Query(q): Query<domain::ai_index::AiIndexQuery>,
+) -> ApiResult<Json<domain::ai_index::AiOwnIndex>> {
+    Ok(Json(domain::ai_index::inspect(&s.pool, &a, pid, q).await?))
 }
 
 #[utoipa::path(patch,path="/projects/{project_id}/ai-trackers/{tracker_id}/schedule",tag="ai-visibility",params(("project_id"=Uuid,Path),("tracker_id"=Uuid,Path)),request_body=ai::AiScheduleInput,responses((status=OK,body=AiVisibilityTracker)),security(("session"=[]),("bearer"=[])))]

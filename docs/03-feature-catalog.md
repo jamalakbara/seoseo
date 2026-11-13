@@ -2,7 +2,7 @@
 
 Every feature with an ID, OpenSEO parity reference, priority, data source, and milestone.
 Priority: **P0** MVP · **P1** parity · **P2** beyond parity · **P3** later.
-Status column is updated as we build (`todo` / `wip` / `done`). Last update: 2026-11-13 (M6 KW-11, SA-12 and SA-13 audit comparison/recurring crawls; M5 live-cloud acceptance remains pending).
+Status column is updated as we build (`todo` / `wip` / `done`). Last update: 2026-11-13 (M6 RT-07 multi-URL flags and AI-05 own prompt/brand index; M5 live-cloud acceptance remains pending).
 
 ## Workspace & identity
 | ID | Feature | OpenSEO ref | Pri | Data | MS | Status |
@@ -68,7 +68,7 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | RT-04 | Run full/subset, per-device positions, URL, features | RankCheckWorkflow | P0 | SERP fetcher | M3 | wip (full or subset runs, fresh SERP per keyword, position, URL, features, provider + exact flag; per-device todo) |
 | RT-05 | Latest table + deltas, history chart, trend, matrix | getRank* | P0 | — | M3 | wip (latest table with change/best, keyword history chart, per-run trend; keyword x run matrix todo) |
 | RT-06 | Cost/"request budget" estimate (requests not $) | estimateRankCheckCost | P1 | — | M3 | done (requests per run and month, provider, rough duration) |
-| RT-07 | Cannibalization flags | (new) | P2 | — | M6 | todo |
+| RT-07 | Cannibalization flags | (new) | P2 | — | M6 | done (same-snapshot multi-URL candidates with positions/provider/time, deduplication, coverage, REST/UI/MCP; not proof of ranking harm) |
 | RT-08 | Movement alerts | (new) | P2 | — | M7 | todo |
 | RT-09 | SERP volatility index | (new) | P3 | own data | M8 | todo |
 
@@ -103,7 +103,7 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | AI-02 | Prompt generation/research | generateAiVisibilityPrompts | P1 | LLM | M5 | done (one-request model question drafts, review/apply before tracking; no demand claim) |
 | AI-03 | Run workflow (answers, sources, matches) | AiVisibilityWorkflow | P1 | LLM APIs / Ollama | M5 | done (durable compatible/Ollama/Anthropic/Gemini comparisons; Anthropic search/citations; cloud live access unverified) |
 | AI-04 | Results, SoV, trend, sources, answer viewer, export | getAiVisibility* | P1 | — | M5 | done (literal rates, share of tracked mentions, retained-run trends, citations, answer viewer and JSON export) |
-| AI-05 | Brand lookup, prompt explorer (own index) | brand-lookup, prompt-explorer | P2 | own index | M6 | todo |
+| AI-05 | Brand lookup, prompt explorer (own index) | brand-lookup, prompt-explorer | P2 | own index | M6 | done (current-website retained answer index, literal brand/topic search, frozen market, expected/successful/failed/unchecked coverage, paged prompts/excerpts, REST/UI/MCP) |
 | AI-06 | Google AI Overview capture | google_ai_overview | P2 | SERP | M6 | todo |
 
 ## Integrations
@@ -130,7 +130,7 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 ## MCP / API / skills
 | MC-01 | MCP streamable HTTP + API-key auth | mcp server | P0 | — | M3 | done (stateless Streamable HTTP at /mcp, API-key or session auth, Host allow-list) |
 | MC-02 | MCP OAuth 2.1 (DCR, PKCE, consent, org-bound) | workers-oauth-provider | P1 | — | M4 | done |
-| MC-03 | Tool parity (~90 tools) | mcp/tools | P1 | — | M3–M6 | wip (92 tools including M6 clustering, internal links, audit comparison and recurring audits; remaining parity depends on later features) |
+| MC-03 | Tool parity (~90 tools) | mcp/tools | P1 | — | M3–M6 | wip (95 tools including M6 cannibalization flags and own AI prompt/brand index; remaining parity depends on later features) |
 | MC-04 | MCP Apps widgets (SERP/GSC views) | widget-tools | P3 | — | M8 | todo |
 | MC-05 | Agent skills (12 ported + new) | plugins/seoseo/skills | P1 | — | M5 | done (14 self-contained SeoSeo-prefixed skills, install guide, display metadata and tool validation) |
 | AP-01 | REST API + OpenAPI 3.1 (utoipa) | — | P0 | — | M0 | done |

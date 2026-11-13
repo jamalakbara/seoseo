@@ -1,6 +1,7 @@
 //! Postgres access: pool, embedded migrations, models and repositories.
 //! Repositories take explicit tenant ids (organization / project) on every call.
 
+pub mod ai_index;
 pub mod ai_visibility;
 pub mod api_keys;
 pub mod audit_compare;

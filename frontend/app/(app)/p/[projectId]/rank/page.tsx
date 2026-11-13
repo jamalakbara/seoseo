@@ -16,6 +16,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { SCHEDULE_ITEMS, scheduleLabel } from "@/components/rank/rank-ui";
 import { ApiError, api, unwrap } from "@/lib/api/client";
 import { useProject } from "@/lib/queries";
+import { CannibalizationCard } from "@/components/rank/cannibalization";
 
 export default function RankTrackersPage() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -27,7 +28,8 @@ export default function RankTrackersPage() {
   });
 
   return (
-    <div className="grid gap-6">
+    <div className="grid min-w-0 grid-cols-1 gap-6">
+      {project.data?.domain&&<CannibalizationCard key={`${projectId}:${project.data.domain}:${project.data.country_code}:${project.data.language_code}`} projectId={projectId} domain={project.data.domain} country={project.data.country_code} language={project.data.language_code}/>}
       <Card>
         <CardHeader>
           <CardTitle>Rank trackers</CardTitle>

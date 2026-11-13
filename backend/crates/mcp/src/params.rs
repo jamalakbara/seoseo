@@ -5,6 +5,35 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CannibalizationParams {
+    pub project_id: String,
+    pub country: Option<String>,
+    pub language: Option<String>,
+    pub limit: Option<usize>,
+    pub offset: Option<usize>,
+}
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct AiIndexParams {
+    pub project_id: String,
+    pub brand: Option<String>,
+    pub topic: Option<String>,
+    pub country: Option<String>,
+    pub language: Option<String>,
+    pub limit: Option<i64>,
+    pub offset: Option<i64>,
+}
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct BrandLookupParams {
+    pub project_id: String,
+    pub brand: String,
+    pub topic: Option<String>,
+    pub country: Option<String>,
+    pub language: Option<String>,
+    pub limit: Option<i64>,
+    pub offset: Option<i64>,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct CompareAuditParams {
     pub project_id: String,
     pub audit_id: String,

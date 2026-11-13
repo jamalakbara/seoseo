@@ -110,6 +110,64 @@ fn conv<T: DeserializeOwned>(params: &impl Serialize) -> AppResult<T> {
 #[tool_router]
 impl SeoSeoMcp {
     #[tool(
+        description = "Flag project keywords where multiple distinct URLs of the project registrable domain appear in the same recent cached results page. Read-only, no search requests. Returns positions/provider/exactness and coverage. These are review candidates, not proof of harmful cannibalization or a recommendation to merge pages."
+    )]
+    async fn get_cannibalization_flags(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<CannibalizationParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::cannibalization::flags(
+                    &self.pool,
+                    &a,
+                    id("project_id", &p.project_id)?,
+                    conv(&p)?,
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Look up a literal brand term in retained successful model answers for this project's current website and selected market. Read-only, no model calls. Includes matched excerpts, prompt/model/engine/grounding, successful/failed/unchecked coverage and rates over saved successful cells only. Not global prompt demand or consumer chat visibility."
+    )]
+    async fn lookup_ai_brand(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<BrandLookupParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                let mut q: domain::ai_index::AiIndexQuery = conv(&p)?;
+                q.view = Some("answers".into());
+                domain::ai_index::inspect(&self.pool, &a, id("project_id", &p.project_id)?, q).await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Explore prompts in this project's own retained model-answer index, current website and selected market. Optional topic searches saved prompt text; optional literal brand filters prompts with saved matching answers. Reports expected/successful/failed/unchecked coverage. Read-only, no model calls; not a global prompt-demand database."
+    )]
+    async fn explore_ai_prompts(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<AiIndexParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                let mut q: domain::ai_index::AiIndexQuery = conv(&p)?;
+                q.view = Some("prompts".into());
+                domain::ai_index::inspect(&self.pool, &a, id("project_id", &p.project_id)?, q).await
+            }
+            .await,
+        )
+    }
+    #[tool(
         description = "Compare two completed project audits with the same start URL. Read-only, paginated observed page/issue differences. Missing URLs are not proven removed, failed/unvisited pages do not resolve issues. Returns coverage/configuration warnings and unconfirmed absences."
     )]
     async fn compare_site_audits(
@@ -2254,6 +2312,9 @@ mod tests {
             "compare_site_audits",
             "get_audit_schedule",
             "set_audit_schedule",
+            "get_cannibalization_flags",
+            "lookup_ai_brand",
+            "explore_ai_prompts",
             "run_site_audit",
             "run_rank_tracker",
         ] {

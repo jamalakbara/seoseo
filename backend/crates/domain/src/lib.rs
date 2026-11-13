@@ -1,6 +1,7 @@
 //! Business logic. Routers and MCP tools call services here; services call `db` repositories.
 
 pub mod actor;
+pub mod ai_index;
 pub mod ai_visibility;
 pub mod api_keys;
 pub mod audit_compare;
@@ -8,6 +9,7 @@ pub mod audit_schedule;
 pub mod audits;
 pub mod auth;
 pub mod backlinks;
+pub mod cannibalization;
 pub mod clustering;
 pub mod competitive;
 pub mod dashboard;

@@ -14,8 +14,22 @@ use uuid::Uuid;
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::new()
         .routes(routes!(get_domain_overview))
+        .routes(routes!(get_cannibalization_flags))
         .routes(routes!(lookup_domain_age))
         .routes(routes!(import_competitive_volumes))
+}
+
+#[utoipa::path(get,path="/projects/{project_id}/cannibalization",tag="competitive",params(("project_id"=Uuid,Path),domain::cannibalization::CannibalizationQuery),
+    responses((status=OK,body=domain::cannibalization::CannibalizationFlags),(status=NOT_FOUND,body=Problem),(status=UNPROCESSABLE_ENTITY,body=Problem)),security(("session"=[]),("bearer"=[])))]
+async fn get_cannibalization_flags(
+    State(s): State<AppState>,
+    Auth(a): Auth,
+    Path(pid): Path<Uuid>,
+    Query(q): Query<domain::cannibalization::CannibalizationQuery>,
+) -> ApiResult<Json<domain::cannibalization::CannibalizationFlags>> {
+    Ok(Json(
+        domain::cannibalization::flags(&s.pool, &a, pid, q).await?,
+    ))
 }
 #[utoipa::path(post,path="/projects/{project_id}/competitive-volumes",tag="competitive",params(("project_id"=Uuid,Path)),request_body=domain::competitive::CompetitiveVolumeInput,responses((status=OK,body=serde_json::Value)),security(("session"=[]),("bearer"=[])))]
 async fn import_competitive_volumes(

@@ -471,6 +471,22 @@ export interface paths {
         patch: operations["update_project"];
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/ai-index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["explore_ai_index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/ai-prompt-research": {
         parameters: {
             query?: never;
@@ -845,6 +861,22 @@ export interface paths {
         put?: never;
         post?: never;
         delete: operations["delete_backlink_snapshot"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/cannibalization": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_cannibalization_flags"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -1975,10 +2007,44 @@ export interface components {
             title?: string | null;
             url: string;
         };
+        AiIndexSummary: {
+            /**
+             * Format: int64
+             * @description Null when no brand term was requested.
+             */
+            brand_mentions?: number | null;
+            /** Format: int64 */
+            expected_answers: number;
+            /** Format: int64 */
+            failed_answers: number;
+            /** Format: int64 */
+            retained_runs: number;
+            /** Format: int64 */
+            successful_answers: number;
+            /** Format: int64 */
+            unchecked_answers: number;
+            /** Format: int64 */
+            unique_prompts: number;
+        };
         AiModelAvailability: {
             models: string[];
             note?: string | null;
             ready: boolean;
+        };
+        AiOwnIndex: {
+            answers: components["schemas"]["IndexedAiAnswer"][];
+            brand?: string | null;
+            country: string;
+            language: string;
+            /** Format: double */
+            mention_rate_percent?: number | null;
+            prompts: components["schemas"]["IndexedAiPrompt"][];
+            summary: components["schemas"]["AiIndexSummary"];
+            topic?: string | null;
+            /** Format: int64 */
+            total_matching: number;
+            view: string;
+            warnings: string[];
         };
         AiPromptDraft: {
             model: string;
@@ -2290,6 +2356,26 @@ export interface components {
             top_pages: components["schemas"]["BacklinkGroup"][];
             total: number;
         };
+        CannibalizationCandidate: {
+            exact: boolean;
+            /** Format: date-time */
+            fetched_at: string;
+            keyword: string;
+            pages: components["schemas"]["CompetingRankedPage"][];
+            provider: string;
+        };
+        CannibalizationFlags: {
+            checked_keywords: number;
+            country: string;
+            domain: string;
+            flagged_keywords: number;
+            items: components["schemas"]["CannibalizationCandidate"][];
+            language: string;
+            matched_keywords: number;
+            sampled_keywords: number;
+            scope_keywords: number;
+            warnings: string[];
+        };
         ChangeResult: {
             /**
              * Format: int64
@@ -2321,6 +2407,11 @@ export interface components {
             provider: string;
             /** @description Distinct HTTP(S) URLs in positions 1–10, with fragments removed. */
             urls: string[];
+        };
+        CompetingRankedPage: {
+            /** Format: int32 */
+            position: number;
+            url: string;
         };
         CompetitiveVolumeInput: {
             country?: string | null;
@@ -2627,6 +2718,37 @@ export interface components {
             key: string;
             /** Format: date-time */
             last_submitted_at?: string | null;
+        };
+        IndexedAiAnswer: {
+            /** Format: date-time */
+            answered_at: string;
+            engine: string;
+            excerpt: string;
+            gateway_id: string;
+            grounding: string;
+            model: string;
+            prompt: string;
+            /** Format: int32 */
+            prompt_index: number;
+            /** Format: uuid */
+            run_id: string;
+            /** Format: uuid */
+            tracker_id: string;
+        };
+        IndexedAiPrompt: {
+            /** Format: int64 */
+            brand_mentions?: number | null;
+            /** Format: int64 */
+            expected_answers: number;
+            /** Format: int64 */
+            failed_answers: number;
+            prompt: string;
+            /** Format: int64 */
+            retained_runs: number;
+            /** Format: int64 */
+            successful_answers: number;
+            /** Format: int64 */
+            unchecked_answers: number;
         };
         InspectInput: {
             urls: string[];
@@ -4711,6 +4833,52 @@ export interface operations {
             };
         };
     };
+    explore_ai_index: {
+        parameters: {
+            query?: {
+                /** @description prompts (default) or answers. Brand filters match literal terms in saved answers. */
+                view?: string | null;
+                brand?: string | null;
+                topic?: string | null;
+                country?: string | null;
+                language?: string | null;
+                limit?: number | null;
+                offset?: number | null;
+            };
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AiOwnIndex"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
     research_ai_prompts: {
         parameters: {
             query?: never;
@@ -5607,6 +5775,48 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    get_cannibalization_flags: {
+        parameters: {
+            query?: {
+                country?: string | null;
+                language?: string | null;
+                limit?: number | null;
+                offset?: number | null;
+            };
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CannibalizationFlags"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
             };
         };
     };

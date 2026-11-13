@@ -161,6 +161,10 @@ Manual AI visibility adds eight model/tracker/run tools (80 tools total), model 
 
 MCP now exposes 66 tools: the previous 49 plus property discovery/selection, nine Analytics report tools, IndexNow setup/verification/submission, website synthesis and link-observation list/save. OAuth discovery/DCR/PKCE/consent and rotating resource-bound tokens complement existing API keys. Feature endpoints and protocol details are documented in [M4 integrations and OAuth](13-m4-integrations-and-oauth.md).
 
+### M6 stored evidence research (95 tools)
+
+`GET /projects/{project_id}/cannibalization` / `get_cannibalization_flags` return same-snapshot multi-URL candidates with source/coverage. `GET /projects/{project_id}/ai-index` / `lookup_ai_brand`, `explore_ai_prompts` search the current website's retained model evidence with frozen market and successful/failed/unchecked denominators. Both are read-only and make no provider calls. See [stored evidence research](21-cannibalization-and-ai-index.md).
+
 ### M6 audit comparison and recurring crawls (92 tools)
 
 `GET /projects/{project_id}/audits/{audit_id}/comparison` / `compare_site_audits` compare completed same-start audit observations, preserving unknown absences and pagination. `GET/PUT /projects/{project_id}/audit-schedule` / `get_audit_schedule`, `set_audit_schedule` provide revisioned admin-controlled UTC recurring crawls from a reviewed completed baseline. See [audit comparison and schedules](20-audit-comparison-and-schedules.md).

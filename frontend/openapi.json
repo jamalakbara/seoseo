@@ -1193,6 +1193,142 @@
         ]
       }
     },
+    "/api/v1/projects/{project_id}/ai-index": {
+      "get": {
+        "tags": [
+          "ai-visibility"
+        ],
+        "operationId": "explore_ai_index",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "view",
+            "in": "query",
+            "description": "prompts (default) or answers. Brand filters match literal terms in saved answers.",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "brand",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "topic",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AiOwnIndex"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/projects/{project_id}/ai-prompt-research": {
       "post": {
         "tags": [
@@ -3033,6 +3169,108 @@
         ],
         "responses": {
           "204": {}
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/cannibalization": {
+      "get": {
+        "tags": [
+          "competitive"
+        ],
+        "operationId": "get_cannibalization_flags",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CannibalizationFlags"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
         },
         "security": [
           {
@@ -7480,6 +7718,51 @@
           }
         }
       },
+      "AiIndexSummary": {
+        "type": "object",
+        "required": [
+          "retained_runs",
+          "unique_prompts",
+          "expected_answers",
+          "successful_answers",
+          "failed_answers",
+          "unchecked_answers"
+        ],
+        "properties": {
+          "brand_mentions": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "Null when no brand term was requested."
+          },
+          "expected_answers": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "failed_answers": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "retained_runs": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "successful_answers": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "unchecked_answers": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "unique_prompts": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
       "AiModelAvailability": {
         "type": "object",
         "required": [
@@ -7501,6 +7784,74 @@
           },
           "ready": {
             "type": "boolean"
+          }
+        }
+      },
+      "AiOwnIndex": {
+        "type": "object",
+        "required": [
+          "country",
+          "language",
+          "view",
+          "summary",
+          "total_matching",
+          "prompts",
+          "answers",
+          "warnings"
+        ],
+        "properties": {
+          "answers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IndexedAiAnswer"
+            }
+          },
+          "brand": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "country": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          },
+          "mention_rate_percent": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
+          "prompts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/IndexedAiPrompt"
+            }
+          },
+          "summary": {
+            "$ref": "#/components/schemas/AiIndexSummary"
+          },
+          "topic": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "total_matching": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "view": {
+            "type": "string"
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
@@ -8619,6 +8970,95 @@
           }
         }
       },
+      "CannibalizationCandidate": {
+        "type": "object",
+        "required": [
+          "keyword",
+          "provider",
+          "exact",
+          "fetched_at",
+          "pages"
+        ],
+        "properties": {
+          "exact": {
+            "type": "boolean"
+          },
+          "fetched_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "keyword": {
+            "type": "string"
+          },
+          "pages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CompetingRankedPage"
+            }
+          },
+          "provider": {
+            "type": "string"
+          }
+        }
+      },
+      "CannibalizationFlags": {
+        "type": "object",
+        "required": [
+          "domain",
+          "country",
+          "language",
+          "scope_keywords",
+          "sampled_keywords",
+          "checked_keywords",
+          "matched_keywords",
+          "flagged_keywords",
+          "items",
+          "warnings"
+        ],
+        "properties": {
+          "checked_keywords": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "country": {
+            "type": "string"
+          },
+          "domain": {
+            "type": "string"
+          },
+          "flagged_keywords": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CannibalizationCandidate"
+            }
+          },
+          "language": {
+            "type": "string"
+          },
+          "matched_keywords": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "sampled_keywords": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "scope_keywords": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "ChangeResult": {
         "type": "object",
         "required": [
@@ -8711,6 +9151,22 @@
             },
             "description": "Distinct HTTP(S) URLs in positions 1–10, with fragments removed.",
             "uniqueItems": true
+          }
+        }
+      },
+      "CompetingRankedPage": {
+        "type": "object",
+        "required": [
+          "url",
+          "position"
+        ],
+        "properties": {
+          "position": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "url": {
+            "type": "string"
           }
         }
       },
@@ -9865,6 +10321,100 @@
               "null"
             ],
             "format": "date-time"
+          }
+        }
+      },
+      "IndexedAiAnswer": {
+        "type": "object",
+        "required": [
+          "tracker_id",
+          "run_id",
+          "prompt_index",
+          "prompt",
+          "model",
+          "engine",
+          "grounding",
+          "gateway_id",
+          "answered_at",
+          "excerpt"
+        ],
+        "properties": {
+          "answered_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "engine": {
+            "type": "string"
+          },
+          "excerpt": {
+            "type": "string"
+          },
+          "gateway_id": {
+            "type": "string"
+          },
+          "grounding": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          },
+          "prompt": {
+            "type": "string"
+          },
+          "prompt_index": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "run_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tracker_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "IndexedAiPrompt": {
+        "type": "object",
+        "required": [
+          "prompt",
+          "retained_runs",
+          "expected_answers",
+          "successful_answers",
+          "failed_answers",
+          "unchecked_answers"
+        ],
+        "properties": {
+          "brand_mentions": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "expected_answers": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "failed_answers": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "prompt": {
+            "type": "string"
+          },
+          "retained_runs": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "successful_answers": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "unchecked_answers": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },
