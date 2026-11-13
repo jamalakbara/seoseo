@@ -110,6 +110,69 @@ fn conv<T: DeserializeOwned>(params: &impl Serialize) -> AppResult<T> {
 #[tool_router]
 impl SeoSeoMcp {
     #[tool(
+        description = "Compare two completed project audits with the same start URL. Read-only, paginated observed page/issue differences. Missing URLs are not proven removed, failed/unvisited pages do not resolve issues. Returns coverage/configuration warnings and unconfirmed absences."
+    )]
+    async fn compare_site_audits(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<CompareAuditParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::audit_compare::compare(
+                    &self.pool,
+                    &a,
+                    id("project_id", &p.project_id)?,
+                    id("audit_id", &p.audit_id)?,
+                    conv(&p)?,
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Read this project's optional recurring site-audit schedule, frozen baseline crawl settings, UTC next run, latest audit and errors. Returns null if no schedule has been configured. Does not start a crawl."
+    )]
+    async fn get_audit_schedule(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<ProjectRef>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::audit_schedule::get(&self.pool, &a, id("project_id", &p.project_id)?).await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Explicitly configure or disable recurring project audits. Admin required. Enabling copies a reviewed completed baseline of the current website; expected_revision=0 initially, else GET revision. Schedule manual/daily/weekly/monthly, hour_utc 0-23, weekday 1-7. Enabling authorizes future crawls with those frozen budgets; archives, website changes and 100 stored audits pause it."
+    )]
+    async fn set_audit_schedule(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<SetAuditScheduleParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::audit_schedule::set(
+                    &self.pool,
+                    &a,
+                    id("project_id", &p.project_id)?,
+                    self.policy,
+                    self.renderer_available,
+                    conv(&p)?,
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
         description = "Inspect a completed audit's internal link graph and conservative link suggestions from stored evidence. Read-only, no crawl or provider calls. Page counts cover the full stored audit; edges/suggestions use the bounded selected pages (limit 10-500, default 200). Self-links excluded, nofollow distinct, missing pages unknown. Review title/H1 overlap suggestions before editing."
     )]
     async fn get_internal_link_graph(
@@ -2188,6 +2251,9 @@ mod tests {
             "research_keywords",
             "cluster_keywords",
             "get_internal_link_graph",
+            "compare_site_audits",
+            "get_audit_schedule",
+            "set_audit_schedule",
             "run_site_audit",
             "run_rank_tracker",
         ] {

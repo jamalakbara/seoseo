@@ -2,6 +2,7 @@
 //! and reaps jobs whose worker died. Job kinds are registered in [`Registry`].
 
 pub mod ai_visibility;
+pub mod audit_schedule;
 pub mod backlink_discovery;
 pub mod cc_ranks;
 pub mod keyword_research;

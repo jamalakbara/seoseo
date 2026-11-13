@@ -2,7 +2,7 @@
 
 Every feature with an ID, OpenSEO parity reference, priority, data source, and milestone.
 Priority: **P0** MVP · **P1** parity · **P2** beyond parity · **P3** later.
-Status column is updated as we build (`todo` / `wip` / `done`). Last update: 2026-11-13 (M6 KW-11 clustering and SA-12 internal link graphs/suggestions; M5 live-cloud acceptance remains pending).
+Status column is updated as we build (`todo` / `wip` / `done`). Last update: 2026-11-13 (M6 KW-11, SA-12 and SA-13 audit comparison/recurring crawls; M5 live-cloud acceptance remains pending).
 
 ## Workspace & identity
 | ID | Feature | OpenSEO ref | Pri | Data | MS | Status |
@@ -85,7 +85,7 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | SA-10 | Progress (live SSE), history, delete | getCrawlProgress | P0 | — | M1 | done |
 | SA-11 | Results UI: summary, pages, issues, page detail, export | results/* | P0 | — | M1 | done |
 | SA-12 | Internal link graph + suggestions | (new) | P2 | — | M6 | done (completed-audit graph, full-crawl distinct counts, bounded interactive neighborhood, conservative title/H1 overlap suggestions, REST/UI/JSON/MCP; no automatic page edits) |
-| SA-13 | Audit comparison + scheduled re-audit | (new) | P2 | — | M6 | todo |
+| SA-13 | Audit comparison + scheduled re-audit | (new) | P2 | — | M6 | done (same-start completed-audit observed differences, unknown absences, pagination; revisioned UTC recurring crawls with frozen budgets, atomic worker claims and safe pauses; REST/UI/MCP) |
 | SA-14 | Signed crawler credentials (Shopify web-bot-auth) | crawlerCredentials | P3 | — | M8 | todo |
 | SA-15 | Log-file analyzer | (new) | P3 | upload | M8 | todo |
 | SA-16 | Change monitoring of key pages | (new) | P2 | crawler | M7 | todo |
@@ -130,7 +130,7 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 ## MCP / API / skills
 | MC-01 | MCP streamable HTTP + API-key auth | mcp server | P0 | — | M3 | done (stateless Streamable HTTP at /mcp, API-key or session auth, Host allow-list) |
 | MC-02 | MCP OAuth 2.1 (DCR, PKCE, consent, org-bound) | workers-oauth-provider | P1 | — | M4 | done |
-| MC-03 | Tool parity (~90 tools) | mcp/tools | P1 | — | M3–M6 | wip (89 tools including M6 keyword clustering and internal link graph; remaining parity depends on later features) |
+| MC-03 | Tool parity (~90 tools) | mcp/tools | P1 | — | M3–M6 | wip (92 tools including M6 clustering, internal links, audit comparison and recurring audits; remaining parity depends on later features) |
 | MC-04 | MCP Apps widgets (SERP/GSC views) | widget-tools | P3 | — | M8 | todo |
 | MC-05 | Agent skills (12 ported + new) | plugins/seoseo/skills | P1 | — | M5 | done (14 self-contained SeoSeo-prefixed skills, install guide, display metadata and tool validation) |
 | AP-01 | REST API + OpenAPI 3.1 (utoipa) | — | P0 | — | M0 | done |

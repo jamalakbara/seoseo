@@ -599,6 +599,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/audit-schedule": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_audit_schedule"];
+        put: operations["set_audit_schedule"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/audits": {
         parameters: {
             query?: never;
@@ -645,6 +661,22 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["cancel_audit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/audits/{audit_id}/comparison": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["compare_site_audits"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -2089,6 +2121,62 @@ export interface components {
             /** @description queued | running | completed | failed | cancelled */
             status: string;
             stop_reason?: string | null;
+        };
+        AuditComparison: {
+            baseline: components["schemas"]["Audit"];
+            counts: components["schemas"]["AuditComparisonCounts"];
+            current: components["schemas"]["Audit"];
+            /** Format: int32 */
+            health_score_change?: number | null;
+            pages: components["schemas"]["AuditPageChange"][];
+            total_matching: number;
+            warnings: string[];
+        };
+        AuditComparisonCounts: {
+            changed: number;
+            only_in_baseline: number;
+            only_in_current: number;
+            unchanged: number;
+        };
+        AuditPageChange: {
+            /** Format: uuid */
+            baseline_page_id?: string | null;
+            changed_fields: string[];
+            content_comparable: boolean;
+            /** Format: uuid */
+            current_page_id?: string | null;
+            newly_observed_issues: string[];
+            no_longer_observed_issues: string[];
+            observation: string;
+            unconfirmed_absent_issues: string[];
+            url: string;
+        };
+        AuditSchedule: {
+            /** Format: uuid */
+            baseline_audit_id?: string | null;
+            config: unknown;
+            /** Format: uuid */
+            created_by?: string | null;
+            domain: string;
+            /** Format: int32 */
+            hour_utc: number;
+            /** Format: uuid */
+            last_audit_id?: string | null;
+            last_error?: string | null;
+            /** Format: date-time */
+            last_run_at?: string | null;
+            /** Format: date-time */
+            next_run_at?: string | null;
+            /** Format: uuid */
+            project_id: string;
+            /** Format: int64 */
+            revision: number;
+            schedule: string;
+            start_url: string;
+            /** Format: date-time */
+            updated_at: string;
+            /** Format: int32 */
+            weekday: number;
         };
         AuthorityStatus: {
             /**
@@ -3609,6 +3697,24 @@ export interface components {
             title: string;
             url: string;
         };
+        SetAuditScheduleInput: {
+            /**
+             * Format: uuid
+             * @description Required when enabling a schedule; frozen configuration is copied from this completed audit.
+             */
+            baseline_audit_id?: string | null;
+            expected_domain: string;
+            /**
+             * Format: int64
+             * @description 0 for first save; otherwise the revision returned by GET.
+             */
+            expected_revision: number;
+            /** Format: int32 */
+            hour_utc: number;
+            schedule: string;
+            /** Format: int32 */
+            weekday: number;
+        };
         /** @enum {string} */
         Severity: "critical" | "warning" | "info";
         ShareReportResult: {
@@ -4873,6 +4979,76 @@ export interface operations {
             };
         };
     };
+    get_audit_schedule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditSchedule"] | null;
+                };
+            };
+        };
+    };
+    set_audit_schedule: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetAuditScheduleInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditSchedule"];
+                };
+            };
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
     list_audits: {
         parameters: {
             query?: never;
@@ -5014,6 +5190,58 @@ export interface operations {
                 };
             };
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    compare_site_audits: {
+        parameters: {
+            query: {
+                baseline_id: string;
+                /** @description changes (default) | all | changed | unchanged | only_in_baseline | only_in_current */
+                kind?: string | null;
+                limit?: number | null;
+                offset?: number | null;
+            };
+            header?: never;
+            path: {
+                project_id: string;
+                audit_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditComparison"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };

@@ -5,6 +5,27 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CompareAuditParams {
+    pub project_id: String,
+    pub audit_id: String,
+    pub baseline_id: String,
+    pub kind: Option<String>,
+    pub limit: Option<usize>,
+    pub offset: Option<usize>,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct SetAuditScheduleParams {
+    pub project_id: String,
+    pub expected_domain: String,
+    pub expected_revision: i64,
+    pub baseline_audit_id: Option<String>,
+    pub schedule: String,
+    pub hour_utc: i16,
+    pub weekday: i16,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct InternalLinkParams {
     pub project_id: String,
     pub audit_id: String,

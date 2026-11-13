@@ -97,6 +97,9 @@ async fn run_audit(ctx: &JobCtx, settings: &CrawlSettings, audit_id: Uuid) -> an
     if matches!(audit.status.as_str(), "completed" | "failed" | "cancelled") {
         return Ok(());
     }
+    if !scheduled_site_current(ctx, audit_id).await? {
+        return Ok(());
+    }
     let mut cfg: AuditConfig = serde_json::from_value(audit.config.clone()).unwrap_or_default();
     cfg.renderer_url = settings.renderer_url.clone();
     let fetcher = Fetcher::new(FetcherConfig {
@@ -138,6 +141,19 @@ async fn run_audit(ctx: &JobCtx, settings: &CrawlSettings, audit_id: Uuid) -> an
         {
             start = final_url;
             audits::set_start_url(pool, audit_id, start.as_str()).await?;
+        }
+        if ctx.job.payload["scheduled"].as_bool() == Some(true) {
+            let expected = ctx.job.payload["expected_domain"].as_str().unwrap_or("");
+            let root = Url::parse(&format!("https://{expected}/"))?;
+            if !Scope::new(&root).contains(&start) {
+                audits::fail(
+                    pool,
+                    audit_id,
+                    "Scheduled crawl stopped: start URL redirected outside the reviewed website",
+                )
+                .await?;
+                return Ok(());
+            }
         }
         audits::frontier_add(
             pool,
@@ -219,6 +235,26 @@ fn excluded(cfg: &AuditConfig, url: &Url) -> bool {
         .any(|p| !p.is_empty() && url.path().starts_with(p.as_str()))
 }
 
+/// A queued recurring crawl must not outlive its website authorization. In-flight
+/// requests may finish; check again before claiming every further crawl batch.
+async fn scheduled_site_current(ctx: &JobCtx, audit_id: Uuid) -> anyhow::Result<bool> {
+    if ctx.job.payload["scheduled"].as_bool() != Some(true) {
+        return Ok(true);
+    }
+    let expected = ctx.job.payload["expected_domain"].as_str().unwrap_or("");
+    let current:bool=sqlx::query_scalar("SELECT EXISTS(SELECT 1 FROM projects WHERE id=$1 AND organization_id=$2 AND domain::text=$3 AND archived_at IS NULL)")
+        .bind(ctx.job.project_id).bind(ctx.job.organization_id).bind(expected).fetch_one(&ctx.pool).await?;
+    if !current {
+        audits::fail(
+            &ctx.pool,
+            audit_id,
+            "Scheduled crawl stopped: website changed or project archived",
+        )
+        .await?;
+    }
+    Ok(current)
+}
+
 #[derive(Debug, PartialEq, Eq)]
 enum Stop {
     Finished,
@@ -258,6 +294,9 @@ async fn crawl(
     let mut rate_limited_streak = 0u32;
 
     loop {
+        if !scheduled_site_current(ctx, audit_id).await? {
+            return Ok(Stop::Cancelled);
+        }
         if audits::status(pool, audit_id).await? == "cancelled" {
             return Ok(Stop::Cancelled);
         }

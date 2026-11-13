@@ -15,6 +15,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { AuditStatus, scoreColor } from "@/components/audit/health-score";
 import { ApiError, api, unwrap } from "@/lib/api/client";
 import { useProject } from "@/lib/queries";
+import { AuditScheduleCard } from "@/components/audit/schedule";
 
 export default function AuditsPage() {
   const { projectId } = useParams<{ projectId: string }>();
@@ -28,8 +29,9 @@ export default function AuditsPage() {
   });
 
   return (
-    <div className="grid gap-6">
+    <div className="grid min-w-0 grid-cols-1 gap-6">
       <StartAuditCard projectId={projectId} defaultUrl={project.data?.domain ? `https://${project.data.domain}/` : ""} />
+      {project.data && <AuditScheduleCard projectId={projectId} domain={project.data.domain??null} audits={audits.data??[]} />}
       <Card>
         <CardHeader>
           <CardTitle>Audit history</CardTitle>

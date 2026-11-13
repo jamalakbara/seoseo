@@ -29,6 +29,59 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(get_audit_page))
         .routes(routes!(list_issue_types))
         .routes(routes!(get_internal_link_graph))
+        .routes(routes!(compare_site_audits))
+        .routes(routes!(get_audit_schedule, set_audit_schedule))
+}
+
+#[utoipa::path(get,path="/projects/{project_id}/audits/{audit_id}/comparison",tag="audits",
+    params(("project_id"=Uuid,Path),("audit_id"=Uuid,Path),domain::audit_compare::CompareAuditQuery),
+    responses((status=OK,body=domain::audit_compare::AuditComparison),(status=NOT_FOUND,body=Problem),(status=CONFLICT,body=Problem),(status=UNPROCESSABLE_ENTITY,body=Problem)),security(("session"=[]),("bearer"=[])))]
+async fn compare_site_audits(
+    State(state): State<AppState>,
+    Auth(actor): Auth,
+    Path((pid, aid)): Path<(Uuid, Uuid)>,
+    Query(q): Query<domain::audit_compare::CompareAuditQuery>,
+) -> ApiResult<Json<domain::audit_compare::AuditComparison>> {
+    Ok(Json(
+        domain::audit_compare::compare(&state.pool, &actor, pid, aid, q).await?,
+    ))
+}
+
+#[utoipa::path(get,path="/projects/{project_id}/audit-schedule",tag="audits",params(("project_id"=Uuid,Path)),
+    responses((status=OK,body=Option<db::audit_schedule::AuditSchedule>)),security(("session"=[]),("bearer"=[])))]
+async fn get_audit_schedule(
+    State(state): State<AppState>,
+    Auth(actor): Auth,
+    Path(pid): Path<Uuid>,
+) -> ApiResult<Json<Option<db::audit_schedule::AuditSchedule>>> {
+    Ok(Json(
+        domain::audit_schedule::get(&state.pool, &actor, pid).await?,
+    ))
+}
+
+#[utoipa::path(put,path="/projects/{project_id}/audit-schedule",tag="audits",params(("project_id"=Uuid,Path)),request_body=domain::audit_schedule::SetAuditScheduleInput,
+    responses((status=OK,body=db::audit_schedule::AuditSchedule),(status=CONFLICT,body=Problem),(status=FORBIDDEN,body=Problem),(status=UNPROCESSABLE_ENTITY,body=Problem)),security(("session"=[]),("bearer"=[])))]
+async fn set_audit_schedule(
+    State(state): State<AppState>,
+    Auth(actor): Auth,
+    Path(pid): Path<Uuid>,
+    Json(input): Json<domain::audit_schedule::SetAuditScheduleInput>,
+) -> ApiResult<Json<db::audit_schedule::AuditSchedule>> {
+    Ok(Json(
+        domain::audit_schedule::set(
+            &state.pool,
+            &actor,
+            pid,
+            policy(&state),
+            state
+                .cfg
+                .renderer_url
+                .as_deref()
+                .is_some_and(|s| !s.trim().is_empty()),
+            input,
+        )
+        .await?,
+    ))
 }
 
 #[utoipa::path(get, path = "/projects/{project_id}/audits/{audit_id}/internal-links", tag = "audits",

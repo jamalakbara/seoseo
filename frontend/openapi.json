@@ -1731,6 +1731,124 @@
         ]
       }
     },
+    "/api/v1/projects/{project_id}/audit-schedule": {
+      "get": {
+        "tags": [
+          "audits"
+        ],
+        "operationId": "get_audit_schedule",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/AuditSchedule"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "audits"
+        ],
+        "operationId": "set_audit_schedule",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetAuditScheduleInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditSchedule"
+                }
+              }
+            }
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/projects/{project_id}/audits": {
       "get": {
         "tags": [
@@ -1976,6 +2094,125 @@
             }
           },
           "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/audits/{audit_id}/comparison": {
+      "get": {
+        "tags": [
+          "audits"
+        ],
+        "operationId": "compare_site_audits",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "audit_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "baseline_id",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "description": "changes (default) | all | changed | unchanged | only_in_baseline | only_in_current",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0
+            }
+          },
+          {
+            "name": "offset",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditComparison"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
@@ -7779,6 +8016,226 @@
           }
         }
       },
+      "AuditComparison": {
+        "type": "object",
+        "required": [
+          "baseline",
+          "current",
+          "counts",
+          "total_matching",
+          "pages",
+          "warnings"
+        ],
+        "properties": {
+          "baseline": {
+            "$ref": "#/components/schemas/Audit"
+          },
+          "counts": {
+            "$ref": "#/components/schemas/AuditComparisonCounts"
+          },
+          "current": {
+            "$ref": "#/components/schemas/Audit"
+          },
+          "health_score_change": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "pages": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuditPageChange"
+            }
+          },
+          "total_matching": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "AuditComparisonCounts": {
+        "type": "object",
+        "required": [
+          "changed",
+          "unchanged",
+          "only_in_baseline",
+          "only_in_current"
+        ],
+        "properties": {
+          "changed": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "only_in_baseline": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "only_in_current": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "unchanged": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
+      "AuditPageChange": {
+        "type": "object",
+        "required": [
+          "url",
+          "observation",
+          "changed_fields",
+          "newly_observed_issues",
+          "no_longer_observed_issues",
+          "unconfirmed_absent_issues",
+          "content_comparable"
+        ],
+        "properties": {
+          "baseline_page_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "changed_fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "content_comparable": {
+            "type": "boolean"
+          },
+          "current_page_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "newly_observed_issues": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "no_longer_observed_issues": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "observation": {
+            "type": "string"
+          },
+          "unconfirmed_absent_issues": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "AuditSchedule": {
+        "type": "object",
+        "required": [
+          "project_id",
+          "domain",
+          "start_url",
+          "config",
+          "schedule",
+          "hour_utc",
+          "weekday",
+          "revision",
+          "updated_at"
+        ],
+        "properties": {
+          "baseline_audit_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "config": {},
+          "created_by": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "domain": {
+            "type": "string"
+          },
+          "hour_utc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "last_audit_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "last_error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "last_run_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "next_run_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "project_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "revision": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "schedule": {
+            "type": "string"
+          },
+          "start_url": {
+            "type": "string"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "weekday": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "AuthorityStatus": {
         "type": "object",
         "required": [
@@ -12937,6 +13394,45 @@
           },
           "url": {
             "type": "string"
+          }
+        }
+      },
+      "SetAuditScheduleInput": {
+        "type": "object",
+        "required": [
+          "expected_revision",
+          "expected_domain",
+          "schedule",
+          "hour_utc",
+          "weekday"
+        ],
+        "properties": {
+          "baseline_audit_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Required when enabling a schedule; frozen configuration is copied from this completed audit."
+          },
+          "expected_domain": {
+            "type": "string"
+          },
+          "expected_revision": {
+            "type": "integer",
+            "format": "int64",
+            "description": "0 for first save; otherwise the revision returned by GET."
+          },
+          "hour_utc": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "schedule": {
+            "type": "string"
+          },
+          "weekday": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },

@@ -3,6 +3,8 @@
 pub mod actor;
 pub mod ai_visibility;
 pub mod api_keys;
+pub mod audit_compare;
+pub mod audit_schedule;
 pub mod audits;
 pub mod auth;
 pub mod backlinks;

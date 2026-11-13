@@ -44,4 +44,4 @@ The browser regression verifies the audit tab, interactive SVG/table selection, 
 
 Verified on 2026-11-13: all 84 workspace tests, workspace/all-targets clippy with warnings denied, Rust formatting, app build, frontend typecheck/lint/production build, API regression, browser regression and validation of 14 portable skills against 89 MCP tools passed. Desktop and mobile screenshots were visually reviewed. The existing CSV link-button semantics on the touched audit page were corrected.
 
-Other M6 features, including audit comparison and scheduled re-audits (SA-13), remain open. M5's live-cloud acceptance is unchanged.
+Audit comparison and scheduled re-audits (SA-13) are documented in [audit comparison and schedules](20-audit-comparison-and-schedules.md). Other M6 features remain open. M5's live-cloud acceptance is unchanged.

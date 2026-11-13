@@ -2,7 +2,7 @@
 
 Free, open-source, self-hostable SEO platform — an alternative to Semrush, Ahrefs and OpenSEO that works **without paid API keys**.
 
-> Status: **M6 in progress: keyword clustering and internal link graphs delivered; M5 live-cloud acceptance pending**. Page-topic groups, internal link exploration and editorial suggestions now accompany M0–M5, with 89 MCP tools. Real Ollama and offline cloud contracts are verified; the three-live-engine gate needs Anthropic/Gemini credentials. See [keyword clustering](docs/18-keyword-clustering.md), [internal links](docs/19-internal-links.md), [M5 acceptance](docs/17-m5-acceptance.md) and the [roadmap](docs/07-roadmap.md).
+> Status: **M6 in progress; M5 live-cloud acceptance pending**. Keyword clustering, internal link graphs, audit comparisons and scheduled re-audits now accompany M0–M5, with 92 MCP tools. Real Ollama and offline cloud contracts are verified; the three-live-engine gate needs Anthropic/Gemini credentials. See [M6 audit features](docs/20-audit-comparison-and-schedules.md), [M5 acceptance](docs/17-m5-acceptance.md) and the [roadmap](docs/07-roadmap.md).
 
 M5 guides: [competitive research](docs/14-competitive-research.md), [backlinks](docs/15-backlink-snapshots.md), [AI visibility setup](docs/16-ai-visibility.md), [agent skills](plugins/seoseo/README.md). Domain/backlink coverage is a bounded sample, and traffic estimates require eligible monthly search counts. Unknown metrics stay null.
 

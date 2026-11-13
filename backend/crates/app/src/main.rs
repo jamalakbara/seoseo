@@ -116,6 +116,11 @@ async fn main() -> anyhow::Result<()> {
                     {
                         tracing::error!(%error,"AI scheduler failed");
                     }
+                    if let Err(error) =
+                        jobs::audit_schedule::schedule_due(&sched_pool, &sched_cfg).await
+                    {
+                        tracing::error!(%error,"audit scheduler failed");
+                    }
                     tokio::select! {_=tokio::time::sleep(std::time::Duration::from_secs(60))=>{},_=sched_rx.changed()=>break,}
                 }
             });
