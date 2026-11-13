@@ -28,6 +28,23 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(list_audit_pages))
         .routes(routes!(get_audit_page))
         .routes(routes!(list_issue_types))
+        .routes(routes!(get_internal_link_graph))
+}
+
+#[utoipa::path(get, path = "/projects/{project_id}/audits/{audit_id}/internal-links", tag = "audits",
+    params(("project_id" = Uuid, Path), ("audit_id" = Uuid, Path), domain::internal_links::InternalLinkQuery),
+    responses((status = OK, body = domain::internal_links::InternalLinkGraph), (status = NOT_FOUND, body = Problem),
+              (status = CONFLICT, body = Problem), (status = UNPROCESSABLE_ENTITY, body = Problem)),
+    security(("session" = []), ("bearer" = [])))]
+async fn get_internal_link_graph(
+    State(state): State<AppState>,
+    Auth(actor): Auth,
+    Path((project_id, audit_id)): Path<(Uuid, Uuid)>,
+    Query(query): Query<domain::internal_links::InternalLinkQuery>,
+) -> ApiResult<Json<domain::internal_links::InternalLinkGraph>> {
+    Ok(Json(
+        domain::internal_links::graph(&state.pool, &actor, project_id, audit_id, query).await?,
+    ))
 }
 
 fn policy(state: &AppState) -> crawler::UrlPolicy {

@@ -110,6 +110,29 @@ fn conv<T: DeserializeOwned>(params: &impl Serialize) -> AppResult<T> {
 #[tool_router]
 impl SeoSeoMcp {
     #[tool(
+        description = "Inspect a completed audit's internal link graph and conservative link suggestions from stored evidence. Read-only, no crawl or provider calls. Page counts cover the full stored audit; edges/suggestions use the bounded selected pages (limit 10-500, default 200). Self-links excluded, nofollow distinct, missing pages unknown. Review title/H1 overlap suggestions before editing."
+    )]
+    async fn get_internal_link_graph(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<InternalLinkParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::internal_links::graph(
+                    &self.pool,
+                    &a,
+                    id("project_id", &p.project_id)?,
+                    id("audit_id", &p.audit_id)?,
+                    conv(&p)?,
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
         description = "Group project keywords by shared top-ten SERP URLs using cached evidence from the last seven days. Read-only, no provider requests. Every pair must share min_shared URLs (2-10, default 3); providers/exactness are never mixed. Returns groups, ungrouped keywords, missing evidence and coverage. Review before assigning pages."
     )]
     async fn cluster_keywords(
@@ -2164,6 +2187,7 @@ mod tests {
             "whoami",
             "research_keywords",
             "cluster_keywords",
+            "get_internal_link_graph",
             "run_site_audit",
             "run_rank_tracker",
         ] {

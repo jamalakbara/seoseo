@@ -671,6 +671,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/audits/{audit_id}/internal-links": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_internal_link_graph"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/audits/{audit_id}/issues": {
         parameters: {
             query?: never;
@@ -2535,6 +2551,72 @@ export interface components {
         InstanceInfo: {
             auth_mode: string;
             version: string;
+        };
+        InternalLinkEdge: {
+            anchor_sample?: string | null;
+            /** @description True if at least one observed link for this pair does not carry nofollow. */
+            followed: boolean;
+            /** Format: int64 */
+            occurrences: number;
+            /** Format: uuid */
+            source_id: string;
+            /** Format: uuid */
+            target_id: string;
+        };
+        InternalLinkGraph: {
+            /** Format: uuid */
+            audit_id: string;
+            edges: components["schemas"]["InternalLinkEdge"][];
+            edges_truncated: boolean;
+            nodes: components["schemas"]["InternalLinkNode"][];
+            sampled_pages: number;
+            /** @description At most three sources per target, fifty suggestions overall. Manual review required. */
+            suggestions: components["schemas"]["InternalLinkSuggestion"][];
+            /** Format: int64 */
+            total_pages: number;
+            /** Format: int64 */
+            total_sample_edges: number;
+            warnings: string[];
+        };
+        InternalLinkNode: {
+            canonical_url?: string | null;
+            /** Format: int32 */
+            depth: number;
+            fetch_class: string;
+            /** Format: int64 */
+            followed_incoming_sources: number;
+            h1?: string | null;
+            header_canonical_url?: string | null;
+            /** Format: uuid */
+            id: string;
+            /**
+             * Format: int64
+             * @description Unique other source pages across the full stored audit, including nofollow.
+             */
+            incoming_sources: number;
+            is_indexable: boolean;
+            /**
+             * Format: int64
+             * @description Unique non-self destinations across the full stored audit.
+             */
+            outgoing_targets: number;
+            redirected: boolean;
+            /** Format: int32 */
+            status_code?: number | null;
+            /** @description Set by the domain service after checking status, canonicals and crawl scope. */
+            suggestion_eligible: boolean;
+            title?: string | null;
+            /** Format: int64 */
+            unfetched_targets: number;
+            url: string;
+        };
+        InternalLinkSuggestion: {
+            reason: string;
+            shared_terms: string[];
+            /** Format: uuid */
+            source_id: string;
+            /** Format: uuid */
+            target_id: string;
         };
         Invitation: {
             /** Format: date-time */
@@ -4959,6 +5041,55 @@ export interface operations {
                 };
                 content: {
                     "text/event-stream": string;
+                };
+            };
+        };
+    };
+    get_internal_link_graph: {
+        parameters: {
+            query?: {
+                /** @description First pages alphabetically to visualize (10–500; default 200). */
+                limit?: number | null;
+            };
+            header?: never;
+            path: {
+                project_id: string;
+                audit_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["InternalLinkGraph"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
                 };
             };
         };

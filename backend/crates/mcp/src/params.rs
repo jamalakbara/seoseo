@@ -5,6 +5,14 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct InternalLinkParams {
+    pub project_id: String,
+    pub audit_id: String,
+    /// Pages to visualize (10–500, default 200).
+    pub limit: Option<i64>,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct KeywordClusterParams {
     pub project_id: String,
     pub country: Option<String>,

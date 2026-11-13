@@ -11,6 +11,7 @@ pub mod competitive;
 pub mod dashboard;
 pub mod domain_age;
 pub mod gsc;
+pub mod internal_links;
 pub mod keywords;
 pub mod memory;
 pub mod onboarding;

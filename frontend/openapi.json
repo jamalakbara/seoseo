@@ -2043,6 +2043,93 @@
         ]
       }
     },
+    "/api/v1/projects/{project_id}/audits/{audit_id}/internal-links": {
+      "get": {
+        "tags": [
+          "audits"
+        ],
+        "operationId": "get_internal_link_graph",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "audit_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "First pages alphabetically to visualize (10–500; default 200).",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "format": "int64"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InternalLinkGraph"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/projects/{project_id}/audits/{audit_id}/issues": {
       "get": {
         "tags": [
@@ -9368,6 +9455,218 @@
           },
           "version": {
             "type": "string"
+          }
+        }
+      },
+      "InternalLinkEdge": {
+        "type": "object",
+        "required": [
+          "source_id",
+          "target_id",
+          "occurrences",
+          "followed"
+        ],
+        "properties": {
+          "anchor_sample": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "followed": {
+            "type": "boolean",
+            "description": "True if at least one observed link for this pair does not carry nofollow."
+          },
+          "occurrences": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "source_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "target_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "InternalLinkGraph": {
+        "type": "object",
+        "required": [
+          "audit_id",
+          "total_pages",
+          "sampled_pages",
+          "total_sample_edges",
+          "edges_truncated",
+          "nodes",
+          "edges",
+          "suggestions",
+          "warnings"
+        ],
+        "properties": {
+          "audit_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "edges": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InternalLinkEdge"
+            }
+          },
+          "edges_truncated": {
+            "type": "boolean"
+          },
+          "nodes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InternalLinkNode"
+            }
+          },
+          "sampled_pages": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "suggestions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InternalLinkSuggestion"
+            },
+            "description": "At most three sources per target, fifty suggestions overall. Manual review required."
+          },
+          "total_pages": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "total_sample_edges": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "InternalLinkNode": {
+        "type": "object",
+        "required": [
+          "id",
+          "url",
+          "fetch_class",
+          "is_indexable",
+          "depth",
+          "redirected",
+          "incoming_sources",
+          "followed_incoming_sources",
+          "outgoing_targets",
+          "unfetched_targets",
+          "suggestion_eligible"
+        ],
+        "properties": {
+          "canonical_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "depth": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fetch_class": {
+            "type": "string"
+          },
+          "followed_incoming_sources": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "h1": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "header_canonical_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "incoming_sources": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Unique other source pages across the full stored audit, including nofollow."
+          },
+          "is_indexable": {
+            "type": "boolean"
+          },
+          "outgoing_targets": {
+            "type": "integer",
+            "format": "int64",
+            "description": "Unique non-self destinations across the full stored audit."
+          },
+          "redirected": {
+            "type": "boolean"
+          },
+          "status_code": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "suggestion_eligible": {
+            "type": "boolean",
+            "description": "Set by the domain service after checking status, canonicals and crawl scope."
+          },
+          "title": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "unfetched_targets": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "InternalLinkSuggestion": {
+        "type": "object",
+        "required": [
+          "source_id",
+          "target_id",
+          "shared_terms",
+          "reason"
+        ],
+        "properties": {
+          "reason": {
+            "type": "string"
+          },
+          "shared_terms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "target_id": {
+            "type": "string",
+            "format": "uuid"
           }
         }
       },

@@ -16,6 +16,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AuditStatus, HealthScore, SeverityBadge, StatusCode } from "@/components/audit/health-score";
 import { ApiError, api, unwrap, type Schemas } from "@/lib/api/client";
+import { InternalLinksView } from "@/components/audit/internal-links";
 
 type Audit = Schemas["Audit"];
 
@@ -81,6 +82,7 @@ export default function AuditResultsPage() {
           <TabsList>
             <TabsTrigger value="issues">Issues</TabsTrigger>
             <TabsTrigger value="pages">Pages</TabsTrigger>
+            <TabsTrigger value="internal-links">Internal links</TabsTrigger>
           </TabsList>
           <TabsContent value="issues" className="pt-4">
             {done ? (
@@ -91,6 +93,9 @@ export default function AuditResultsPage() {
           </TabsContent>
           <TabsContent value="pages" className="pt-4">
             <PagesView projectId={projectId} auditId={auditId} live={!done} />
+          </TabsContent>
+          <TabsContent value="internal-links" className="pt-4">
+            {done ? <InternalLinksView projectId={projectId} auditId={auditId} /> : <p className="text-sm text-muted-foreground">The link graph is available after the audit completes.</p>}
           </TabsContent>
         </Tabs>
       ) : null}
@@ -160,6 +165,7 @@ function SummaryCard({ projectId, audit: a }: { projectId: string; audit: Audit 
               {a.status === "completed" && (
                 <Button
                   variant="outline"
+                  nativeButton={false}
                   render={<a href={`/api/v1/projects/${projectId}/audits/${a.id}/issues.csv`} />}
                 >
                   <Download /> CSV

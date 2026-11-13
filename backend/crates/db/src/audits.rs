@@ -848,6 +848,120 @@ pub struct LinkRow {
     pub status_code: Option<i32>,
 }
 
+#[derive(Debug, Clone, Serialize, ToSchema, sqlx::FromRow)]
+pub struct InternalLinkNode {
+    pub id: Uuid,
+    pub url: String,
+    pub title: Option<String>,
+    pub h1: Option<String>,
+    pub status_code: Option<i32>,
+    pub fetch_class: String,
+    pub is_indexable: bool,
+    pub depth: i32,
+    pub redirected: bool,
+    pub canonical_url: Option<String>,
+    pub header_canonical_url: Option<String>,
+    /// Unique other source pages across the full stored audit, including nofollow.
+    pub incoming_sources: i64,
+    pub followed_incoming_sources: i64,
+    /// Unique non-self destinations across the full stored audit.
+    pub outgoing_targets: i64,
+    pub unfetched_targets: i64,
+    /// Set by the domain service after checking status, canonicals and crawl scope.
+    pub suggestion_eligible: bool,
+}
+
+#[derive(Debug, Clone, Serialize, ToSchema, sqlx::FromRow)]
+pub struct InternalLinkEdge {
+    pub source_id: Uuid,
+    pub target_id: Uuid,
+    pub occurrences: i64,
+    /// True if at least one observed link for this pair does not carry nofollow.
+    pub followed: bool,
+    pub anchor_sample: Option<String>,
+}
+
+pub struct InternalLinkEvidence {
+    pub audit: Audit,
+    pub total_pages: i64,
+    pub nodes: Vec<InternalLinkNode>,
+    pub edges: Vec<InternalLinkEdge>,
+    pub total_sample_edges: i64,
+}
+
+/// Read an authorized, stable audit snapshot, keeping full-audit counts separate from
+/// the bounded visualization. No reads can observe half of a concurrent deletion.
+pub async fn internal_link_evidence(
+    pool: &PgPool,
+    org_id: Uuid,
+    project_id: Uuid,
+    audit_id: Uuid,
+    limit: i64,
+) -> AppResult<InternalLinkEvidence> {
+    let mut tx = pool.begin().await.map_err(internal)?;
+    sqlx::query("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ READ ONLY")
+        .execute(&mut *tx)
+        .await
+        .map_err(internal)?;
+    let audit: Audit = sqlx::query_as(concat!("SELECT ", audit_columns!(),
+        " FROM audits WHERE id=$1 AND project_id=$2 AND EXISTS(SELECT 1 FROM projects WHERE id=$2 AND organization_id=$3)"))
+        .bind(audit_id).bind(project_id).bind(org_id).fetch_optional(&mut *tx).await.map_err(internal)?
+        .ok_or(AppError::NotFound("audit"))?;
+    if audit.status != "completed" {
+        return Err(AppError::Conflict(
+            "wait for a completed audit before viewing its link graph".into(),
+        ));
+    }
+    let total_pages = sqlx::query_scalar("SELECT count(*) FROM audit_pages WHERE audit_id=$1")
+        .bind(audit_id)
+        .fetch_one(&mut *tx)
+        .await
+        .map_err(internal)?;
+    let nodes: Vec<InternalLinkNode> = sqlx::query_as(
+        "WITH selected AS (SELECT * FROM audit_pages WHERE audit_id=$1 ORDER BY url,id LIMIT $2)
+         SELECT p.id,p.url,left(p.title,300) AS title,left(p.h1,300) AS h1,p.status_code,p.fetch_class,p.is_indexable,p.depth,
+           jsonb_array_length(p.redirect_chain)>0 AS redirected,p.canonical_url,p.header_canonical_url,
+           (SELECT count(DISTINCT l.from_page_id) FROM audit_links l WHERE l.audit_id=$1 AND l.to_url_hash=p.url_hash AND l.from_page_id<>p.id) AS incoming_sources,
+           (SELECT count(DISTINCT l.from_page_id) FROM audit_links l WHERE l.audit_id=$1 AND l.to_url_hash=p.url_hash AND l.from_page_id<>p.id AND NOT l.nofollow) AS followed_incoming_sources,
+           (SELECT count(DISTINCT l.to_url_hash) FROM audit_links l WHERE l.audit_id=$1 AND l.from_page_id=p.id AND l.to_url_hash<>p.url_hash) AS outgoing_targets,
+           (SELECT count(DISTINCT l.to_url_hash) FROM audit_links l WHERE l.audit_id=$1 AND l.from_page_id=p.id AND NOT EXISTS(SELECT 1 FROM audit_pages t WHERE t.audit_id=$1 AND t.url_hash=l.to_url_hash)) AS unfetched_targets,
+           false AS suggestion_eligible
+         FROM selected p ORDER BY p.url,p.id")
+        .bind(audit_id).bind(limit).fetch_all(&mut *tx).await.map_err(internal)?;
+    let ids: Vec<Uuid> = nodes.iter().map(|n| n.id).collect();
+    let total_sample_edges = sqlx::query_scalar(
+        "SELECT count(*) FROM (SELECT l.from_page_id,t.id FROM audit_links l
+         JOIN audit_pages t ON t.audit_id=$1 AND t.url_hash=l.to_url_hash
+         WHERE l.audit_id=$1 AND l.from_page_id=ANY($2) AND t.id=ANY($2) AND l.from_page_id<>t.id
+         GROUP BY l.from_page_id,t.id) pairs",
+    )
+    .bind(audit_id)
+    .bind(&ids)
+    .fetch_one(&mut *tx)
+    .await
+    .map_err(internal)?;
+    let edges = sqlx::query_as(
+        "SELECT l.from_page_id AS source_id,t.id AS target_id,count(*) AS occurrences,
+           bool_or(NOT l.nofollow) AS followed,min(nullif(left(l.anchor,200),'')) AS anchor_sample
+         FROM audit_links l JOIN audit_pages t ON t.audit_id=$1 AND t.url_hash=l.to_url_hash
+         WHERE l.audit_id=$1 AND l.from_page_id=ANY($2) AND t.id=ANY($2) AND l.from_page_id<>t.id
+         GROUP BY l.from_page_id,t.id ORDER BY l.from_page_id,t.id LIMIT 5000",
+    )
+    .bind(audit_id)
+    .bind(&ids)
+    .fetch_all(&mut *tx)
+    .await
+    .map_err(internal)?;
+    tx.commit().await.map_err(internal)?;
+    Ok(InternalLinkEvidence {
+        audit,
+        total_pages,
+        nodes,
+        edges,
+        total_sample_edges,
+    })
+}
+
 /// Links out of a page (with the target's status when it was crawled).
 pub async fn outlinks(pool: &PgPool, audit_id: Uuid, page_id: Uuid) -> AppResult<Vec<LinkRow>> {
     sqlx::query_as(
