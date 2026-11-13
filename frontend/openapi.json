@@ -3958,6 +3958,98 @@
         ]
       }
     },
+    "/api/v1/projects/{project_id}/keyword-clusters": {
+      "get": {
+        "tags": [
+          "keywords"
+        ],
+        "summary": "Read-only page-planning suggestions from this project's cached top-ten search results.",
+        "operationId": "cluster_keywords",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "country",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "language",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": [
+                "string",
+                "null"
+              ]
+            }
+          },
+          {
+            "name": "min_shared",
+            "in": "query",
+            "description": "Minimum shared top-ten URLs for every pair in a group (2–10; default 3).",
+            "required": false,
+            "schema": {
+              "type": [
+                "integer",
+                "null"
+              ],
+              "minimum": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/KeywordClusters"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/projects/{project_id}/keyword-research": {
       "get": {
         "tags": [
@@ -8045,6 +8137,39 @@
           }
         }
       },
+      "ClusterKeyword": {
+        "type": "object",
+        "required": [
+          "keyword",
+          "provider",
+          "exact",
+          "fetched_at",
+          "urls"
+        ],
+        "properties": {
+          "exact": {
+            "type": "boolean"
+          },
+          "fetched_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "keyword": {
+            "type": "string"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "urls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Distinct HTTP(S) URLs in positions 1–10, with fragments removed.",
+            "uniqueItems": true
+          }
+        }
+      },
       "CompetitiveVolumeInput": {
         "type": "object",
         "required": [
@@ -9590,6 +9715,94 @@
           },
           "url": {
             "type": "string"
+          }
+        }
+      },
+      "KeywordCluster": {
+        "type": "object",
+        "required": [
+          "representative",
+          "minimum_shared_urls",
+          "keywords"
+        ],
+        "properties": {
+          "keywords": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClusterKeyword"
+            }
+          },
+          "minimum_shared_urls": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "representative": {
+            "type": "string",
+            "description": "Stable alphabetical representative; not a volume or business-priority recommendation."
+          }
+        }
+      },
+      "KeywordClusters": {
+        "type": "object",
+        "required": [
+          "country",
+          "language",
+          "min_shared",
+          "scope_keywords",
+          "sampled_keywords",
+          "eligible_keywords",
+          "clusters",
+          "ungrouped",
+          "unavailable",
+          "warnings"
+        ],
+        "properties": {
+          "clusters": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/KeywordCluster"
+            }
+          },
+          "country": {
+            "type": "string"
+          },
+          "eligible_keywords": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "language": {
+            "type": "string"
+          },
+          "min_shared": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "sampled_keywords": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "scope_keywords": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "unavailable": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UnavailableClusterKeyword"
+            }
+          },
+          "ungrouped": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ClusterKeyword"
+            },
+            "description": "Eligible keywords that could not join a group; not proof of distinct intent."
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
@@ -12784,6 +12997,22 @@
           },
           "tracker": {
             "$ref": "#/components/schemas/RankTracker"
+          }
+        }
+      },
+      "UnavailableClusterKeyword": {
+        "type": "object",
+        "required": [
+          "keyword",
+          "reason"
+        ],
+        "properties": {
+          "keyword": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string",
+            "description": "no_recent_snapshot | insufficient_results"
           }
         }
       },

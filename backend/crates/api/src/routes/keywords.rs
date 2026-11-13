@@ -30,6 +30,23 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(export_saved_keywords))
         .routes(routes!(analyze_serp))
         .routes(routes!(refresh_saved_keywords))
+        .routes(routes!(cluster_keywords))
+}
+
+/// Read-only page-planning suggestions from this project's cached top-ten search results.
+#[utoipa::path(get, path = "/projects/{project_id}/keyword-clusters", tag = "keywords",
+    params(("project_id" = Uuid, Path), domain::clustering::ClusterQuery),
+    responses((status = OK, body = domain::clustering::KeywordClusters), (status = NOT_FOUND, body = Problem),
+              (status = UNPROCESSABLE_ENTITY, body = Problem)), security(("session" = []), ("bearer" = [])))]
+async fn cluster_keywords(
+    State(state): State<AppState>,
+    Auth(actor): Auth,
+    Path(project_id): Path<Uuid>,
+    Query(query): Query<domain::clustering::ClusterQuery>,
+) -> ApiResult<Json<domain::clustering::KeywordClusters>> {
+    Ok(Json(
+        domain::clustering::clusters(&state.pool, &actor, project_id, query).await?,
+    ))
 }
 
 #[utoipa::path(get, path = "/projects/{project_id}/keyword-research", tag = "keywords",

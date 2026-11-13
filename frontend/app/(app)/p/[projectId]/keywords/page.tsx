@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ResearchStatus } from "@/components/keywords/metrics";
+import { KeywordClusterCard } from "@/components/keywords/clusters";
 import { ApiError, api, unwrap } from "@/lib/api/client";
 import { countryName } from "@/lib/markets";
 import { useProject } from "@/lib/queries";
@@ -39,10 +40,11 @@ export default function KeywordsPage() {
           project.data ? `${countryName(project.data.country_code)} · ${project.data.language_code}` : "…"
         }
       />
+      {project.data && <KeywordClusterCard key={`${projectId}:${project.data.country_code}:${project.data.language_code}`} projectId={projectId} country={project.data.country_code} language={project.data.language_code} />}
       <Card>
         <CardHeader className="flex flex-row items-center justify-between">
           <CardTitle>Research history</CardTitle>
-          <Button variant="outline" size="sm" render={<Link href={`/p/${projectId}/keywords/saved`} />}>
+          <Button variant="outline" size="sm" nativeButton={false} render={<Link href={`/p/${projectId}/keywords/saved`} />}>
             <Bookmark /> Saved keywords
           </Button>
         </CardHeader>

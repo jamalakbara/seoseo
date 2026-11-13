@@ -6,7 +6,7 @@ Connect the client to your instance's `/mcp` endpoint with a workspace API key o
 
 The skill names use a `seoseo-` prefix to avoid collisions with OpenSEO skills. Invoke a workflow by its full name, such as `$seoseo-keyword-research` or `$seoseo-ai-visibility-audit`. The runtime MCP schemas remain the source of truth for field names and capabilities.
 
-Available categories: site audit, keyword research, keyword clustering/page mapping, competitor analysis, competitive landscape, link prospecting, local SEO evidence review, AI prompt research, AI visibility audit, project setup, HTML reporting, coaching, backlink monitoring and rank tracking. Local Maps/grid functionality and automatic clustering persistence remain M6 work; those skills explicitly limit their current behavior to available evidence rather than inventing tools.
+Available categories: site audit, keyword research, keyword clustering/page mapping, competitor analysis, competitive landscape, link prospecting, local SEO evidence review, AI prompt research, AI visibility audit, project setup, HTML reporting, coaching, backlink monitoring and rank tracking. Keyword clustering uses the read-only cached-SERP tool; reviewed page assignments are returned to the user or a requested report. Local Maps/grid functionality remains M6 work; those skills explicitly limit their current behavior to available evidence rather than inventing tools.
 
 Validate the package with `python scripts/validate-agent-skills.py` from the repository root. It checks frontmatter, display metadata and tool references against the actual MCP implementation. Skills retain the user's existing authorization; they do not independently authorize messages, sharing, recurring cloud usage or unrelated mutations.
 

@@ -161,6 +161,10 @@ Manual AI visibility adds eight model/tracker/run tools (80 tools total), model 
 
 MCP now exposes 66 tools: the previous 49 plus property discovery/selection, nine Analytics report tools, IndexNow setup/verification/submission, website synthesis and link-observation list/save. OAuth discovery/DCR/PKCE/consent and rotating resource-bound tokens complement existing API keys. Feature endpoints and protocol details are documented in [M4 integrations and OAuth](13-m4-integrations-and-oauth.md).
 
+### M6 keyword clustering (88 tools)
+
+`GET /projects/{project_id}/keyword-clusters` and MCP `cluster_keywords` return conservative page-topic suggestions from the project's recent cached SERP evidence. Country/language default to the project; min_shared is 2–10 (default 3). No provider requests or database writes occur. See [keyword clustering](18-keyword-clustering.md) for coverage, grouping and export semantics.
+
 ### M5 completion (87 tools)
 
 The runtime MCP schemas and generated OpenAPI are authoritative. Added `import_competitive_search_volumes`; `discover_backlinks`, `list_backlink_discoveries`, `get_dashboard_backlinks`; `set_ai_visibility_schedule`, `research_ai_visibility_prompts`, `get_ai_visibility_summary`. Domain overview accepts `limit`/`offset`. REST paths and payloads are documented in guides 14–16. Fourteen portable skills ship in `plugins/seoseo/skills`; see its install guide. Cloud adapters are fixture-verified; the three-live-engine acceptance gate remains pending credentials.

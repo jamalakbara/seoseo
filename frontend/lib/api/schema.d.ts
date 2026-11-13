@@ -1186,6 +1186,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/keyword-clusters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Read-only page-planning suggestions from this project's cached top-ten search results. */
+        get: operations["cluster_keywords"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/keyword-research": {
         parameters: {
             query?: never;
@@ -2192,6 +2209,15 @@ export interface components {
             label: string;
             skipped: boolean;
         };
+        ClusterKeyword: {
+            exact: boolean;
+            /** Format: date-time */
+            fetched_at: string;
+            keyword: string;
+            provider: string;
+            /** @description Distinct HTTP(S) URLs in positions 1–10, with fragments removed. */
+            urls: string[];
+        };
         CompetitiveVolumeInput: {
             country?: string | null;
             language?: string | null;
@@ -2617,6 +2643,25 @@ export interface components {
             role: string;
             topic?: string | null;
             url: string;
+        };
+        KeywordCluster: {
+            keywords: components["schemas"]["ClusterKeyword"][];
+            minimum_shared_urls: number;
+            /** @description Stable alphabetical representative; not a volume or business-priority recommendation. */
+            representative: string;
+        };
+        KeywordClusters: {
+            clusters: components["schemas"]["KeywordCluster"][];
+            country: string;
+            eligible_keywords: number;
+            language: string;
+            min_shared: number;
+            sampled_keywords: number;
+            scope_keywords: number;
+            unavailable: components["schemas"]["UnavailableClusterKeyword"][];
+            /** @description Eligible keywords that could not join a group; not proof of distinct intent. */
+            ungrouped: components["schemas"]["ClusterKeyword"][];
+            warnings: string[];
         };
         KeywordDashboard: {
             error?: string | null;
@@ -3593,6 +3638,11 @@ export interface components {
             /** @description Recent runs, newest first. */
             runs: components["schemas"]["RankRun"][];
             tracker: components["schemas"]["RankTracker"];
+        };
+        UnavailableClusterKeyword: {
+            keyword: string;
+            /** @description no_recent_snapshot | insufficient_results */
+            reason: string;
         };
         UpdateProjectContextInput: {
             competitors?: components["schemas"]["CompetitorInput"][];
@@ -5860,6 +5910,48 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["IndexNowResult"];
+                };
+            };
+        };
+    };
+    cluster_keywords: {
+        parameters: {
+            query?: {
+                country?: string | null;
+                language?: string | null;
+                /** @description Minimum shared top-ten URLs for every pair in a group (2–10; default 3). */
+                min_shared?: number | null;
+            };
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["KeywordClusters"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
                 };
             };
         };

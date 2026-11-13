@@ -24,4 +24,4 @@ Free, open-source, self-hostable SEO platform. Rust (axum) backend · Next.js 16
 Reference source: `reference/open-seo/` (git-ignored clone; re-clone with `git clone https://github.com/every-app/open-seo reference/open-seo`).
 Upstream design records worth re-reading before building a feature: `reference/open-seo/docs/maintainers/specs/00xx-*.md`.
 
-M5 implementation and verification: [Acceptance record](17-m5-acceptance.md). Portable [agent workflows](../plugins/seoseo/README.md) contain 14 skills for the self-hosted MCP server.
+M5 implementation and verification: [Acceptance record](17-m5-acceptance.md). M6 starts with [SERP keyword clustering](18-keyword-clustering.md). Portable [agent workflows](../plugins/seoseo/README.md) contain 14 skills for the self-hosted MCP server.

@@ -6,6 +6,7 @@ pub mod api_keys;
 pub mod audits;
 pub mod auth;
 pub mod backlinks;
+pub mod clustering;
 pub mod competitive;
 pub mod dashboard;
 pub mod domain_age;

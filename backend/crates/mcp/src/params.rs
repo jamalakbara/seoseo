@@ -5,6 +5,15 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct KeywordClusterParams {
+    pub project_id: String,
+    pub country: Option<String>,
+    pub language: Option<String>,
+    /// Minimum shared URLs for every pair (2–10, default 3).
+    pub min_shared: Option<usize>,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct BacklinkDiscoveryParams {
     pub project_id: String,
     pub expected_domain: String,

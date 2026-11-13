@@ -110,6 +110,28 @@ fn conv<T: DeserializeOwned>(params: &impl Serialize) -> AppResult<T> {
 #[tool_router]
 impl SeoSeoMcp {
     #[tool(
+        description = "Group project keywords by shared top-ten SERP URLs using cached evidence from the last seven days. Read-only, no provider requests. Every pair must share min_shared URLs (2-10, default 3); providers/exactness are never mixed. Returns groups, ungrouped keywords, missing evidence and coverage. Review before assigning pages."
+    )]
+    async fn cluster_keywords(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<KeywordClusterParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::clustering::clusters(
+                    &self.pool,
+                    &a,
+                    id("project_id", &p.project_id)?,
+                    conv(&p)?,
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
         description = "List accessible GA4 properties with pagination. Needs admin and a separate Analytics grant; pass next_page_token as page_token."
     )]
     async fn list_google_analytics_properties(
@@ -2141,6 +2163,7 @@ mod tests {
             "save_project_website_setup",
             "whoami",
             "research_keywords",
+            "cluster_keywords",
             "run_site_audit",
             "run_rank_tracker",
         ] {

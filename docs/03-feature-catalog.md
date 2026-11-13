@@ -2,7 +2,7 @@
 
 Every feature with an ID, OpenSEO parity reference, priority, data source, and milestone.
 Priority: **P0** MVP · **P1** parity · **P2** beyond parity · **P3** later.
-Status column is updated as we build (`todo` / `wip` / `done`). Last update: 2026-11-13 (M5 competitive research, RDAP, imported backlinks and manual AI model comparisons).
+Status column is updated as we build (`todo` / `wip` / `done`). Last update: 2026-11-13 (M6 KW-11 cached SERP keyword clustering, REST/UI/CSV/MCP; M5 live-cloud acceptance remains pending).
 
 ## Workspace & identity
 | ID | Feature | OpenSEO ref | Pri | Data | MS | Status |
@@ -39,7 +39,7 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | KW-08 | Filters/sort/paging/export | keyword table | P0 | — | M2 | done (search, intent, questions filter, sort, paging, CSV; API also filters popularity/kd/volume/words) |
 | KW-09 | Saved keywords + tags + refresh + export | saved-keywords | P0 | — | M2 | done (save/manual, tags, CSV, per-keyword SERP refresh and durable bulk refresh with progress; available demand estimates are refreshed through the pageview cache) |
 | KW-10 | Local (city) volume context | spec 0008 | P2 | Trends geo | M6 | todo |
-| KW-11 | Keyword clustering (SERP overlap) | skill only | P2 | SERP | M6 | todo |
+| KW-11 | Keyword clustering (SERP overlap) | skill only | P2 | SERP | M6 | done (cached top-ten URL overlap, complete-link groups, provider/market isolation, coverage, REST/UI/CSV/MCP; reviewed page assignments remain manual) |
 | KW-12 | CPC/competition (BYOK only) | google_ads | P3 | BYOK | M8 | todo |
 
 ## Competitive research
@@ -130,7 +130,7 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 ## MCP / API / skills
 | MC-01 | MCP streamable HTTP + API-key auth | mcp server | P0 | — | M3 | done (stateless Streamable HTTP at /mcp, API-key or session auth, Host allow-list) |
 | MC-02 | MCP OAuth 2.1 (DCR, PKCE, consent, org-bound) | workers-oauth-provider | P1 | — | M4 | done |
-| MC-03 | Tool parity (~90 tools) | mcp/tools | P1 | — | M3–M6 | wip (43 tools: existing M3 set plus project memory and report/template/sharing tools) |
+| MC-03 | Tool parity (~90 tools) | mcp/tools | P1 | — | M3–M6 | wip (88 tools including M5 research and M6 keyword clustering; remaining parity depends on later features) |
 | MC-04 | MCP Apps widgets (SERP/GSC views) | widget-tools | P3 | — | M8 | todo |
 | MC-05 | Agent skills (12 ported + new) | plugins/seoseo/skills | P1 | — | M5 | done (14 self-contained SeoSeo-prefixed skills, install guide, display metadata and tool validation) |
 | AP-01 | REST API + OpenAPI 3.1 (utoipa) | — | P0 | — | M0 | done |
