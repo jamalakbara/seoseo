@@ -1,6 +1,8 @@
 "use client";
 
 import { BacklinkDiscovery } from "@/components/m5-research";
+import { LinkIntersectCard } from "@/components/link-intersect";
+import { useClientReady } from "@/lib/use-client-ready";
 import { useState } from "react";
 import { useParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -40,6 +42,7 @@ const EXAMPLE = JSON.stringify(
 );
 
 export default function BacklinksPage() {
+  const ready = useClientReady();
   const { projectId } = useParams<{ projectId: string }>();
   const project = useProject(projectId);
   const me = useMe();
@@ -79,8 +82,10 @@ export default function BacklinksPage() {
       setSelectedId(null);
     },
   });
+  if (!ready) return <p role="status" className="text-sm text-muted-foreground">Loading backlink evidence…</p>;
   return (
-    <div className="grid gap-6">
+    <div className="grid min-w-0 grid-cols-1 gap-6">
+      {project.data?.domain&&<LinkIntersectCard key={`link-intersect:${projectId}:${project.data.domain}`} projectId={projectId} domain={project.data.domain}/>}
       <Card>
         <CardHeader>
           <CardTitle>Backlink evidence</CardTitle>
@@ -115,7 +120,7 @@ export default function BacklinksPage() {
       </Card>
       {project.data?.domain && (
         <BacklinkDiscovery
-          key={`${projectId}:${project.data.domain}`}
+          key={`discovery:${projectId}:${project.data.domain}`}
           projectId={projectId}
           domain={project.data.domain}
           writable={!!writable}
@@ -123,7 +128,7 @@ export default function BacklinksPage() {
       )}
       {writable && project.data?.domain && (
         <ImportCard
-          key={`${projectId}:${project.data.domain}`}
+          key={`import:${projectId}:${project.data.domain}`}
           projectId={projectId}
           domain={project.data.domain}
           onImported={(s) => {

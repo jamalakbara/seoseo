@@ -15,8 +15,31 @@ pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::new()
         .routes(routes!(get_domain_overview))
         .routes(routes!(get_cannibalization_flags))
+        .routes(routes!(detect_technologies))
         .routes(routes!(lookup_domain_age))
         .routes(routes!(import_competitive_volumes))
+}
+
+#[utoipa::path(post,path="/projects/{project_id}/technology",tag="competitive",params(("project_id"=Uuid,Path)),request_body=domain::technology::TechnologyInput,
+    responses((status=OK,body=domain::technology::TechnologyResult),(status=NOT_FOUND,body=Problem),(status=CONFLICT,body=Problem),(status=UNPROCESSABLE_ENTITY,body=Problem)),security(("session"=[]),("bearer"=[])))]
+async fn detect_technologies(
+    State(s): State<AppState>,
+    Auth(a): Auth,
+    Path(pid): Path<Uuid>,
+    Json(input): Json<domain::technology::TechnologyInput>,
+) -> ApiResult<Json<domain::technology::TechnologyResult>> {
+    Ok(Json(
+        domain::technology::inspect(
+            &s.pool,
+            &a,
+            pid,
+            crawler::UrlPolicy {
+                allow_private: s.cfg.crawler_allow_private,
+            },
+            input,
+        )
+        .await?,
+    ))
 }
 
 #[utoipa::path(get,path="/projects/{project_id}/cannibalization",tag="competitive",params(("project_id"=Uuid,Path),domain::cannibalization::CannibalizationQuery),

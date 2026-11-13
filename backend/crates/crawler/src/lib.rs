@@ -8,6 +8,7 @@ pub mod policy;
 pub mod robots;
 pub mod rules;
 pub mod sitemap;
+pub mod technology;
 pub mod urls;
 
 pub use extract::PageFacts;

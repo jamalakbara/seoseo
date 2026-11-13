@@ -161,6 +161,10 @@ Manual AI visibility adds eight model/tracker/run tools (80 tools total), model 
 
 MCP now exposes 66 tools: the previous 49 plus property discovery/selection, nine Analytics report tools, IndexNow setup/verification/submission, website synthesis and link-observation list/save. OAuth discovery/DCR/PKCE/consent and rotating resource-bound tokens complement existing API keys. Feature endpoints and protocol details are documented in [M4 integrations and OAuth](13-m4-integrations-and-oauth.md).
 
+### M6 technology and prospects (97 tools)
+
+`POST /projects/{project_id}/technology` / `detect_technologies` perform one explicit guarded robots/homepage markup lookup with 24h caching and durable cooldowns. `POST /projects/{project_id}/link-intersect` / `find_link_intersect` compare accessible current-website project samples, with bounded latest-dataset evidence and no discovery/outreach. See [technology and prospects](22-technology-and-link-prospects.md).
+
 ### M6 stored evidence research (95 tools)
 
 `GET /projects/{project_id}/cannibalization` / `get_cannibalization_flags` return same-snapshot multi-URL candidates with source/coverage. `GET /projects/{project_id}/ai-index` / `lookup_ai_brand`, `explore_ai_prompts` search the current website's retained model evidence with frozen market and successful/failed/unchecked denominators. Both are read-only and make no provider calls. See [stored evidence research](21-cannibalization-and-ai-index.md).

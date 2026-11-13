@@ -1353,6 +1353,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/link-intersect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["find_link_intersect"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/links": {
         parameters: {
             query?: never;
@@ -1755,6 +1771,22 @@ export interface paths {
          *     difficulty and intent. Cached pages are reused for 7 days unless `refresh` is set.
          */
         post: operations["analyze_serp"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/technology": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["detect_technologies"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2554,6 +2586,11 @@ export interface components {
             /** Format: int64 */
             deleted: number;
         };
+        DetectedTechnology: {
+            category: string;
+            name: string;
+            signals: string[];
+        };
         DiscoveryConfig: {
             country: string;
             /** Format: uuid */
@@ -3052,6 +3089,40 @@ export interface components {
             state: string;
             target_url: string;
         };
+        LinkIntersect: {
+            domain: string;
+            items: components["schemas"]["LinkProspect"][];
+            /** Format: int64 */
+            min_competitors: number;
+            /** Format: uuid */
+            project_id: string;
+            scopes: components["schemas"]["LinkIntersectScope"][];
+            /** Format: int64 */
+            total_matching: number;
+            warnings: string[];
+        };
+        LinkIntersectInput: {
+            competitor_project_ids: string[];
+            /** Format: int64 */
+            limit?: number | null;
+            /** Format: int64 */
+            min_competitors?: number | null;
+            /** Format: int64 */
+            offset?: number | null;
+        };
+        LinkIntersectScope: {
+            /** Format: int64 */
+            available_datasets: number;
+            domain: string;
+            /** Format: date-time */
+            newest_snapshot_at?: string | null;
+            /** Format: date-time */
+            oldest_snapshot_at?: string | null;
+            /** Format: uuid */
+            project_id: string;
+            /** Format: int64 */
+            sampled_datasets: number;
+        };
         LinkObservation: {
             /** Format: uuid */
             id: string;
@@ -3060,6 +3131,21 @@ export interface components {
             source_url: string;
             state: string;
             target_url: string;
+        };
+        LinkProspect: {
+            /** Format: int64 */
+            competitor_count: number;
+            competitor_project_ids: string[];
+            /** Format: int64 */
+            imported_links: number;
+            /** Format: date-time */
+            newest_snapshot_at: string;
+            /** Format: int64 */
+            observed_links: number;
+            sample_source_urls: string[];
+            source_domain: string;
+            /** Format: int64 */
+            verified_links: number;
         };
         LinkRow: {
             anchor?: string | null;
@@ -3935,6 +4021,24 @@ export interface components {
         SwitchOrgInput: {
             /** Format: uuid */
             organization_id: string;
+        };
+        TechnologyInput: {
+            /** @description Homepage URL or host; defaults to the project HTTPS homepage. */
+            url?: string | null;
+        };
+        TechnologyRecord: {
+            /** Format: date-time */
+            checked_at: string;
+            /** Format: int32 */
+            http_status?: number | null;
+            note: string;
+            status: string;
+            technologies: components["schemas"]["DetectedTechnology"][];
+            url: string;
+        };
+        TechnologyResult: {
+            cached: boolean;
+            record: components["schemas"]["TechnologyRecord"];
         };
         TopPage: {
             /** Format: int32 */
@@ -6710,6 +6814,55 @@ export interface operations {
             };
         };
     };
+    find_link_intersect: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LinkIntersectInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LinkIntersect"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
     link_list_route: {
         parameters: {
             query?: never;
@@ -7670,6 +7823,55 @@ export interface operations {
                 };
             };
             503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    detect_technologies: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TechnologyInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TechnologyResult"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };

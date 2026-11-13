@@ -2,7 +2,7 @@
 
 Every feature with an ID, OpenSEO parity reference, priority, data source, and milestone.
 Priority: **P0** MVP · **P1** parity · **P2** beyond parity · **P3** later.
-Status column is updated as we build (`todo` / `wip` / `done`). Last update: 2026-11-13 (M6 RT-07 multi-URL flags and AI-05 own prompt/brand index; M5 live-cloud acceptance remains pending).
+Status column is updated as we build (`todo` / `wip` / `done`). Last update: 2026-11-13 (M6 DO-06 homepage technology hints and BL-07 sampled link intersect; M5 live-cloud acceptance remains pending).
 
 ## Workspace & identity
 | ID | Feature | OpenSEO ref | Pri | Data | MS | Status |
@@ -48,7 +48,7 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | DO-03 | Top pages | relevant_pages | P1 | SERP index | M5 | done (best-result URLs and keyword counts in bounded sample) |
 | DO-04 | SERP competitors | serp_competitors | P1 | SERP index | M5 | done (shared observed keyword competitors) |
 | DO-05 | Domain keyword suggestions / keyword gap | getDomainKeywordSuggestions | P1 | SERP index | M5 | done (sampled gaps against project website) |
-| DO-06 | Tech stack detection | (new) | P2 | fingerprints | M6 | todo |
+| DO-06 | Tech stack detection | (new) | P2 | fingerprints | M6 | done (explicit guarded/robots-respecting homepage markup hints for WordPress/Next.js/Nuxt/Shopify, 24h cache/cooldowns, REST/UI/MCP; hidden stack and versions unknown) |
 | DO-07 | Domain age (RDAP) | free tool | P1 | RDAP | M5 | done (on-demand HTTPS registry metadata, 24h cache, REST/UI/MCP; unknown dates remain null) |
 
 ## Backlinks
@@ -58,7 +58,7 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | BL-04 | Top linked pages, anchors | domain_pages_summary | P1 | guarded crawl + import | M5 | done (current sample target-page and anchor groups) |
 | BL-05 | Spam score | dashboard filter | P1 | computed | M5 | done (explainable 0-100 HTML heuristic and scored-pair coverage; unverified stays null) |
 | BL-06 | New/lost via snapshot diff | backlink_snapshots | P1 | — | M5 | done (atomic source/dataset/domain diffs; inconclusive crawls retain unconfirmed pairs) |
-| BL-07 | Link prospecting (link intersect) | skill link-prospecting | P2 | CC | M6 | todo |
+| BL-07 | Link prospecting (link intersect) | skill link-prospecting | P2 | stored backlink samples | M6 | done (current-website sample intersect across 1–5 accessible competitor projects, latest dataset/source snapshots, bounded coverage/provenance, REST/UI/MCP; no exhaustive index or outreach) |
 | BL-08 | Domain authority "SR" from CC host graph | Ahrefs DR lookup | P0 | CC host graph | M2 | done (top-N import of Common Crawl domain ranks, SR = log-scaled harmonic rank, lookup API + UI) |
 
 ## Rank tracking
@@ -130,7 +130,7 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 ## MCP / API / skills
 | MC-01 | MCP streamable HTTP + API-key auth | mcp server | P0 | — | M3 | done (stateless Streamable HTTP at /mcp, API-key or session auth, Host allow-list) |
 | MC-02 | MCP OAuth 2.1 (DCR, PKCE, consent, org-bound) | workers-oauth-provider | P1 | — | M4 | done |
-| MC-03 | Tool parity (~90 tools) | mcp/tools | P1 | — | M3–M6 | wip (95 tools including M6 cannibalization flags and own AI prompt/brand index; remaining parity depends on later features) |
+| MC-03 | Tool parity (~90 tools) | mcp/tools | P1 | — | M3–M6 | wip (97 tools including M6 technology hints and sampled link intersect; remaining parity depends on later features) |
 | MC-04 | MCP Apps widgets (SERP/GSC views) | widget-tools | P3 | — | M8 | todo |
 | MC-05 | Agent skills (12 ported + new) | plugins/seoseo/skills | P1 | — | M5 | done (14 self-contained SeoSeo-prefixed skills, install guide, display metadata and tool validation) |
 | AP-01 | REST API + OpenAPI 3.1 (utoipa) | — | P0 | — | M0 | done |

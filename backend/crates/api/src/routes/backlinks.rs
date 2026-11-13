@@ -15,10 +15,24 @@ use uuid::Uuid;
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::new()
+        .routes(routes!(find_link_intersect))
         .routes(routes!(list_backlink_snapshots, import_backlink_snapshot))
         .routes(routes!(get_backlink_snapshot, delete_backlink_snapshot))
         .routes(routes!(list_backlink_discoveries, start_backlink_discovery))
         .routes(routes!(dashboard_backlinks))
+}
+
+#[utoipa::path(post,path="/projects/{project_id}/link-intersect",tag="backlinks",params(("project_id"=Uuid,Path)),request_body=domain::link_intersect::LinkIntersectInput,
+    responses((status=OK,body=domain::link_intersect::LinkIntersect),(status=NOT_FOUND,body=Problem),(status=CONFLICT,body=Problem),(status=UNPROCESSABLE_ENTITY,body=Problem)),security(("session"=[]),("bearer"=[])))]
+async fn find_link_intersect(
+    State(s): State<AppState>,
+    Auth(a): Auth,
+    Path(pid): Path<Uuid>,
+    Json(input): Json<domain::link_intersect::LinkIntersectInput>,
+) -> ApiResult<Json<domain::link_intersect::LinkIntersect>> {
+    Ok(Json(
+        domain::link_intersect::inspect(&s.pool, &a, pid, input).await?,
+    ))
 }
 
 #[utoipa::path(get,path="/projects/{project_id}/backlink-discoveries",tag="backlinks",params(("project_id"=Uuid,Path)),responses((status=OK,body=Vec<db::backlink_discovery::BacklinkDiscovery>)),security(("session"=[]),("bearer"=[])))]

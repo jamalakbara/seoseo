@@ -5,6 +5,20 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct TechnologyParams {
+    pub project_id: String,
+    pub url: Option<String>,
+}
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct LinkIntersectParams {
+    pub project_id: String,
+    pub competitor_project_ids: Vec<String>,
+    pub min_competitors: Option<i64>,
+    pub limit: Option<i64>,
+    pub offset: Option<i64>,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct CannibalizationParams {
     pub project_id: String,
     pub country: Option<String>,

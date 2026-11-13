@@ -1,6 +1,8 @@
 "use client";
 
 import { CompetitiveVolumes } from "@/components/m5-research";
+import { TechnologyCard } from "@/components/technology";
+import { useClientReady } from "@/lib/use-client-ready";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useState } from "react";
@@ -27,6 +29,7 @@ import {
 } from "@/components/ui/table";
 
 export default function CompetitivePage() {
+  const ready = useClientReady();
   const { projectId } = useParams<{ projectId: string }>();
   const project = useProject(projectId);
   const me = useMe();
@@ -63,8 +66,10 @@ export default function CompetitivePage() {
     });
   }
 
+  if (!ready) return <p role="status" className="text-sm text-muted-foreground">Loading competitive research…</p>;
   return (
-    <div className="grid gap-6">
+    <div className="grid min-w-0 grid-cols-1 gap-6">
+      {project.data?.domain&&<TechnologyCard key={`technology:${projectId}:${project.data.domain}`} projectId={projectId} domain={project.data.domain}/>}
       <Card>
         <CardHeader>
           <CardTitle>Competitive research</CardTitle>

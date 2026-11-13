@@ -17,6 +17,7 @@ pub mod domain_age;
 pub mod gsc;
 pub mod internal_links;
 pub mod keywords;
+pub mod link_intersect;
 pub mod memory;
 pub mod onboarding;
 pub mod projects;
@@ -24,6 +25,7 @@ pub mod providers;
 pub mod rank;
 pub mod reports;
 pub mod team;
+pub mod technology;
 pub mod validate;
 
 pub use actor::{Actor, ActorVia, Role};

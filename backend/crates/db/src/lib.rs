@@ -15,6 +15,7 @@ pub mod gsc;
 pub mod invitations;
 pub mod jobs;
 pub mod keywords;
+pub mod link_intersect;
 pub mod memory;
 pub mod models;
 pub mod orgs;

@@ -5072,6 +5072,81 @@
         ]
       }
     },
+    "/api/v1/projects/{project_id}/link-intersect": {
+      "post": {
+        "tags": [
+          "backlinks"
+        ],
+        "operationId": "find_link_intersect",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LinkIntersectInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinkIntersect"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/projects/{project_id}/links": {
       "get": {
         "tags": [
@@ -6964,6 +7039,81 @@
             }
           },
           "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/technology": {
+      "post": {
+        "tags": [
+          "competitive"
+        ],
+        "operationId": "detect_technologies",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TechnologyInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TechnologyResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
             "content": {
               "application/json": {
                 "schema": {
@@ -9733,6 +9883,28 @@
           }
         }
       },
+      "DetectedTechnology": {
+        "type": "object",
+        "required": [
+          "name",
+          "category",
+          "signals"
+        ],
+        "properties": {
+          "category": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "signals": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "DiscoveryConfig": {
         "type": "object",
         "required": [
@@ -11446,6 +11618,129 @@
         },
         "additionalProperties": false
       },
+      "LinkIntersect": {
+        "type": "object",
+        "required": [
+          "project_id",
+          "domain",
+          "min_competitors",
+          "scopes",
+          "total_matching",
+          "items",
+          "warnings"
+        ],
+        "properties": {
+          "domain": {
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LinkProspect"
+            }
+          },
+          "min_competitors": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "project_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "scopes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LinkIntersectScope"
+            }
+          },
+          "total_matching": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "warnings": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "LinkIntersectInput": {
+        "type": "object",
+        "required": [
+          "competitor_project_ids"
+        ],
+        "properties": {
+          "competitor_project_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "limit": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "min_competitors": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "offset": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          }
+        }
+      },
+      "LinkIntersectScope": {
+        "type": "object",
+        "required": [
+          "project_id",
+          "domain",
+          "available_datasets",
+          "sampled_datasets"
+        ],
+        "properties": {
+          "available_datasets": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "domain": {
+            "type": "string"
+          },
+          "newest_snapshot_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "oldest_snapshot_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "project_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sampled_datasets": {
+            "type": "integer",
+            "format": "int64"
+          }
+        }
+      },
       "LinkObservation": {
         "type": "object",
         "required": [
@@ -11472,6 +11767,57 @@
           },
           "target_url": {
             "type": "string"
+          }
+        }
+      },
+      "LinkProspect": {
+        "type": "object",
+        "required": [
+          "source_domain",
+          "competitor_count",
+          "competitor_project_ids",
+          "sample_source_urls",
+          "observed_links",
+          "verified_links",
+          "imported_links",
+          "newest_snapshot_at"
+        ],
+        "properties": {
+          "competitor_count": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "competitor_project_ids": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "imported_links": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "newest_snapshot_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "observed_links": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "sample_source_urls": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "source_domain": {
+            "type": "string"
+          },
+          "verified_links": {
+            "type": "integer",
+            "format": "int64"
           }
         }
       },
@@ -14294,6 +14640,72 @@
           "organization_id": {
             "type": "string",
             "format": "uuid"
+          }
+        }
+      },
+      "TechnologyInput": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Homepage URL or host; defaults to the project HTTPS homepage."
+          }
+        }
+      },
+      "TechnologyRecord": {
+        "type": "object",
+        "required": [
+          "url",
+          "checked_at",
+          "status",
+          "technologies",
+          "note"
+        ],
+        "properties": {
+          "checked_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "http_status": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "minimum": 0
+          },
+          "note": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "technologies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DetectedTechnology"
+            }
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      },
+      "TechnologyResult": {
+        "type": "object",
+        "required": [
+          "record",
+          "cached"
+        ],
+        "properties": {
+          "cached": {
+            "type": "boolean"
+          },
+          "record": {
+            "$ref": "#/components/schemas/TechnologyRecord"
           }
         }
       },

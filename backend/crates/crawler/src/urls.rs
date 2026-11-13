@@ -11,9 +11,8 @@ pub fn normalize(url: &Url) -> Option<Url> {
     }
     let mut u = url.clone();
     u.set_fragment(None);
-    if u.port() == u.port_or_known_default() && u.port().is_some() {
-        let _ = u.set_port(None);
-    }
+    // `Url` already canonicalizes default ports. `port_or_known_default()` also
+    // returns explicit non-default ports, so comparing it to `port()` loses them.
     if u.query() == Some("") {
         u.set_query(None);
     }
@@ -83,6 +82,8 @@ mod tests {
         assert_eq!(normalize(&u).unwrap().as_str(), "https://example.com/a");
         let u = Url::parse("http://example.com").unwrap();
         assert_eq!(normalize(&u).unwrap().as_str(), "http://example.com/");
+        let u = Url::parse("http://example.com:8080/a#fragment").unwrap();
+        assert_eq!(normalize(&u).unwrap().as_str(), "http://example.com:8080/a");
         assert!(normalize(&Url::parse("mailto:a@b.c").unwrap()).is_none());
     }
 

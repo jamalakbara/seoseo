@@ -110,6 +110,51 @@ fn conv<T: DeserializeOwned>(params: &impl Serialize) -> AppResult<T> {
 #[tool_router]
 impl SeoSeoMcp {
     #[tool(
+        description = "Inspect public homepage technology fingerprints from meta generators and asset markup. One explicit robots-respecting bounded lookup, no redirect following or bot-check bypass; results cached 24 hours, uncached calls paced per project/URL. Returns observed hints or unknown, never a verified full stack/version/security assessment. Optional homepage URL defaults to the project HTTPS root."
+    )]
+    async fn detect_technologies(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<TechnologyParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::technology::inspect(
+                    &self.pool,
+                    &a,
+                    id("project_id", &p.project_id)?,
+                    self.policy,
+                    conv(&p)?,
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Find link-intersect prospects from current-website backlink samples of 1-5 accessible competitor projects. Read-only, no discovery/contact lookup/outreach. Uses latest snapshot per dataset/source, at most ten datasets per project; excludes source domains already observed in this project's selected sample. Absence is not proof of no live link. Returns scope/provenance and paged prospects."
+    )]
+    async fn find_link_intersect(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<LinkIntersectParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::link_intersect::inspect(
+                    &self.pool,
+                    &a,
+                    id("project_id", &p.project_id)?,
+                    conv(&p)?,
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
         description = "Flag project keywords where multiple distinct URLs of the project registrable domain appear in the same recent cached results page. Read-only, no search requests. Returns positions/provider/exactness and coverage. These are review candidates, not proof of harmful cannibalization or a recommendation to merge pages."
     )]
     async fn get_cannibalization_flags(
@@ -2315,6 +2360,8 @@ mod tests {
             "get_cannibalization_flags",
             "lookup_ai_brand",
             "explore_ai_prompts",
+            "detect_technologies",
+            "find_link_intersect",
             "run_site_audit",
             "run_rank_tracker",
         ] {
