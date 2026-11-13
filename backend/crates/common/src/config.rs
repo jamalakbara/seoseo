@@ -11,6 +11,16 @@ pub enum AuthMode {
 /// Runtime configuration, read from CLI flags or environment variables.
 #[derive(Debug, Clone, Args)]
 pub struct Config {
+    /// Optional free Chrome UX Report API key; never returned to clients.
+    #[arg(long, env = "CRUX_API_KEY", hide_env_values = true)]
+    pub crux_api_key: Option<String>,
+    /// Operator-only override for integration fixtures or an approved proxy.
+    #[arg(
+        long,
+        env = "CRUX_API_URL",
+        default_value = "https://chromeuxreport.googleapis.com/v1/records:queryRecord"
+    )]
+    pub crux_api_url: String,
     #[arg(long, env = "DATABASE_URL")]
     pub database_url: String,
 

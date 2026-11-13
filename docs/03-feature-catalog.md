@@ -81,7 +81,7 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | SA-06 | Extended rules (H1, hreflang, mixed content, orphans, broken links, schema validation, soft-404, …) | (new) | P1 | — | M2 | done (H1, mixed content, JSON-LD, links, sitemap, hreflang syntax/self/reciprocal/indexability, heuristic soft-404, URL hygiene, bounded same-origin asset checks) |
 | SA-07 | JS rendering (headless Chromium) | rendered-page | P1 | renderer | M2 | done (opt-in rendered DOM, isolated browser + guarded egress proxy, static fallback with explicit issue) |
 | SA-08 | Lighthouse (CLI or PSI API) | lighthouse.ts | P1 | renderer/PSI | M2 | done (desktop lab categories, metrics and opportunities stored per page and shown in page detail) |
-| SA-09 | CrUX field data | (new) | P2 | CrUX API | M6 | todo |
+| SA-09 | CrUX field data | (new) | P2 | CrUX API | M6 | wip — REST/MCP/UI implemented; browser/live acceptance pending ([guide](23-crux-field-data.md)) |
 | SA-10 | Progress (live SSE), history, delete | getCrawlProgress | P0 | — | M1 | done |
 | SA-11 | Results UI: summary, pages, issues, page detail, export | results/* | P0 | — | M1 | done |
 | SA-12 | Internal link graph + suggestions | (new) | P2 | — | M6 | done (completed-audit graph, full-crawl distinct counts, bounded interactive neighborhood, conservative title/H1 overlap suggestions, REST/UI/JSON/MCP; no automatic page edits) |

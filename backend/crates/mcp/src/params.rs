@@ -5,6 +5,16 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CruxParams {
+    pub project_id: String,
+    pub url: String,
+    /// url or origin, with no automatic fallback.
+    pub scope: String,
+    /// PHONE, DESKTOP, TABLET or ALL.
+    pub form_factor: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct TechnologyParams {
     pub project_id: String,
     pub url: Option<String>,

@@ -110,6 +110,29 @@ fn conv<T: DeserializeOwned>(params: &impl Serialize) -> AppResult<T> {
 #[tool_router]
 impl SeoSeoMcp {
     #[tool(
+        description = "Look up Chrome UX Report real-user field p75 metrics for a project page or origin. Requires operator CRUX_API_KEY; not configured or insufficient coverage stays unknown. Explicit scope url/origin and device PHONE/DESKTOP/TABLET/ALL; no silent origin fallback. Cached 24 hours, uncached lookups paced per project/target. Does not start a crawl or change audit health/Lighthouse scores."
+    )]
+    async fn get_crux_field_data(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<CruxParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::crux::lookup(
+                    &self.pool,
+                    &a,
+                    id("project_id", &p.project_id)?,
+                    &self.cfg,
+                    conv(&p)?,
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
         description = "Inspect public homepage technology fingerprints from meta generators and asset markup. One explicit robots-respecting bounded lookup, no redirect following or bot-check bypass; results cached 24 hours, uncached calls paced per project/URL. Returns observed hints or unknown, never a verified full stack/version/security assessment. Optional homepage URL defaults to the project HTTPS root."
     )]
     async fn detect_technologies(
@@ -2361,6 +2384,7 @@ mod tests {
             "lookup_ai_brand",
             "explore_ai_prompts",
             "detect_technologies",
+            "get_crux_field_data",
             "find_link_intersect",
             "run_site_audit",
             "run_rank_tracker",

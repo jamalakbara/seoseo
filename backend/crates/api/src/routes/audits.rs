@@ -18,6 +18,7 @@ use uuid::Uuid;
 
 pub fn router() -> OpenApiRouter<AppState> {
     OpenApiRouter::new()
+        .routes(routes!(get_crux_field_data))
         .routes(routes!(list_audits, start_audit))
         .routes(routes!(get_audit, delete_audit))
         .routes(routes!(cancel_audit))
@@ -31,6 +32,19 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(get_internal_link_graph))
         .routes(routes!(compare_site_audits))
         .routes(routes!(get_audit_schedule, set_audit_schedule))
+}
+
+#[utoipa::path(post,path="/projects/{project_id}/crux",tag="audits",params(("project_id"=Uuid,Path)),request_body=domain::crux::CruxInput,
+    responses((status=OK,body=domain::crux::CruxResult),(status=NOT_FOUND,body=Problem),(status=CONFLICT,body=Problem),(status=UNPROCESSABLE_ENTITY,body=Problem),(status=SERVICE_UNAVAILABLE,body=Problem)),security(("session"=[]),("bearer"=[])))]
+async fn get_crux_field_data(
+    State(s): State<AppState>,
+    Auth(a): Auth,
+    Path(pid): Path<Uuid>,
+    Json(input): Json<domain::crux::CruxInput>,
+) -> ApiResult<Json<domain::crux::CruxResult>> {
+    Ok(Json(
+        domain::crux::lookup(&s.pool, &a, pid, &s.cfg, input).await?,
+    ))
 }
 
 #[utoipa::path(get,path="/projects/{project_id}/audits/{audit_id}/comparison",tag="audits",

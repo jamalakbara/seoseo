@@ -6,6 +6,8 @@ Free, open-source, self-hostable SEO platform — an alternative to Semrush, Ahr
 
 M5 guides: [competitive research](docs/14-competitive-research.md), [backlinks](docs/15-backlink-snapshots.md), [AI visibility setup](docs/16-ai-visibility.md), [agent skills](plugins/seoseo/README.md). Domain/backlink coverage is a bounded sample, and traffic estimates require eligible monthly search counts. Unknown metrics stay null.
 
+Latest development checkpoint: [CrUX field performance](docs/23-crux-field-data.md) adds REST/MCP/UI support (98 tools total); browser and real-provider acceptance remain pending.
+
 ## Quick start (Docker)
 
 ```bash

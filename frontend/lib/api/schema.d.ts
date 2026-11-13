@@ -914,6 +914,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/crux": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["get_crux_field_data"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/dashboard/backlinks": {
         parameters: {
             query?: never;
@@ -2564,6 +2580,40 @@ export interface components {
             invitation: components["schemas"]["Invitation"];
             /** @description Secret token for the invite link (`/invite/{token}`). Shown once. */
             token: string;
+        };
+        CruxInput: {
+            /** @description PHONE, DESKTOP, TABLET or ALL. */
+            form_factor: string;
+            /** @description url or origin. There is no automatic origin fallback. */
+            scope: string;
+            /** @description Exact HTTP(S) URL on the project host (or its www equivalent). */
+            url: string;
+        };
+        CruxMetric: {
+            name: string;
+            /** Format: double */
+            p75?: number | null;
+            unit: string;
+        };
+        CruxRecord: {
+            /** Format: date-time */
+            checked_at: string;
+            /** Format: date */
+            first_date?: string | null;
+            form_factor: string;
+            /** Format: date */
+            last_date?: string | null;
+            metrics: components["schemas"]["CruxMetric"][];
+            note: string;
+            /** @description The provider's returned key; may differ because of URL normalization. */
+            returned_target?: string | null;
+            scope: string;
+            status: string;
+            target: string;
+        };
+        CruxResult: {
+            cached: boolean;
+            record: components["schemas"]["CruxRecord"];
         };
         DashboardBacklinks: {
             history: components["schemas"]["BacklinkSnapshot"][];
@@ -6010,6 +6060,63 @@ export interface operations {
                 };
             };
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    get_crux_field_data: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CruxInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CruxResult"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            503: {
                 headers: {
                     [name: string]: unknown;
                 };

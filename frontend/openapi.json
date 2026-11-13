@@ -3439,6 +3439,90 @@
         ]
       }
     },
+    "/api/v1/projects/{project_id}/crux": {
+      "post": {
+        "tags": [
+          "audits"
+        ],
+        "operationId": "get_crux_field_data",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CruxInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CruxResult"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/projects/{project_id}/dashboard/backlinks": {
       "get": {
         "tags": [
@@ -9768,6 +9852,125 @@
           "token": {
             "type": "string",
             "description": "Secret token for the invite link (`/invite/{token}`). Shown once."
+          }
+        }
+      },
+      "CruxInput": {
+        "type": "object",
+        "required": [
+          "url",
+          "scope",
+          "form_factor"
+        ],
+        "properties": {
+          "form_factor": {
+            "type": "string",
+            "description": "PHONE, DESKTOP, TABLET or ALL."
+          },
+          "scope": {
+            "type": "string",
+            "description": "url or origin. There is no automatic origin fallback."
+          },
+          "url": {
+            "type": "string",
+            "description": "Exact HTTP(S) URL on the project host (or its www equivalent)."
+          }
+        }
+      },
+      "CruxMetric": {
+        "type": "object",
+        "required": [
+          "name",
+          "unit"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "p75": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
+          "unit": {
+            "type": "string"
+          }
+        }
+      },
+      "CruxRecord": {
+        "type": "object",
+        "required": [
+          "target",
+          "scope",
+          "form_factor",
+          "status",
+          "checked_at",
+          "metrics",
+          "note"
+        ],
+        "properties": {
+          "checked_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "first_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "form_factor": {
+            "type": "string"
+          },
+          "last_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "metrics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CruxMetric"
+            }
+          },
+          "note": {
+            "type": "string"
+          },
+          "returned_target": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The provider's returned key; may differ because of URL normalization."
+          },
+          "scope": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "target": {
+            "type": "string"
+          }
+        }
+      },
+      "CruxResult": {
+        "type": "object",
+        "required": [
+          "record",
+          "cached"
+        ],
+        "properties": {
+          "cached": {
+            "type": "boolean"
+          },
+          "record": {
+            "$ref": "#/components/schemas/CruxRecord"
           }
         }
       },

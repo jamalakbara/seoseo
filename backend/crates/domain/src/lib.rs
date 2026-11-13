@@ -12,6 +12,7 @@ pub mod backlinks;
 pub mod cannibalization;
 pub mod clustering;
 pub mod competitive;
+pub mod crux;
 pub mod dashboard;
 pub mod domain_age;
 pub mod gsc;
