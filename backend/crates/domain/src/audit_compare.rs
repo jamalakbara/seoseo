@@ -222,7 +222,7 @@ mod tests {
     use super::*;
     fn page(ok: bool, issue: bool) -> ComparisonPage {
         ComparisonPage {
-            id: Uuid::new_v4(),
+            id: common::new_id(),
             url: "https://example.com/a".into(),
             comparable: ok,
             values: serde_json::json!({"title": if ok {"hash"} else {""},"status_code":if ok {200}else{503}}),

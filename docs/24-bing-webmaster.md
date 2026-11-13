@@ -1,0 +1,13 @@
+# Bing Webmaster Tools
+
+M6 IN-04 connects a project to Bing's first-party Webmaster data without making the installation operator register a shared OAuth client. An administrator enters a user-generated Bing Webmaster API key in Integrations. The server validates the key with `GetUserSites` before encrypting it with `APP_ENCRYPTION_KEY`; replacement is atomic and clears the prior site selection. The plaintext key is never stored or serialized.
+
+The credential remains project-bound even though Bing issues API keys per user. Only administrators can list account-wide sites, and they can select only an exact verified site returned by Bing. Members can read the selected site's top queries, top pages, daily crawl statistics and paged inbound-link counts. Verification codes, provider type metadata and provider error bodies are removed. Calls have a 20-second timeout, no redirects and a 4 MiB response limit. Bing's weekly top-query/page results and sampled link counts are explicitly not presented as exhaustive or real-time.
+
+REST endpoints live under `/api/v1/projects/{project_id}/bing`; MCP exposes `list_bing_webmaster_sites`, `set_bing_webmaster_site`, and `get_bing_webmaster_report`. The dashboard remains the only place to enter or replace the secret. `BING_WEBMASTER_API_URL` is an operator-only fixture/proxy override; project input cannot redirect credentials to another host.
+
+Validation includes strict workspace Clippy, OpenAPI operation-id checks, frontend type checking/linting, and `scripts/e2e-bing.py`. The disposable regression verifies tenant isolation, validation before save, encrypted storage, verification-secret stripping, exact verified-site selection, all four REST report kinds, MCP reads, link paging and disconnect. Live-provider acceptance still requires a user's Bing key and verified site.
+
+Microsoft documents both OAuth and user API keys, and recommends OAuth for delegated third-party applications. The self-hosted first delivery uses the API-key option to avoid a global application registration while preserving per-project isolation. The integration uses Bing's JSON service, not the SOAP or POX protocols Microsoft retired on 31 August 2026.
+
+References: [Bing Webmaster API](https://learn.microsoft.com/en-us/bingwebmaster/), [getting API access](https://learn.microsoft.com/en-us/bingwebmaster/getting-access), [OAuth scopes](https://learn.microsoft.com/en-us/bingwebmaster/oauth2), [query statistics](https://learn.microsoft.com/en-us/dotnet/api/microsoft.bing.webmaster.api.interfaces.iwebmasterapi.getquerystats), [inbound-link counts](https://learn.microsoft.com/en-us/dotnet/api/microsoft.bing.webmaster.api.interfaces.iwebmasterapi.getlinkcounts).

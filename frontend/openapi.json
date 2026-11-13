@@ -3180,6 +3180,263 @@
         ]
       }
     },
+    "/api/v1/projects/{project_id}/bing": {
+      "get": {
+        "tags": [
+          "bing-webmaster"
+        ],
+        "operationId": "bing_status",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BingConnectionView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "bing-webmaster"
+        ],
+        "operationId": "bing_connect",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BingConnectInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BingConnectionView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "bing-webmaster"
+        ],
+        "operationId": "bing_disconnect",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {}
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/bing/reports/{kind}": {
+      "post": {
+        "tags": [
+          "bing-webmaster"
+        ],
+        "operationId": "bing_report",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "kind",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/BingReportKind"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BingReportInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BingReportView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/bing/site": {
+      "put": {
+        "tags": [
+          "bing-webmaster"
+        ],
+        "operationId": "bing_set_site",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BingSiteInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BingConnectionView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/bing/sites": {
+      "get": {
+        "tags": [
+          "bing-webmaster"
+        ],
+        "operationId": "bing_sites",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BingSiteView"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/projects/{project_id}/cannibalization": {
       "get": {
         "tags": [
@@ -9201,6 +9458,113 @@
           "total": {
             "type": "integer",
             "minimum": 0
+          }
+        }
+      },
+      "BingConnectInput": {
+        "type": "object",
+        "required": [
+          "api_key"
+        ],
+        "properties": {
+          "api_key": {
+            "type": "string"
+          }
+        }
+      },
+      "BingConnectionView": {
+        "type": "object",
+        "required": [
+          "configured",
+          "connected"
+        ],
+        "properties": {
+          "configured": {
+            "type": "boolean"
+          },
+          "connected": {
+            "type": "boolean"
+          },
+          "connected_by": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "site_url": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "BingReportInput": {
+        "type": "object",
+        "properties": {
+          "page": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "BingReportKind": {
+        "type": "string",
+        "enum": [
+          "queries",
+          "pages",
+          "crawl",
+          "inbound_links"
+        ]
+      },
+      "BingReportView": {
+        "type": "object",
+        "required": [
+          "kind",
+          "site_url",
+          "freshness_note",
+          "data"
+        ],
+        "properties": {
+          "data": {},
+          "freshness_note": {
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/BingReportKind"
+          },
+          "site_url": {
+            "type": "string"
+          }
+        }
+      },
+      "BingSiteInput": {
+        "type": "object",
+        "required": [
+          "site_url"
+        ],
+        "properties": {
+          "site_url": {
+            "type": "string"
+          }
+        }
+      },
+      "BingSiteView": {
+        "type": "object",
+        "required": [
+          "url",
+          "verified"
+        ],
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "verified": {
+            "type": "boolean"
           }
         }
       },
@@ -15340,6 +15704,10 @@
     {
       "name": "backlinks",
       "description": "Imported backlink samples and snapshot comparisons"
+    },
+    {
+      "name": "bing-webmaster",
+      "description": "Read-only Bing Webmaster query, page, crawl and link data"
     },
     {
       "name": "ai-visibility",

@@ -21,6 +21,13 @@ pub struct Config {
         default_value = "https://chromeuxreport.googleapis.com/v1/records:queryRecord"
     )]
     pub crux_api_url: String,
+    /// Operator-only Bing Webmaster JSON API base (override for fixtures/proxies).
+    #[arg(
+        long,
+        env = "BING_WEBMASTER_API_URL",
+        default_value = "https://www.bing.com/webmaster/api.svc/json"
+    )]
+    pub bing_webmaster_api_url: String,
     #[arg(long, env = "DATABASE_URL")]
     pub database_url: String,
 

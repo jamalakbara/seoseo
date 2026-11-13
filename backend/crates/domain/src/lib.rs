@@ -9,6 +9,7 @@ pub mod audit_schedule;
 pub mod audits;
 pub mod auth;
 pub mod backlinks;
+pub mod bing;
 pub mod cannibalization;
 pub mod clustering;
 pub mod competitive;

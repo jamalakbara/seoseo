@@ -110,7 +110,7 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | IN-01 | GSC OAuth + property + performance explorer + export | spec 0003 | P0 | GSC API | M3 | done (project grant, PKCE/state, encrypted tokens, verified property, bounded queries, CSV; live Google client setup required) |
 | IN-02 | GSC URL inspection | inspect_urls | P1 | GSC API | M3 | done (1–10 URLs, indexed-version results, partial URL errors, REST/UI/MCP) |
 | IN-03 | GA4 connection + 9 reports | spec 0007 | P1 | GA4 Data API | M4 | done |
-| IN-04 | Bing Webmaster Tools | (new) | P2 | Bing API | M6 | todo |
+| IN-04 | Bing Webmaster Tools | (new) | P2 | Bing API | M6 | done (project-bound encrypted API key, verified-site selection, query/page/crawl/inbound-link REST + MCP reports) |
 | IN-05 | IndexNow setup/verify/submit | spec 0016 | P1 | IndexNow | M4 | done |
 | IN-06 | Webhooks / Slack / Discord | (new) | P2 | — | M7 | todo |
 

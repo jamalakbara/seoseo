@@ -18,4 +18,4 @@ Regression fixture: `deploy/test/m6-field/fixture.py`, API regression: `scripts/
 
 Checkpoint validation: Rust formatting, strict workspace Clippy, all 91 workspace tests and the application build passed. The disposable CrUX API fixture regression passed, as did frontend type checking and lint. The portable skill validator recognizes all 98 MCP tools. Browser and live-provider verification remain pending.
 
-Bing Webmaster Tools, local SEO/grid/demand context and AI Overview capture remain unimplemented in this checkpoint. A prior automatic approval review blocked starting the local production frontend preview (`pnpm start`), with reason “blocked by policy”; no production-preview browser acceptance is claimed.
+Local SEO/grid/demand context and AI Overview capture remain unimplemented in this checkpoint. Bing Webmaster Tools was delivered in the following checkpoint. A prior automatic approval review blocked starting the local production frontend preview (`pnpm start`), with reason “blocked by policy”; no production-preview browser acceptance is claimed.

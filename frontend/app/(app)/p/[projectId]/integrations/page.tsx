@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { BingWebmaster } from "@/components/integrations/bing";
 const reports = [
   "organic_overview",
   "organic_landing_pages",
@@ -314,6 +315,7 @@ export default function Integrations() {
           )}
         </CardContent>
       </Card>
+      <BingWebmaster projectId={projectId} admin={admin} />
       <Card>
         <CardHeader>
           <CardTitle>IndexNow</CardTitle>

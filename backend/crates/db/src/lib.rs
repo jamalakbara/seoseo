@@ -9,6 +9,7 @@ pub mod audit_schedule;
 pub mod audits;
 pub mod backlink_discovery;
 pub mod backlinks;
+pub mod bing;
 pub mod competitive;
 pub mod dashboard;
 pub mod gsc;

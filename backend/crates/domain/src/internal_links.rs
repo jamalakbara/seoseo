@@ -195,7 +195,7 @@ mod tests {
     use super::*;
     fn node(path: &str) -> InternalLinkNode {
         InternalLinkNode {
-            id: Uuid::new_v4(),
+            id: common::new_id(),
             url: format!("https://example.com/{path}"),
             title: Some("Technical SEO crawling".into()),
             h1: None,
@@ -223,8 +223,8 @@ mod tests {
             nodes,
             edges,
             audit: db::audits::Audit {
-                id: Uuid::new_v4(),
-                project_id: Uuid::new_v4(),
+                id: common::new_id(),
+                project_id: common::new_id(),
                 started_by: None,
                 job_id: None,
                 start_url: "https://example.com/".into(),

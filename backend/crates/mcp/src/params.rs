@@ -234,6 +234,22 @@ pub struct GscSite {
 }
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct BingSite {
+    pub project_id: String,
+    /// Exact verified URL from list_bing_webmaster_sites.
+    pub site_url: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct BingReport {
+    pub project_id: String,
+    /// queries, pages, crawl, or inbound_links.
+    pub kind: String,
+    /// Zero-based page for inbound_links; ignored for other reports.
+    pub page: Option<i16>,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct GscFilter {
     pub dimension: String,
     pub operator: String,

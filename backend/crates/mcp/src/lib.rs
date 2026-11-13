@@ -2235,6 +2235,91 @@ impl SeoSeoMcp {
     }
 
     #[tool(
+        description = "List sites visible to this project's encrypted Bing Webmaster API key. Verification codes are never returned. Configure or replace the key in the dashboard first."
+    )]
+    async fn list_bing_webmaster_sites(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<ProjectRef>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        reply(
+            async {
+                domain::bing::sites(
+                    &self.pool,
+                    &actor,
+                    id("project_id", &p.project_id)?,
+                    &self.cfg,
+                )
+                .await
+            }
+            .await,
+        )
+    }
+
+    #[tool(
+        description = "Bind a project to an exact verified site from list_bing_webmaster_sites. Admin role; revalidates the site against Bing before saving."
+    )]
+    async fn set_bing_webmaster_site(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<BingSite>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        reply(
+            async {
+                domain::bing::set_site(
+                    &self.pool,
+                    &actor,
+                    id("project_id", &p.project_id)?,
+                    &self.cfg,
+                    domain::bing::BingSiteInput {
+                        site_url: p.site_url,
+                    },
+                )
+                .await
+            }
+            .await,
+        )
+    }
+
+    #[tool(
+        description = "Read project-scoped Bing Webmaster data. kind is queries, pages, crawl, or inbound_links. Bing top query/page data is weekly, crawl data daily, and inbound links are a paged provider sample; missing rows are unknown, not zero."
+    )]
+    async fn get_bing_webmaster_report(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<BingReport>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        let kind = match p.kind.as_str() {
+            "queries" => domain::bing::BingReportKind::Queries,
+            "pages" => domain::bing::BingReportKind::Pages,
+            "crawl" => domain::bing::BingReportKind::Crawl,
+            "inbound_links" => domain::bing::BingReportKind::InboundLinks,
+            _ => {
+                return reply::<serde_json::Value>(Err(AppError::Validation(
+                    "kind must be queries, pages, crawl, or inbound_links".into(),
+                )));
+            }
+        };
+        reply(
+            async {
+                domain::bing::report(
+                    &self.pool,
+                    &actor,
+                    id("project_id", &p.project_id)?,
+                    &self.cfg,
+                    kind,
+                    domain::bing::BingReportInput { page: p.page },
+                )
+                .await
+            }
+            .await,
+        )
+    }
+
+    #[tool(
         description = "Read measured Google clicks, impressions, CTR and position. Dates within 16 months, excluding the recent three days; AND filters, up to 1000 rows per page. Empty rows mean no reported data."
     )]
     async fn get_search_console_performance(
