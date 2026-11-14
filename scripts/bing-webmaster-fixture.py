@@ -50,4 +50,5 @@ class Handler(BaseHTTPRequestHandler):
         self.wfile.write(raw)
 
 
-ThreadingHTTPServer(("127.0.0.1", 3199), Handler).serve_forever()
+if __name__ == "__main__":
+    ThreadingHTTPServer(("127.0.0.1", 3199), Handler).serve_forever()

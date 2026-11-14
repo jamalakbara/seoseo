@@ -2,7 +2,7 @@
 
 Every feature with an ID, OpenSEO parity reference, priority, data source, and milestone.
 Priority: **P0** MVP · **P1** parity · **P2** beyond parity · **P3** later.
-Status column is updated as we build (`todo` / `wip` / `done`). Last update: 2026-11-13 (M6 DO-06 homepage technology hints and BL-07 sampled link intersect; M5 live-cloud acceptance remains pending).
+Status column is updated as we build (`todo` / `wip` / `done`). Last update: 2026-11-14 (remaining M6 implementation delivered; browser/live-provider acceptance still open; see docs/27-m6-acceptance.md).
 
 ## Workspace & identity
 | ID | Feature | OpenSEO ref | Pri | Data | MS | Status |
@@ -38,7 +38,7 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | KW-07 | SERP analysis card | getSerpAnalysis | P0 | SERP | M2 | done (SERP dialog: results + SR, features, related, PAA, KD, intent; 7-day shared cache) |
 | KW-08 | Filters/sort/paging/export | keyword table | P0 | — | M2 | done (search, intent, questions filter, sort, paging, CSV; API also filters popularity/kd/volume/words) |
 | KW-09 | Saved keywords + tags + refresh + export | saved-keywords | P0 | — | M2 | done (save/manual, tags, CSV, per-keyword SERP refresh and durable bulk refresh with progress; available demand estimates are refreshed through the pageview cache) |
-| KW-10 | Local (city) volume context | spec 0008 | P2 | Trends geo | M6 | todo |
+| KW-10 | Local (city) volume context | spec 0008 | P2 | source-labelled city exports | M6 | done (city/national counts and normalized interest import, dates/source, REST/UI/MCP/export; no fabricated city estimates) |
 | KW-11 | Keyword clustering (SERP overlap) | skill only | P2 | SERP | M6 | done (cached top-ten URL overlap, complete-link groups, provider/market isolation, coverage, REST/UI/CSV/MCP; reviewed page assignments remain manual) |
 | KW-12 | CPC/competition (BYOK only) | google_ads | P3 | BYOK | M8 | todo |
 
@@ -92,11 +92,11 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 
 ## Local SEO
 | LO-01 | Business lookup | search_local_businesses | P1 | OSM / Places key | M6 | done (explicit OSM discovery) |
-| LO-02 | Grid tracker + scan workflow | LocalRankWorkflow | P1 | local SERP fetch | M6 | wip (saved trackers + unmeasured grid preview; scans pending) |
-| LO-03 | Heatmap (MapLibre + OSM tiles), ARP/ATRP/SoLV | local-seo UI | P1 | OSM | M6 | todo |
-| LO-04 | Competitors per point | local_rank_businesses | P1 | — | M6 | todo |
+| LO-02 | Grid tracker + scan workflow | LocalRankWorkflow | P1 | local SERP fetch | M6 | done (frozen durable budgeted BYOK scans and free evidence imports; per-cell recovery, history/status/delete/export; live-provider acceptance open) |
+| LO-03 | Heatmap (MapLibre + OSM tiles), ARP/ATRP/SoLV | local-seo UI | P1 | OSM | M6 | wip (implemented with unknown/failed coverage, numeric fallback and optional attributed map; browser acceptance blocked) |
+| LO-04 | Competitors per point | local_rank_businesses | P1 | — | M6 | done (bounded returned positions and exact identities per point, source/date retained) |
 | LO-05 | Business profile, reviews, Q&A, updates | business tools | P2 | Places key | M7 | todo |
-| LO-06 | Categories list | list_business_categories | P2 | static list | M6 | todo |
+| LO-06 | Categories list | list_business_categories | P2 | static list | M6 | done (curated REST/MCP list and business-search filter) |
 
 ## AI visibility
 | AI-01 | Tracker config (engines, market, schedule) | ai_trackers | P1 | — | M5 | done (immutable market/model trackers + manual/daily/weekly/monthly UTC schedule) |
@@ -104,7 +104,7 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | AI-03 | Run workflow (answers, sources, matches) | AiVisibilityWorkflow | P1 | LLM APIs / Ollama | M5 | done (durable compatible/Ollama/Anthropic/Gemini comparisons; Anthropic search/citations; cloud live access unverified) |
 | AI-04 | Results, SoV, trend, sources, answer viewer, export | getAiVisibility* | P1 | — | M5 | done (literal rates, share of tracked mentions, retained-run trends, citations, answer viewer and JSON export) |
 | AI-05 | Brand lookup, prompt explorer (own index) | brand-lookup, prompt-explorer | P2 | own index | M6 | done (current-website retained answer index, literal brand/topic search, frozen market, expected/successful/failed/unchecked coverage, paged prompts/excerpts, REST/UI/MCP) |
-| AI-06 | Google AI Overview capture | google_ai_overview | P2 | SERP | M6 | todo |
+| AI-06 | Google AI Overview capture | google_ai_overview | P2 | SERP | M6 | done (optional BYOK search + bounded continuation, source-labelled free import, presence/absence/incomplete, cache/history/citations/JSON, REST/UI/MCP; live acceptance open) |
 
 ## Integrations
 | IN-01 | GSC OAuth + property + performance explorer + export | spec 0003 | P0 | GSC API | M3 | done (project grant, PKCE/state, encrypted tokens, verified property, bounded queries, CSV; live Google client setup required) |
@@ -130,7 +130,7 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 ## MCP / API / skills
 | MC-01 | MCP streamable HTTP + API-key auth | mcp server | P0 | — | M3 | done (stateless Streamable HTTP at /mcp, API-key or session auth, Host allow-list) |
 | MC-02 | MCP OAuth 2.1 (DCR, PKCE, consent, org-bound) | workers-oauth-provider | P1 | — | M4 | done |
-| MC-03 | Tool parity (~90 tools) | mcp/tools | P1 | — | M3–M6 | wip (97 tools including M6 technology hints and sampled link intersect; remaining parity depends on later features) |
+| MC-03 | Tool parity (~90 tools) | mcp/tools | P1 | — | M3–M6 | done (115 tools through M6, including local scans, city context and Google AI Overview observations; later-milestone tools remain in their own scope) |
 | MC-04 | MCP Apps widgets (SERP/GSC views) | widget-tools | P3 | — | M8 | todo |
 | MC-05 | Agent skills (12 ported + new) | plugins/seoseo/skills | P1 | — | M5 | done (14 self-contained SeoSeo-prefixed skills, install guide, display metadata and tool validation) |
 | AP-01 | REST API + OpenAPI 3.1 (utoipa) | — | P0 | — | M0 | done |

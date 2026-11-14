@@ -1359,6 +1359,141 @@
         ]
       }
     },
+    "/api/v1/projects/{project_id}/ai-overviews": {
+      "get": {
+        "tags": [
+          "ai-visibility"
+        ],
+        "operationId": "list_google_overviews",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ResearchObservation"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "ai-visibility"
+        ],
+        "operationId": "capture_google_overview",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CaptureOverviewInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OverviewCapture"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/ai-overviews/import": {
+      "post": {
+        "tags": [
+          "ai-visibility"
+        ],
+        "operationId": "import_google_overview",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportOverviewInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResearchObservation"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/projects/{project_id}/ai-prompt-research": {
       "post": {
         "tags": [
@@ -3569,6 +3704,93 @@
         ]
       }
     },
+    "/api/v1/projects/{project_id}/city-demand": {
+      "get": {
+        "tags": [
+          "local-seo"
+        ],
+        "operationId": "list_city_demand",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ResearchObservation"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "local-seo"
+        ],
+        "operationId": "import_city_demand",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportCityDemandInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ResearchObservation"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/projects/{project_id}/competitive-volumes": {
       "post": {
         "tags": [
@@ -5755,6 +5977,270 @@
               }
             }
           }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/local-trackers/{tracker_id}/scans": {
+      "get": {
+        "tags": [
+          "local-seo"
+        ],
+        "operationId": "list_local_scans",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tracker_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LocalScanRun"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "local-seo"
+        ],
+        "operationId": "start_local_scan",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tracker_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartLocalScanInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocalScanRun"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/local-trackers/{tracker_id}/scans/import": {
+      "post": {
+        "tags": [
+          "local-seo"
+        ],
+        "operationId": "import_local_scan",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tracker_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ImportLocalScanInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocalScanRun"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/local-trackers/{tracker_id}/scans/{run_id}": {
+      "get": {
+        "tags": [
+          "local-seo"
+        ],
+        "operationId": "get_local_scan",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tracker_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocalScanView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "local-seo"
+        ],
+        "operationId": "delete_local_scan",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tracker_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "run_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {}
         },
         "security": [
           {
@@ -9994,6 +10480,31 @@
           }
         }
       },
+      "CaptureOverviewInput": {
+        "type": "object",
+        "required": [
+          "keyword",
+          "expected_max_requests"
+        ],
+        "properties": {
+          "expected_max_requests": {
+            "type": "integer",
+            "format": "int32",
+            "description": "Google search plus at most one token continuation. Cached observations make no requests.",
+            "minimum": 0
+          },
+          "keyword": {
+            "type": "string"
+          },
+          "location": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "additionalProperties": false
+      },
       "ChangeResult": {
         "type": "object",
         "required": [
@@ -10055,6 +10566,41 @@
             "type": "boolean"
           }
         }
+      },
+      "CityDemandRow": {
+        "type": "object",
+        "required": [
+          "keyword"
+        ],
+        "properties": {
+          "keyword": {
+            "type": "string"
+          },
+          "monthly_searches": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64",
+            "description": "Explicit imported city searches/month; not inferred by multiplying national volume."
+          },
+          "national_monthly_searches": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "relative_interest": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double",
+            "description": "Source-exported normalized city interest, 0–100. This is not search volume."
+          }
+        },
+        "additionalProperties": false
       },
       "ClusterKeyword": {
         "type": "object",
@@ -11402,6 +11948,112 @@
               "$ref": "#/components/schemas/ImportedBacklink"
             },
             "description": "At most 1000 distinct external source/target URL pairs, within the API's 2 MiB body cap."
+          }
+        },
+        "additionalProperties": false
+      },
+      "ImportCityDemandInput": {
+        "type": "object",
+        "required": [
+          "city",
+          "source_note",
+          "period_start",
+          "period_end",
+          "rows"
+        ],
+        "properties": {
+          "city": {
+            "type": "string"
+          },
+          "period_end": {
+            "type": "string",
+            "format": "date"
+          },
+          "period_start": {
+            "type": "string",
+            "format": "date"
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CityDemandRow"
+            }
+          },
+          "source_note": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ImportLocalScanInput": {
+        "type": "object",
+        "required": [
+          "target_business_id",
+          "keywords",
+          "observed_at",
+          "source_note",
+          "depth",
+          "cells"
+        ],
+        "properties": {
+          "cells": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LocalScanCell"
+            },
+            "description": "Omitted cells remain unchecked; measured false cells must have no results."
+          },
+          "depth": {
+            "type": "integer",
+            "format": "int32",
+            "description": "1–20. Non-returned targets are penalized as depth+1 only in ATRP."
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "source_note": {
+            "type": "string"
+          },
+          "target_business_id": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ImportOverviewInput": {
+        "type": "object",
+        "required": [
+          "keyword",
+          "observed_at",
+          "source_note",
+          "response"
+        ],
+        "properties": {
+          "keyword": {
+            "type": "string"
+          },
+          "location": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "response": {
+            "description": "SerpApi-format Google search response; only normalized text and safe citations are retained."
+          },
+          "source_note": {
+            "type": "string"
           }
         },
         "additionalProperties": false
@@ -12941,6 +13593,220 @@
           }
         }
       },
+      "LocalMetrics": {
+        "type": "object",
+        "required": [
+          "keyword",
+          "expected",
+          "measured",
+          "found"
+        ],
+        "properties": {
+          "arp": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
+          "atrp": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
+          "expected": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "found": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "keyword": {
+            "type": "string"
+          },
+          "measured": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "solv": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          }
+        }
+      },
+      "LocalResult": {
+        "type": "object",
+        "required": [
+          "position",
+          "business_id",
+          "name"
+        ],
+        "properties": {
+          "address": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "business_id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "position": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "website": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "LocalScanCell": {
+        "type": "object",
+        "required": [
+          "keyword",
+          "row",
+          "column",
+          "measured",
+          "results",
+          "checked_at"
+        ],
+        "properties": {
+          "checked_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "column": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "keyword": {
+            "type": "string"
+          },
+          "measured": {
+            "type": "boolean"
+          },
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LocalResult"
+            }
+          },
+          "row": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "LocalScanRun": {
+        "type": "object",
+        "required": [
+          "id",
+          "tracker_id",
+          "provider",
+          "status",
+          "config",
+          "created_at"
+        ],
+        "properties": {
+          "config": {},
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "finished_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "job_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "provider": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "tracker_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "LocalScanView": {
+        "type": "object",
+        "required": [
+          "run",
+          "config",
+          "cells",
+          "metrics",
+          "points",
+          "note"
+        ],
+        "properties": {
+          "cells": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LocalScanCell"
+            }
+          },
+          "config": {
+            "$ref": "#/components/schemas/ScanConfig"
+          },
+          "metrics": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LocalMetrics"
+            }
+          },
+          "note": {
+            "type": "string"
+          },
+          "points": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GridPoint"
+            }
+          },
+          "run": {
+            "$ref": "#/components/schemas/LocalScanRun"
+          }
+        }
+      },
       "LocalTracker": {
         "type": "object",
         "required": [
@@ -13095,6 +13961,27 @@
           },
           "role": {
             "type": "string"
+          }
+        }
+      },
+      "OverviewCapture": {
+        "type": "object",
+        "required": [
+          "observation",
+          "cached",
+          "requests"
+        ],
+        "properties": {
+          "cached": {
+            "type": "boolean"
+          },
+          "observation": {
+            "$ref": "#/components/schemas/ResearchObservation"
+          },
+          "requests": {
+            "type": "integer",
+            "format": "int32",
+            "minimum": 0
           }
         }
       },
@@ -14243,6 +15130,7 @@
       "ProviderKind": {
         "type": "string",
         "enum": [
+          "observations",
           "suggest",
           "serp",
           "demand",
@@ -14991,6 +15879,46 @@
           }
         }
       },
+      "ResearchObservation": {
+        "type": "object",
+        "required": [
+          "id",
+          "project_id",
+          "domain",
+          "country",
+          "language",
+          "kind",
+          "data",
+          "created_at"
+        ],
+        "properties": {
+          "country": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "data": {},
+          "domain": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          },
+          "project_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
       "Role": {
         "type": "string",
         "enum": [
@@ -15277,6 +16205,52 @@
               "string",
               "null"
             ]
+          }
+        }
+      },
+      "ScanConfig": {
+        "type": "object",
+        "required": [
+          "tracker",
+          "keywords",
+          "target_business_id",
+          "country",
+          "depth",
+          "created_by",
+          "observed_at",
+          "source_note"
+        ],
+        "properties": {
+          "country": {
+            "type": "string"
+          },
+          "created_by": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "depth": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "source_note": {
+            "type": "string"
+          },
+          "target_business_id": {
+            "type": "string",
+            "description": "Exact provider place_id or data_id, explicitly reviewed; never fuzzy business-name matching."
+          },
+          "tracker": {
+            "$ref": "#/components/schemas/LocalTracker"
           }
         }
       },
@@ -15736,6 +16710,31 @@
             "items": {
               "type": "string"
             }
+          }
+        },
+        "additionalProperties": false
+      },
+      "StartLocalScanInput": {
+        "type": "object",
+        "required": [
+          "target_business_id",
+          "keywords",
+          "expected_requests"
+        ],
+        "properties": {
+          "expected_requests": {
+            "type": "integer",
+            "description": "Must equal selected keywords × grid points. Live scans may incur provider charges.",
+            "minimum": 0
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "target_business_id": {
+            "type": "string"
           }
         },
         "additionalProperties": false

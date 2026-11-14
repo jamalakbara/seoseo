@@ -533,7 +533,7 @@ pub struct CreateRankTracker {
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct TrackerRef {
     pub project_id: String,
-    /// Tracker id from list_rank_trackers.
+    /// Tracker id from the matching list tool.
     pub tracker_id: String,
 }
 
@@ -639,4 +639,49 @@ pub struct CreateLocalTracker {
     pub grid_size: Option<i16>,
     pub spacing_km: Option<f64>,
     pub keywords: Vec<String>,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct LocalScanRef {
+    pub project_id: String,
+    pub tracker_id: String,
+    pub run_id: String,
+}
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct StartLocalScan {
+    pub project_id: String,
+    pub tracker_id: String,
+    pub target_business_id: String,
+    pub keywords: Vec<String>,
+    pub expected_requests: usize,
+}
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ImportLocalScan {
+    pub project_id: String,
+    pub tracker_id: String,
+    /// target_business_id, keywords, observed_at (RFC3339), source_note, depth (1-20), cells.
+    /// Each cell: keyword,row,column,measured,results,error,checked_at. Result: position,business_id,name,address,website.
+    pub observation: serde_json::Value,
+}
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CaptureGoogleOverview {
+    pub project_id: String,
+    pub keyword: String,
+    pub location: Option<String>,
+    pub expected_max_requests: u8,
+}
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ImportGoogleOverview {
+    pub project_id: String,
+    pub keyword: String,
+    pub location: Option<String>,
+    pub observed_at: String,
+    pub source_note: String,
+    pub response: serde_json::Value,
+}
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ImportCityDemand {
+    pub project_id: String,
+    /// city, source_note, period_start/end (YYYY-MM-DD), rows (keyword,monthly_searches,national_monthly_searches,relative_interest).
+    pub observation: serde_json::Value,
 }

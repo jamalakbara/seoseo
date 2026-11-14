@@ -5,6 +5,7 @@ import {
   PromptResearch,
 } from "@/components/m5-research";
 import { useState } from "react";
+import { AiOverviews } from "@/components/ai-overviews";
 import { AiOwnIndexCard } from "@/components/ai-own-index";
 import { useParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -74,6 +75,7 @@ export default function AiVisibilityPage() {
   });
   return (
     <div className="grid min-w-0 grid-cols-1 gap-6">
+      <AiOverviews key={`${projectId}:${project.data?.domain}:${project.data?.country_code}:${project.data?.language_code}`} projectId={projectId} />
       {project.data&&<AiOwnIndexCard key={`${projectId}:${project.data.domain}:${project.data.country_code}:${project.data.language_code}`} projectId={projectId} country={project.data.country_code} language={project.data.language_code}/>}
       <Card>
         <CardHeader>

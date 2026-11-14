@@ -10,3 +10,6 @@ Use the connected **SeoSeo** MCP server, not the similarly named OpenSEO credit-
 Tools: `research_keywords`, `list_keyword_research`, `get_keyword_research`, `list_saved_keywords`, `get_serp_results`, `save_keywords`.
 
 Start from project market and saved terms. Poll research completion, inspect intent/provider/coverage, and compare real top results for promising questions. Wikipedia pageviews are an entity-demand proxy, not measured search volume; missing volume/CPC stays unknown. Save selected terms/tags when the user requested saving; otherwise present a shortlist and page opportunities.
+
+
+For city context use `list_city_demand`; source-labelled city exports can be saved with `import_city_demand` when requested. Distinguish explicit city searches/month from relative-interest scores; absent city counts remain unknown and national volume must not be scaled into a made-up city estimate.

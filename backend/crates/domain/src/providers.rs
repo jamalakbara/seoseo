@@ -181,6 +181,14 @@ pub async fn test(
     let market = Market::new("US", "en");
     let started = Instant::now();
     let result: Result<String, providers::ProviderError> = match info.kind {
+        ProviderKind::Observations => {
+            let secret = forced
+                .first()
+                .and_then(|s| s.secret.as_deref())
+                .unwrap_or_default();
+            providers::serpapi::request(&pctx.serpapi_url,secret,&[("engine","google".into()),("q","open source software".into())])
+                .await.map(|_|"Provider accepted one test search. Maps and AI Overview availability depend on the query.".into())
+        }
         ProviderKind::Suggest => match registry.suggest.first() {
             Some(p) => SuggestProvider::suggest(p.as_ref(), "seo", &market)
                 .await

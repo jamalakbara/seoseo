@@ -503,6 +503,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/ai-overviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_google_overviews"];
+        put?: never;
+        post: operations["capture_google_overview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/ai-overviews/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["import_google_overview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/ai-prompt-research": {
         parameters: {
             query?: never;
@@ -956,6 +988,22 @@ export interface paths {
         get: operations["get_cannibalization_flags"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/city-demand": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_city_demand"];
+        put?: never;
+        post: operations["import_city_demand"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1508,6 +1556,54 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/local-trackers/{tracker_id}/scans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_local_scans"];
+        put?: never;
+        post: operations["start_local_scan"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/local-trackers/{tracker_id}/scans/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["import_local_scan"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/local-trackers/{tracker_id}/scans/{run_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_local_scan"];
+        put?: never;
+        post?: never;
+        delete: operations["delete_local_scan"];
         options?: never;
         head?: never;
         patch?: never;
@@ -2607,6 +2703,15 @@ export interface components {
             scope_keywords: number;
             warnings: string[];
         };
+        CaptureOverviewInput: {
+            /**
+             * Format: int32
+             * @description Google search plus at most one token continuation. Cached observations make no requests.
+             */
+            expected_max_requests: number;
+            keyword: string;
+            location?: string | null;
+        };
         ChangeResult: {
             /**
              * Format: int64
@@ -2629,6 +2734,21 @@ export interface components {
             id: string;
             label: string;
             skipped: boolean;
+        };
+        CityDemandRow: {
+            keyword: string;
+            /**
+             * Format: int64
+             * @description Explicit imported city searches/month; not inferred by multiplying national volume.
+             */
+            monthly_searches?: number | null;
+            /** Format: int64 */
+            national_monthly_searches?: number | null;
+            /**
+             * Format: double
+             * @description Source-exported normalized city interest, 0–100. This is not search volume.
+             */
+            relative_interest?: number | null;
         };
         ClusterKeyword: {
             exact: boolean;
@@ -3000,6 +3120,38 @@ export interface components {
             expected_domain: string;
             /** @description At most 1000 distinct external source/target URL pairs, within the API's 2 MiB body cap. */
             links: components["schemas"]["ImportedBacklink"][];
+        };
+        ImportCityDemandInput: {
+            city: string;
+            /** Format: date */
+            period_end: string;
+            /** Format: date */
+            period_start: string;
+            rows: components["schemas"]["CityDemandRow"][];
+            source_note: string;
+        };
+        ImportLocalScanInput: {
+            /** @description Omitted cells remain unchecked; measured false cells must have no results. */
+            cells: components["schemas"]["LocalScanCell"][];
+            /**
+             * Format: int32
+             * @description 1–20. Non-returned targets are penalized as depth+1 only in ATRP.
+             */
+            depth: number;
+            keywords: string[];
+            /** Format: date-time */
+            observed_at: string;
+            source_note: string;
+            target_business_id: string;
+        };
+        ImportOverviewInput: {
+            keyword: string;
+            location?: string | null;
+            /** Format: date-time */
+            observed_at: string;
+            /** @description SerpApi-format Google search response; only normalized text and safe citations are retained. */
+            response: unknown;
+            source_note: string;
         };
         ImportedBacklink: {
             anchor?: string | null;
@@ -3443,6 +3595,62 @@ export interface components {
             status: string;
             tracker: components["schemas"]["LocalTracker"];
         };
+        LocalMetrics: {
+            /** Format: double */
+            arp?: number | null;
+            /** Format: double */
+            atrp?: number | null;
+            expected: number;
+            found: number;
+            keyword: string;
+            measured: number;
+            /** Format: double */
+            solv?: number | null;
+        };
+        LocalResult: {
+            address?: string | null;
+            business_id: string;
+            name: string;
+            /** Format: int32 */
+            position: number;
+            website?: string | null;
+        };
+        LocalScanCell: {
+            /** Format: date-time */
+            checked_at: string;
+            /** Format: int32 */
+            column: number;
+            error?: string | null;
+            keyword: string;
+            measured: boolean;
+            results: components["schemas"]["LocalResult"][];
+            /** Format: int32 */
+            row: number;
+        };
+        LocalScanRun: {
+            config: unknown;
+            /** Format: date-time */
+            created_at: string;
+            error?: string | null;
+            /** Format: date-time */
+            finished_at?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            job_id?: string | null;
+            provider: string;
+            status: string;
+            /** Format: uuid */
+            tracker_id: string;
+        };
+        LocalScanView: {
+            cells: components["schemas"]["LocalScanCell"][];
+            config: components["schemas"]["ScanConfig"];
+            metrics: components["schemas"]["LocalMetrics"][];
+            note: string;
+            points: components["schemas"]["GridPoint"][];
+            run: components["schemas"]["LocalScanRun"];
+        };
         LocalTracker: {
             address: string;
             business_id: string;
@@ -3490,6 +3698,12 @@ export interface components {
             organization_id: string;
             organization_name: string;
             role: string;
+        };
+        OverviewCapture: {
+            cached: boolean;
+            observation: components["schemas"]["ResearchObservation"];
+            /** Format: int32 */
+            requests: number;
         };
         PageDetail: {
             browser_result?: unknown;
@@ -3814,7 +4028,7 @@ export interface components {
             note?: string | null;
         };
         /** @enum {string} */
-        ProviderKind: "suggest" | "serp" | "demand" | "authority";
+        ProviderKind: "observations" | "suggest" | "serp" | "demand" | "authority";
         ProviderTest: {
             /** Format: int64 */
             latency_ms: number;
@@ -4070,6 +4284,19 @@ export interface components {
             summary: string;
             updated_by: string;
         };
+        ResearchObservation: {
+            country: string;
+            /** Format: date-time */
+            created_at: string;
+            data: unknown;
+            domain: string;
+            /** Format: uuid */
+            id: string;
+            kind: string;
+            language: string;
+            /** Format: uuid */
+            project_id: string;
+        };
         /** @enum {string} */
         Role: "member" | "admin" | "owner";
         /** @description What a check costs in provider requests (there are no credits or fees in SeoSeo itself). */
@@ -4162,6 +4389,20 @@ export interface components {
             volume_bucket?: string | null;
             volume_confidence?: string | null;
             volume_source?: string | null;
+        };
+        ScanConfig: {
+            country: string;
+            /** Format: uuid */
+            created_by: string;
+            /** Format: int32 */
+            depth: number;
+            keywords: string[];
+            /** Format: date-time */
+            observed_at: string;
+            source_note: string;
+            /** @description Exact provider place_id or data_id, explicitly reviewed; never fuzzy business-name matching. */
+            target_business_id: string;
+            tracker: components["schemas"]["LocalTracker"];
         };
         SerpAnalysis: {
             /** @description False until the Common Crawl ranks were imported (KD needs them). */
@@ -4309,6 +4550,12 @@ export interface components {
             expected_domain: string;
             search: boolean;
             source_urls: string[];
+        };
+        StartLocalScanInput: {
+            /** @description Must equal selected keywords × grid points. Live scans may incur provider charges. */
+            expected_requests: number;
+            keywords: string[];
+            target_business_id: string;
         };
         StartResearchInput: {
             /** @description ISO 3166-1 alpha-2; defaults to the project's market. */
@@ -5312,6 +5559,77 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    list_google_overviews: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchObservation"][];
+                };
+            };
+        };
+    };
+    capture_google_overview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CaptureOverviewInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OverviewCapture"];
+                };
+            };
+        };
+    };
+    import_google_overview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportOverviewInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchObservation"];
                 };
             };
         };
@@ -6390,6 +6708,52 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    list_city_demand: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchObservation"][];
+                };
+            };
+        };
+    };
+    import_city_demand: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportCityDemandInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResearchObservation"];
                 };
             };
         };
@@ -7525,6 +7889,124 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["Problem"];
                 };
+            };
+        };
+    };
+    list_local_scans: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                tracker_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LocalScanRun"][];
+                };
+            };
+        };
+    };
+    start_local_scan: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                tracker_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StartLocalScanInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LocalScanRun"];
+                };
+            };
+        };
+    };
+    import_local_scan: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                tracker_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ImportLocalScanInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LocalScanRun"];
+                };
+            };
+        };
+    };
+    get_local_scan: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                tracker_id: string;
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LocalScanView"];
+                };
+            };
+        };
+    };
+    delete_local_scan: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                tracker_id: string;
+                run_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };

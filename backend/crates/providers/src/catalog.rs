@@ -7,6 +7,8 @@ use utoipa::ToSchema;
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, ToSchema)]
 #[serde(rename_all = "snake_case")]
 pub enum ProviderKind {
+    /// Explicit local-grid and Google AI Overview collection, separate from organic search.
+    Observations,
     /// Keyword ideas from autocomplete.
     Suggest,
     /// Search result pages.
@@ -37,6 +39,20 @@ pub struct ProviderInfo {
 }
 
 pub const CATALOG: &[ProviderInfo] = &[
+    ProviderInfo {
+        id: "serpapi_observations",
+        kind: ProviderKind::Observations,
+        name: "SerpApi (Maps and AI Overviews)",
+        description: "Optional explicit Google Maps grid scans and Google AI Overview capture.",
+        free: false,
+        needs_key: true,
+        key_url: Some("https://serpapi.com/"),
+        needs_env: None,
+        default_enabled: false,
+        note: Some(
+            "BYOK. Enable explicitly. Grid scans show a reviewed request budget; imported observations work without a key. Never used as an organic search fallback.",
+        ),
+    },
     ProviderInfo {
         id: "suggest_google",
         kind: ProviderKind::Suggest,

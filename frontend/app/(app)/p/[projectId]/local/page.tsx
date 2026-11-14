@@ -12,6 +12,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
+import { LocalScans } from "@/components/local/scans";
+import { CityDemand } from "@/components/local/city-demand";
+
 type Business = components["schemas"]["LocalBusiness"];
 
 export default function LocalPage() {
@@ -24,7 +27,10 @@ function LocalWorkspace({ projectId }: { projectId: string }) {
   const path = { project_id: projectId };
   const [query, setQuery] = useState("");
   const [near, setNear] = useState("");
+  const [category, setCategory] = useState("");
+  const categories = useQuery({ queryKey: ["local-categories"], queryFn: () => unwrap(api.GET("/api/v1/local/categories")) });
   const [business, setBusiness] = useState<Business | null>(null);
+  const [trackerName, setTrackerName] = useState("");
   const [keywords, setKeywords] = useState("");
   const [size, setSize] = useState(5);
   const [spacing, setSpacing] = useState(2);
@@ -35,7 +41,7 @@ function LocalWorkspace({ projectId }: { projectId: string }) {
   });
   const search = useMutation({
     mutationFn: () => unwrap(api.POST("/api/v1/projects/{project_id}/local/businesses/search", {
-      params: { path }, body: { query, near },
+      params: { path }, body: { query, near, category: category || null },
     })),
     onMutate: () => { setBusiness(null); },
   });
@@ -44,6 +50,7 @@ function LocalWorkspace({ projectId }: { projectId: string }) {
       if (!business) throw new Error("Select a business first");
       return unwrap(api.POST("/api/v1/projects/{project_id}/local-trackers", {
         params: { path }, body: {
+          name: trackerName,
           business_source: business.source, business_id: business.source_id,
           business_name: business.name, address: business.address,
           latitude: business.latitude, longitude: business.longitude,
@@ -66,13 +73,17 @@ function LocalWorkspace({ projectId }: { projectId: string }) {
   });
   return <div className="grid min-w-0 gap-6">
     <Card><CardHeader><CardTitle>Local SEO</CardTitle><CardDescription>
-      Find a business and plan a keyword grid. Rank scans are not available yet; every point is unmeasured.
+      Find a business and plan a keyword grid. Run budgeted provider scans or import observations; unmeasured points stay unknown.
     </CardDescription></CardHeader><CardContent className="grid gap-4">
       <form className="grid gap-3 sm:grid-cols-2" onSubmit={e => { e.preventDefault(); search.mutate(); }}>
         <div className="grid gap-2"><Label htmlFor="business-query">Business name</Label>
           <Input id="business-query" required maxLength={120} value={query} onChange={e => setQuery(e.target.value)} /></div>
         <div className="grid gap-2"><Label htmlFor="business-near">City or address</Label>
           <Input id="business-near" required maxLength={160} value={near} onChange={e => setNear(e.target.value)} /></div>
+        <label className="grid gap-2 text-sm">Business category (optional)
+          <select className="rounded border bg-background p-2" value={category} onChange={e => setCategory(e.target.value)}>
+            <option value="">Any category</option>{categories.data?.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
+          </select></label>
         <Button type="submit" disabled={search.isPending}>{search.isPending ? "Searching…" : "Find business"}</Button>
       </form>
       {search.error && <p role="alert" className="text-sm text-destructive">{search.error.message}</p>}
@@ -82,7 +93,7 @@ function LocalWorkspace({ projectId }: { projectId: string }) {
         {search.data.businesses.map(b => <div className="flex flex-wrap items-center justify-between gap-3 rounded border p-3" key={b.source_id}>
           <div><p className="font-medium">{b.name}</p><p className="text-sm text-muted-foreground">{b.address}</p>
             <a className="text-sm underline" href={b.source_url} target="_blank" rel="noreferrer">View on OpenStreetMap</a></div>
-          <Button variant={business?.source_id === b.source_id ? "default" : "outline"} onClick={() => setBusiness(b)}>
+          <Button variant={business?.source_id === b.source_id ? "default" : "outline"} onClick={() => { setBusiness(b); setTrackerName(Array.from(b.name).slice(0, 120).join("")); }}>
             {business?.source_id === b.source_id ? "Selected" : "Use business"}</Button>
         </div>)}
         <p className="text-xs text-muted-foreground"><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">{search.data.attribution}</a>
@@ -92,6 +103,7 @@ function LocalWorkspace({ projectId }: { projectId: string }) {
     {business && <Card><CardHeader><CardTitle>Plan grid for {business.name}</CardTitle>
       <CardDescription>Up to 50 unique keywords. Saving stores the configuration and makes no rank requests.</CardDescription>
     </CardHeader><CardContent><form className="grid gap-4" onSubmit={e => { e.preventDefault(); create.mutate(); }}>
+      <label className="grid gap-2 text-sm">Tracker name<Input required maxLength={120} value={trackerName} onChange={e => setTrackerName(e.target.value)} /></label>
       <div className="grid gap-2"><Label htmlFor="local-keywords">Keywords (one per line or separated by commas)</Label>
         <Textarea id="local-keywords" required value={keywords} onChange={e => setKeywords(e.target.value)} /></div>
       <div className="grid gap-2"><Label htmlFor="local-size">Grid dimension</Label>
@@ -112,6 +124,8 @@ function LocalWorkspace({ projectId }: { projectId: string }) {
         {t.name} · {t.grid_size} × {t.grid_size} · {t.spacing_km} km · {t.keyword_count} keywords
       </Button>)}
     </CardContent></Card>
+    {selected && grid.data && <LocalScans key={selected} projectId={projectId} trackerId={selected} keywords={grid.data.keywords} size={grid.data.tracker.grid_size} />}
+    <CityDemand projectId={projectId} />
     {selected && <Card><CardHeader><CardTitle>Grid preview · Unmeasured</CardTitle></CardHeader><CardContent className="grid gap-4">
       {grid.isPending && <p>Loading preview…</p>}
       {grid.error && <p role="alert" className="text-destructive">{grid.error.message}</p>}

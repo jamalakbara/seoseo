@@ -8,7 +8,7 @@ use sqlx::{PgPool, Postgres, QueryBuilder};
 use utoipa::ToSchema;
 use uuid::Uuid;
 
-#[derive(Debug, Clone, Serialize, ToSchema, sqlx::FromRow)]
+#[derive(Debug, Clone, Serialize, serde::Deserialize, ToSchema, sqlx::FromRow)]
 pub struct LocalTracker {
     pub id: Uuid,
     pub project_id: Uuid,

@@ -9,6 +9,7 @@ use uuid::Uuid;
 /// Operator-level provider configuration shared by the API and the worker.
 #[derive(Clone, Default)]
 pub struct ProviderCtx {
+    pub serpapi_url: String,
     pub env: EnvCfg,
     /// `None` when `APP_ENCRYPTION_KEY` is not set: keys cannot be stored or read.
     pub secrets: Option<SecretBox>,
@@ -26,6 +27,7 @@ impl ProviderCtx {
             None => None,
         };
         Ok(Self {
+            serpapi_url: cfg.serpapi_url.clone(),
             env: EnvCfg {
                 renderer_url: cfg.renderer_url.clone().filter(|u| !u.is_empty()),
                 searxng_url: cfg

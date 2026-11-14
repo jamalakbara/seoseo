@@ -11,6 +11,13 @@ pub enum AuthMode {
 /// Runtime configuration, read from CLI flags or environment variables.
 #[derive(Debug, Clone, Args)]
 pub struct Config {
+    /// Operator-only SerpApi endpoint override for an approved proxy or offline fixtures.
+    #[arg(
+        long,
+        env = "SERPAPI_URL",
+        default_value = "https://serpapi.com/search.json"
+    )]
+    pub serpapi_url: String,
     /// Operator-only Nominatim search endpoint. Public usage is limited to explicit,
     /// user-triggered business discovery and is cached and globally paced.
     #[arg(

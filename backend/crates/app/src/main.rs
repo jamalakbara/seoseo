@@ -124,6 +124,7 @@ async fn main() -> anyhow::Result<()> {
                     tokio::select! {_=tokio::time::sleep(std::time::Duration::from_secs(60))=>{},_=sched_rx.changed()=>break,}
                 }
             });
+            let registry = domain::local_scans::register(registry, cfg.clone());
             let registry = domain::dashboard::register(registry, cfg);
             let result = jobs::run_worker(pool, registry, concurrency, rx).await;
             scheduler.abort();

@@ -110,6 +110,8 @@ services:
   web:
     build:
       context: ../frontend
+      args:
+        NEXT_PUBLIC_MAP_TILE_URL: ${MAP_TILE_URL:-https://tile.openstreetmap.org/{z}/{x}/{y}.png}
     image: ${SEOSEO_WEB_IMAGE:-seoseo-web:local}
     restart: unless-stopped
     environment:

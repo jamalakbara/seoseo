@@ -450,7 +450,7 @@ pub struct LocalGridPreview {
     pub note: String,
 }
 
-fn points(t: &LocalTracker) -> Vec<GridPoint> {
+pub(crate) fn points(t: &LocalTracker) -> Vec<GridPoint> {
     let half = t.grid_size / 2;
     let lat_step = t.spacing_km / 110.574;
     let lon_step = t.spacing_km / (111.320 * t.latitude.to_radians().cos());

@@ -107,8 +107,229 @@ fn conv<T: DeserializeOwned>(params: &impl Serialize) -> AppResult<T> {
         .map_err(|e| AppError::Validation(format!("invalid arguments: {e}")))
 }
 
+// REST bodies reject unknown fields; routing IDs belong only in the MCP wrapper.
+fn conv_scoped<T: DeserializeOwned>(params: &impl Serialize) -> AppResult<T> {
+    let mut value = serde_json::to_value(params).map_err(AppError::internal)?;
+    if let Some(object) = value.as_object_mut() {
+        for key in ["project_id", "tracker_id", "run_id"] {
+            object.remove(key);
+        }
+    }
+    conv(&value)
+}
+
 #[tool_router]
 impl SeoSeoMcp {
+    #[tool(
+        description = "Start a durable explicitly budgeted Maps grid scan using enabled SerpApi BYOK. expected_requests must equal selected saved keywords times grid points, max 250. Exact provider target ID required; no fuzzy name matching."
+    )]
+    async fn start_local_scan(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<StartLocalScan>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        reply(
+            async {
+                domain::local_scans::start(
+                    &self.pool,
+                    &actor,
+                    id("project_id", &p.project_id)?,
+                    id("tracker_id", &p.tracker_id)?,
+                    &self.cfg,
+                    conv_scoped(&p)?,
+                )
+                .await
+            }
+            .await,
+        )
+    }
+
+    #[tool(
+        description = "Import a source-labelled local ranking observation without provider requests. Missing cells stay unchecked; false measured cells have no results. Uses frozen tracker geometry. See REST ImportLocalScanInput for the observation schema."
+    )]
+    async fn import_local_scan(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<ImportLocalScan>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        reply(
+            async {
+                domain::local_scans::import(
+                    &self.pool,
+                    &actor,
+                    id("project_id", &p.project_id)?,
+                    id("tracker_id", &p.tracker_id)?,
+                    conv(&p.observation)?,
+                )
+                .await
+            }
+            .await,
+        )
+    }
+
+    #[tool(
+        description = "List up to 20 frozen local-grid runs with status and source; distinguish imports from provider captures."
+    )]
+    async fn list_local_scans(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<TrackerRef>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        reply(
+            async {
+                domain::local_scans::list(
+                    &self.pool,
+                    &actor,
+                    id("project_id", &p.project_id)?,
+                    id("tracker_id", &p.tracker_id)?,
+                )
+                .await
+            }
+            .await,
+        )
+    }
+
+    #[tool(
+        description = "Read local grid cell competitors, measured/unchecked coverage and per-keyword ARP/ATRP/SoLV. Null ranks on failed cells are unknown. Compare only matching grids, keywords and sources."
+    )]
+    async fn get_local_scan(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<LocalScanRef>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        reply(
+            async {
+                domain::local_scans::get(
+                    &self.pool,
+                    &actor,
+                    id("project_id", &p.project_id)?,
+                    id("tracker_id", &p.tracker_id)?,
+                    id("run_id", &p.run_id)?,
+                )
+                .await
+            }
+            .await,
+        )
+    }
+
+    #[tool(
+        description = "Capture actual Google AI Overview text and reported citations using enabled SerpApi BYOK. Review expected_max_requests=2. Uses a 24h cache; absent and incomplete are distinct. Never generates a model answer."
+    )]
+    async fn capture_google_ai_overview(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<CaptureGoogleOverview>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        reply(
+            async {
+                domain::observations::capture_overview(
+                    &self.pool,
+                    &actor,
+                    id("project_id", &p.project_id)?,
+                    &self.cfg,
+                    conv_scoped(&p)?,
+                )
+                .await
+            }
+            .await,
+        )
+    }
+
+    #[tool(
+        description = "Import source-labelled SerpApi-format Google search evidence without requests. Only normalized overview text/status and safe citations are retained; metadata, keys and continuation tokens are discarded."
+    )]
+    async fn import_google_ai_overview(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<ImportGoogleOverview>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        reply(
+            async {
+                domain::observations::import_overview(
+                    &self.pool,
+                    &actor,
+                    id("project_id", &p.project_id)?,
+                    conv_scoped(&p)?,
+                )
+                .await
+            }
+            .await,
+        )
+    }
+
+    #[tool(
+        description = "List up to 100 Google AI Overview observations for the current project website and market, with source, dates, status and reported citations."
+    )]
+    async fn list_google_ai_overviews(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<ProjectRef>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        reply(
+            async {
+                domain::observations::overview_history(
+                    &self.pool,
+                    &actor,
+                    id("project_id", &p.project_id)?,
+                )
+                .await
+            }
+            .await,
+        )
+    }
+
+    #[tool(
+        description = "Save city-level demand context from an explicit source export: city, period_start/end, source_note and up to 500 keyword rows. Relative interest 0-100 is not volume; national volume is never scaled into a city estimate."
+    )]
+    async fn import_city_demand(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<ImportCityDemand>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        reply(
+            async {
+                domain::observations::import_city(
+                    &self.pool,
+                    &actor,
+                    id("project_id", &p.project_id)?,
+                    conv(&p.observation)?,
+                )
+                .await
+            }
+            .await,
+        )
+    }
+
+    #[tool(
+        description = "Read up to 100 source-labelled city demand datasets in the current website and market. Missing city searches remain null; normalized relative interest is not searches/month."
+    )]
+    async fn list_city_demand(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<ProjectRef>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        reply(
+            async {
+                domain::observations::city_history(
+                    &self.pool,
+                    &actor,
+                    id("project_id", &p.project_id)?,
+                )
+                .await
+            }
+            .await,
+        )
+    }
+
     #[tool(
         description = "List curated local business categories for explicit OpenStreetMap business discovery."
     )]
@@ -2562,6 +2783,10 @@ mod tests {
             "create_local_tracker",
             "list_local_trackers",
             "get_local_grid_preview",
+            "start_local_scan",
+            "get_local_scan",
+            "capture_google_ai_overview",
+            "import_city_demand",
             "get_internal_link_graph",
             "compare_site_audits",
             "get_audit_schedule",

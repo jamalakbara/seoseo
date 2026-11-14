@@ -14,6 +14,7 @@ mod http;
 pub mod rdap;
 pub mod registry;
 pub mod serp;
+pub mod serpapi;
 pub mod suggest;
 pub mod wikipedia;
 

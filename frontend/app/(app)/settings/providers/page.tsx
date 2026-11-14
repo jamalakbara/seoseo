@@ -17,6 +17,7 @@ import { useMe } from "@/lib/queries";
 type Provider = Schemas["ProviderView"];
 
 const KIND_TITLES: Record<Provider["kind"], { title: string; description: string }> = {
+  observations: { title: "Local and AI observations", description: "Optional collection of Maps rankings and Google AI Overviews. Imports work without a paid key." },
   suggest: { title: "Keyword ideas", description: "Where keyword ideas come from." },
   demand: { title: "Demand signals", description: "Measured signals behind volume estimates and trends." },
   serp: {
@@ -26,7 +27,7 @@ const KIND_TITLES: Record<Provider["kind"], { title: string; description: string
   },
   authority: { title: "Domain authority", description: "Scores how strong a domain is (SeoSeo Rank, 0–100)." },
 };
-const KIND_ORDER: Provider["kind"][] = ["suggest", "demand", "serp", "authority"];
+const KIND_ORDER: Provider["kind"][] = ["suggest", "demand", "serp", "observations", "authority"];
 const fail = (e: unknown) => toast.error(e instanceof ApiError ? e.message : "Failed");
 
 export default function ProvidersPage() {
