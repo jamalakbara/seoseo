@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useLocale } from "@/lib/locale";
 import { useParams, usePathname } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { countryName } from "@/lib/markets";
@@ -8,6 +9,7 @@ import { useProject } from "@/lib/queries";
 import { cn } from "cn";
 
 export function ProjectHeader() {
+  const { t: translate } = useLocale();
   const { projectId } = useParams<{ projectId: string }>();
   const pathname = usePathname();
   const project = useProject(projectId);
@@ -28,6 +30,7 @@ export function ProjectHeader() {
     { href: `${base}/business`, label: "Business" },
     { href: `${base}/reports`, label: "Reports" },
     { href: `${base}/integrations`, label: "Integrations" },
+    { href: `${base}/extras`, label: "Extras" },
     { href: `${base}/settings`, label: "Settings" },
   ];
 
@@ -57,7 +60,7 @@ export function ProjectHeader() {
                 active && "border-foreground text-foreground",
               )}
             >
-              {t.label}
+              {translate(t.label)}
             </Link>
           );
         })}

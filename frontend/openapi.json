@@ -4807,6 +4807,118 @@
         ]
       }
     },
+    "/api/v1/projects/{project_id}/crawler-credential": {
+      "get": {
+        "tags": [
+          "extras"
+        ],
+        "operationId": "get_crawler_credential",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CredentialView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "extras"
+        ],
+        "operationId": "save_crawler_credential",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CrawlerCredentialInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CredentialView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "extras"
+        ],
+        "operationId": "delete_crawler_credential",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {}
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/projects/{project_id}/crux": {
       "post": {
         "tags": [
@@ -6064,6 +6176,54 @@
         ]
       }
     },
+    "/api/v1/projects/{project_id}/keyword-cpc": {
+      "post": {
+        "tags": [
+          "keywords"
+        ],
+        "operationId": "get_cpc_metrics",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CpcInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CpcView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/projects/{project_id}/keyword-research": {
       "get": {
         "tags": [
@@ -7167,6 +7327,132 @@
               }
             }
           }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/log-analyses": {
+      "get": {
+        "tags": [
+          "extras"
+        ],
+        "operationId": "list_log_analyses",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LogAnalysis"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "extras"
+        ],
+        "operationId": "create_log_analysis",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogAnalysis"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/log-analyses/{analysis_id}": {
+      "delete": {
+        "tags": [
+          "extras"
+        ],
+        "operationId": "delete_log_analysis",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "analysis_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {}
         },
         "security": [
           {
@@ -9757,6 +10043,44 @@
         ]
       }
     },
+    "/api/v1/projects/{project_id}/volatility": {
+      "get": {
+        "tags": [
+          "extras"
+        ],
+        "operationId": "get_volatility",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Volatility"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/projects/{project_id}/website-research": {
       "post": {
         "tags": [
@@ -10076,6 +10400,113 @@
           },
           {
             "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/public/tools": {
+      "post": {
+        "tags": [
+          "public-tools"
+        ],
+        "operationId": "run_public_tool",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublicToolInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/settings/telemetry": {
+      "get": {
+        "tags": [
+          "system"
+        ],
+        "operationId": "get_telemetry",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TelemetryView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "system"
+        ],
+        "operationId": "save_telemetry",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TelemetryInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TelemetryView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ]
+      }
+    },
+    "/api/v1/settings/telemetry/send": {
+      "post": {
+        "tags": [
+          "system"
+        ],
+        "operationId": "send_telemetry",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TelemetryView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
           }
         ]
       }
@@ -12969,6 +13400,133 @@
           }
         }
       },
+      "CpcInput": {
+        "type": "object",
+        "required": [
+          "keywords",
+          "geo_target_id",
+          "language_id",
+          "currency"
+        ],
+        "properties": {
+          "currency": {
+            "type": "string",
+            "description": "Expected account currency, verified with Google before returning measured micros."
+          },
+          "geo_target_id": {
+            "type": "string",
+            "description": "Google geo target constant ID, e.g. 2840. Explicit to avoid guessing market."
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "language_id": {
+            "type": "string",
+            "description": "Google language constant ID, e.g. 1000."
+          }
+        },
+        "additionalProperties": false
+      },
+      "CpcRow": {
+        "type": "object",
+        "required": [
+          "keyword"
+        ],
+        "properties": {
+          "average_cpc_micros": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "average_monthly_searches": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "competition": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "competition_index": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "keyword": {
+            "type": "string"
+          }
+        }
+      },
+      "CpcView": {
+        "type": "object",
+        "required": [
+          "source",
+          "available",
+          "currency",
+          "rows",
+          "note"
+        ],
+        "properties": {
+          "available": {
+            "type": "boolean"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "note": {
+            "type": "string"
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CpcRow"
+            }
+          },
+          "source": {
+            "type": "string"
+          }
+        }
+      },
+      "CrawlerCredentialInput": {
+        "type": "object",
+        "required": [
+          "host",
+          "signature",
+          "signature_input",
+          "signature_agent",
+          "expires_at"
+        ],
+        "properties": {
+          "expires_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "host": {
+            "type": "string"
+          },
+          "signature": {
+            "type": "string"
+          },
+          "signature_agent": {
+            "type": "string"
+          },
+          "signature_input": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "CreateAiTrackerInput": {
         "type": "object",
         "required": [
@@ -13247,6 +13805,30 @@
           "token": {
             "type": "string",
             "description": "Secret token for the invite link (`/invite/{token}`). Shown once."
+          }
+        }
+      },
+      "CredentialView": {
+        "type": "object",
+        "required": [
+          "configured"
+        ],
+        "properties": {
+          "configured": {
+            "type": "boolean"
+          },
+          "expires_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "host": {
+            "type": [
+              "string",
+              "null"
+            ]
           }
         }
       },
@@ -16160,6 +16742,42 @@
           }
         }
       },
+      "LogAnalysis": {
+        "type": "object",
+        "required": [
+          "id",
+          "project_id",
+          "summary",
+          "created_at"
+        ],
+        "properties": {
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "project_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "summary": {}
+        }
+      },
+      "LogInput": {
+        "type": "object",
+        "required": [
+          "content"
+        ],
+        "properties": {
+          "content": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "MeView": {
         "type": "object",
         "required": [
@@ -17787,6 +18405,30 @@
           }
         ]
       },
+      "PublicToolInput": {
+        "type": "object",
+        "required": [
+          "tool"
+        ],
+        "properties": {
+          "content": {
+            "type": "string",
+            "description": "Seed, HTML, robots.txt, XML, or JSON-LD according to the tool."
+          },
+          "tool": {
+            "type": "string",
+            "description": "keywords | serp-preview | backlinks | authority | domain-age | robots | sitemap |\nmeta | schema | redirects | hreflang"
+          },
+          "url": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Public URL for resolution, target matching, robots testing or redirect checks."
+          }
+        },
+        "additionalProperties": false
+      },
       "RankMover": {
         "type": "object",
         "required": [
@@ -19000,6 +19642,48 @@
           }
         }
       },
+      "SerpPairView": {
+        "type": "object",
+        "required": [
+          "keyword",
+          "current_urls",
+          "previous_urls"
+        ],
+        "properties": {
+          "churn": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
+          "current_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "current_urls": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "keyword": {
+            "type": "string"
+          },
+          "previous_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "previous_urls": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
       "SerpRow": {
         "type": "object",
         "required": [
@@ -19510,6 +20194,39 @@
           }
         }
       },
+      "TelemetryInput": {
+        "type": "object",
+        "required": [
+          "enabled"
+        ],
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          }
+        },
+        "additionalProperties": false
+      },
+      "TelemetryView": {
+        "type": "object",
+        "required": [
+          "enabled",
+          "receiver_configured",
+          "payload",
+          "note"
+        ],
+        "properties": {
+          "enabled": {
+            "type": "boolean"
+          },
+          "note": {
+            "type": "string"
+          },
+          "payload": {},
+          "receiver_configured": {
+            "type": "boolean"
+          }
+        }
+      },
       "TopPage": {
         "type": "object",
         "required": [
@@ -19738,6 +20455,52 @@
             "type": "boolean"
           },
           "name": {
+            "type": "string"
+          }
+        }
+      },
+      "Volatility": {
+        "type": "object",
+        "required": [
+          "serp_pairs",
+          "comparable_keywords",
+          "excluded_keywords",
+          "source",
+          "note"
+        ],
+        "properties": {
+          "comparable_keywords": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "excluded_keywords": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "index": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
+          "note": {
+            "type": "string"
+          },
+          "rank_movement_index": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double"
+          },
+          "serp_pairs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SerpPairView"
+            }
+          },
+          "source": {
             "type": "string"
           }
         }

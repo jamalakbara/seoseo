@@ -95,6 +95,7 @@ async fn main() -> anyhow::Result<()> {
                     user_agent: cfg.crawler_user_agent.clone(),
                     allow_private: cfg.crawler_allow_private,
                     renderer_url: cfg.renderer_url.clone().filter(|s| !s.is_empty()),
+                    secrets: pctx.secrets.clone(),
                 },
             );
             let registry = jobs::keyword_research::register(registry, pctx.clone());

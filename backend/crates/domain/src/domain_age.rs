@@ -49,8 +49,13 @@ pub async fn lookup(
     let domain = normalize_domain(input.domain.as_deref().or(p.domain.as_deref()).ok_or_else(
         || AppError::Validation("enter a domain or set the project's website".into()),
     )?)?;
+    public_lookup(pool, &domain).await
+}
+
+/// Shared bounded public registry metadata; no project information is exposed.
+pub async fn public_lookup(pool: &PgPool, domain: &str) -> AppResult<DomainAge> {
     // One day for all responses, including unsupported/404; no user refresh bypass.
-    if let Some(value) = db::providers::cache_get(pool, "rdap_registration_v1", &domain, 1).await?
+    if let Some(value) = db::providers::cache_get(pool, "rdap_registration_v1", domain, 1).await?
         && let Ok(record) = serde_json::from_value::<RdapRecord>(value)
         && record.domain == domain
     {
@@ -67,14 +72,14 @@ pub async fn lookup(
             value
         }
     };
-    let record = rdap::lookup(&domain, &bootstrap)
+    let record = rdap::lookup(domain, &bootstrap)
         .await
         .map_err(jobs::provider_ctx::provider_err)?;
     debug_assert!(record.registered_at.is_none() || record.status == RdapStatus::Found);
     db::providers::cache_put(
         pool,
         "rdap_registration_v1",
-        &domain,
+        domain,
         &serde_json::to_value(&record).map_err(AppError::internal)?,
     )
     .await?;

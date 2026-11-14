@@ -2,7 +2,7 @@
 
 Free, open-source, self-hostable SEO platform — an alternative to Semrush, Ahrefs and OpenSEO that works **without paid API keys**.
 
-> Status: **M7 complete**. Streamed assistant and reviewed memory, content tools, evidence alerts, webhooks, weekly email, reports/PDF, business records, backup/restore and account deletion are delivered, with 121 MCP tools. See [M7 setup and acceptance](docs/30-m7-operations-and-acceptance.md). M6's final export closeout and M5's live-cloud gate remain pending; see the [roadmap](docs/07-roadmap.md).
+> Status: **M8 implemented; release publication pending**. Eleven public tools, private log summaries, measured SERP volatility, signed crawler credentials, optional Ads CPC, en/id navigation, diagnostics and 124 MCP tools are delivered. See [M8 setup and acceptance](docs/31-m8-polish-and-release.md). Public tools: `/tools`; documentation site: `/docs`. The v1.0/GHCR/ARM64 release gates and prior M5/M6 acceptance gates remain open in the [roadmap](docs/07-roadmap.md).
 
 M5 guides: [competitive research](docs/14-competitive-research.md), [backlinks](docs/15-backlink-snapshots.md), [AI visibility setup](docs/16-ai-visibility.md), [agent skills](plugins/seoseo/README.md). Domain/backlink coverage is a bounded sample, and traffic estimates require eligible monthly search counts. Unknown metrics stay null.
 

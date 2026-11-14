@@ -8,6 +8,7 @@ mod bing;
 mod competitive;
 mod content;
 mod dashboard;
+mod extras;
 mod ga4;
 mod gsc;
 mod integrations;
@@ -56,5 +57,6 @@ pub fn v1() -> OpenApiRouter<AppState> {
         .merge(reports::router())
         .merge(gsc::router())
         .merge(ga4::router())
+        .merge(extras::router())
         .merge(integrations::router())
 }

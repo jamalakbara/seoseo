@@ -59,11 +59,12 @@ impl Default for AuditConfig {
 }
 
 /// Operator-level crawler settings (environment).
-#[derive(Debug, Clone, Default)]
+#[derive(Clone, Default)]
 pub struct CrawlSettings {
     pub user_agent: Option<String>,
     pub allow_private: bool,
     pub renderer_url: Option<String>,
+    pub secrets: Option<common::crypto::SecretBox>,
 }
 
 #[derive(Deserialize)]
@@ -102,7 +103,7 @@ async fn run_audit(ctx: &JobCtx, settings: &CrawlSettings, audit_id: Uuid) -> an
     }
     let mut cfg: AuditConfig = serde_json::from_value(audit.config.clone()).unwrap_or_default();
     cfg.renderer_url = settings.renderer_url.clone();
-    let fetcher = Fetcher::new(FetcherConfig {
+    let mut fetcher = Fetcher::new(FetcherConfig {
         user_agent: settings
             .user_agent
             .clone()
@@ -112,6 +113,46 @@ async fn run_audit(ctx: &JobCtx, settings: &CrawlSettings, audit_id: Uuid) -> an
         },
         timeout: Duration::from_secs(20),
     })?;
+    if let Some(c) = db::extras::credential(pool, audit.project_id).await? {
+        // Only the crawler receives secrets. Browser/render services never see them.
+        let secrets = settings
+            .secrets
+            .as_ref()
+            .ok_or_else(|| anyhow::anyhow!("crawler credentials require APP_ENCRYPTION_KEY"))?;
+        let plaintext = secrets.decrypt(&c.secret)?;
+        let v: serde_json::Value = serde_json::from_str(&plaintext)?;
+        let mut headers = reqwest::header::HeaderMap::new();
+        for (header, field) in [
+            ("signature", "signature"),
+            ("signature-input", "signature_input"),
+            ("signature-agent", "signature_agent"),
+        ] {
+            headers.insert(
+                reqwest::header::HeaderName::from_static(header),
+                reqwest::header::HeaderValue::from_str(
+                    v[field]
+                        .as_str()
+                        .ok_or_else(|| anyhow::anyhow!("invalid crawler credential"))?,
+                )?,
+            );
+        }
+        // Project changes invalidate use even if a saved credential was not removed.
+        let project = db::projects::get(
+            pool,
+            ctx.job
+                .organization_id
+                .ok_or_else(|| anyhow::anyhow!("audit job lacks workspace"))?,
+            audit.project_id,
+        )
+        .await?;
+        if project.domain.as_deref() == Some(c.host.as_str()) {
+            fetcher = fetcher.with_credential(crawler::fetch::ScopedCredential {
+                host: c.host,
+                headers,
+                expires_unix: c.expires_at.timestamp().max(0) as u64,
+            });
+        }
+    }
 
     // ---- probe: resolve the start URL (http→https, apex→www) to define the crawl scope.
     let mut start = Url::parse(&audit.start_url)?;

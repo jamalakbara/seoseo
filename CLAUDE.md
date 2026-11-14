@@ -1,19 +1,21 @@
-# SeoSeo — agent context
+# SeoSeo â€” agent context
 
 Free, open-source, self-hostable SEO platform (OpenSEO / Semrush / Ahrefs alternative) that works with **zero paid API keys**.
 
 ## Read first
-- `docs/00-README.md` → index. PRD `docs/02-PRD.md`, backlog `docs/03-feature-catalog.md`, architecture `docs/04-architecture.md`, free data `docs/05-free-data-sources.md`, roadmap `docs/07-roadmap.md`.
+- `docs/00-README.md` â†’ index. PRD `docs/02-PRD.md`, backlog `docs/03-feature-catalog.md`, architecture `docs/04-architecture.md`, free data `docs/05-free-data-sources.md`, roadmap `docs/07-roadmap.md`.
 - `aimem context` for decisions, memories, last handoff.
 - Reference implementation: `reference/open-seo/` (read-only clone of every-app/open-seo, git-ignored). Its `docs/maintainers/specs/` are good design records.
 
 ## Status
 
-M5 implementation complete; the exact three-live-engine acceptance gate is pending cloud credentials. See `docs/17-m5-acceptance.md`. 87 MCP tools; 14 portable skills in `plugins/seoseo/skills` (validate with `python scripts/validate-agent-skills.py`). Competitive evidence combines saved/researched/rank-tracked/volume-imported project keywords, up to 500; traffic is an exact-rank/imported-monthly-volume heuristic for the observed sample, not total domain traffic. Wikipedia pageviews are not search counts.
+M8 implementation delivered on `codex/m8-polish`; v1.0/GHCR publication and ARM64 runtime verification remain open. See `docs/31-m8-polish-and-release.md` for exact limits and acceptance. The server exposes 124 MCP tools, including SERP/GSC Apps widgets and measured SERP churn. Public `/tools` and `/docs` do not require sign-in. English/Indonesian localization covers navigation and core public-tool labels; legacy prose remains English.
 
-Backlinks: bounded SERP/explicit-source discovery, guarded HTML verification, inconclusive prior rows retained as unconfirmed, source-specific immutable snapshots and explainable HTML risk. AI: compatible + native Ollama/Anthropic/Gemini; Anthropic search/citations, Gemini text-only because Google Search grounding restrictions conflict with durable analysis. Manual/daily/weekly/monthly UTC schedules claim due work atomically and pause at 20 retained runs. Migrations 0013/0014 are additive; never edit applied migrations. API and worker need matching engine configuration.
+M7 assistant/content, alerts, webhook destinations, scheduled SMTP digests, reports/PDF, business records, backup/restore and account deletion are complete (`docs/30-m7-operations-and-acceptance.md`). M6 implementation is delivered; final export closeout remains open (`docs/27-m6-acceptance.md`). M5's exact three-live-engine gate still requires cloud credentials (`docs/17-m5-acceptance.md`). M3 retained follow-ups are keyword import, per-tracker timezones/run matrix, Jobs retry and provider-dependent device/city/depth controls.
 
-Primary docs: `docs/14-competitive-research.md`, `docs/15-backlink-snapshots.md`, `docs/16-ai-visibility.md`. Main new E2E is `scripts/e2e-m5-final.py` on a disposable password-auth stack with model/research fixtures and actual local Ollama. Existing competitive/backlink/AI regressions remain required. Native cloud fixtures do not establish live cloud access. Normal containers must be rebuilt/migrated to use new code. M3 retained follow-ups: keyword file import, tracker timezones/run matrix, Jobs retry, provider-dependent device/city/depth. M6 remains future scope.
+M8 migrations are additive through 0022. Logs retain only bounded private aggregates; Web Bot Auth headers are encrypted and restricted to the exact HTTPS host before expiry. SERP churn requires two complete same-provider exact-engine top-ten URL samples; tracked rank movement is separate. CPC needs explicit operator Google Ads BYOK; absent credentials mean nulls. Diagnostics are off by default, version-only, instance-admin opt-in and manually sent to an operator receiver. Never claim live Ads/Shopify acceptance from local tests.
+
+Use isolated `deploy/compose.m8check.yaml`, `scripts/e2e-m8.py` and `scripts/e2e-m8-browser.cjs` for M8 regression; the normal stack has not been upgraded. `python scripts/build-docs.py` regenerates the checked-in public documentation bundle after canonical Markdown edits, and `--check` runs in CI. API/worker must use matching source and operator configuration.
 
 ## Commands
 - No local Rust: `scripts/cargo-docker.sh "<cargo args>"` (e.g. `"clippy --workspace --all-targets -- -D warnings"`, `"test --workspace"`).
@@ -29,7 +31,7 @@ Primary docs: `docs/14-competitive-research.md`, `docs/15-backlink-snapshots.md`
 - Docker Compose: db, cache, migrate, api, worker, web, renderer (Chromium+Lighthouse), searxng (profile), ollama (profile), caddy (profile).
 
 ## Rules
-- Layering: router / MCP tool → service (`domain`) → repository (`db`). Providers only called from services.
+- Layering: router / MCP tool â†’ service (`domain`) â†’ repository (`db`). Providers only called from services.
 - Every query tenant-scoped (org, project). `projectId` explicit in every project route.
 - No billing/credits. Every data feature needs a free default provider; paid APIs only as optional BYOK adapters.
 - Metrics carry `source` + `confidence`; unknown = null, never 0.
@@ -48,10 +50,10 @@ START of every session:
 1. Read `.aimem/INDEX.md`.
 2. Run `aimem context --task "<what the user asked>" --yes` (or call the aimem_context MCP tool).
 
-DURING work — record only what a future agent would otherwise have to rediscover:
-- A choice with reasons or rejected alternatives → `aimem decide`
-- A non-obvious fact, gotcha, or constraint → `aimem remember`
-- A production problem and its cause → `aimem incident`
+DURING work â€” record only what a future agent would otherwise have to rediscover:
+- A choice with reasons or rejected alternatives â†’ `aimem decide`
+- A non-obvious fact, gotcha, or constraint â†’ `aimem remember`
+- A production problem and its cause â†’ `aimem incident`
 Before adding, run `aimem search` to avoid duplicates. Never record secrets or personal data.
 
 END of every session (or when stopping):

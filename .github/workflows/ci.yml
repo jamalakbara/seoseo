@@ -4,6 +4,7 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_call:
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -62,6 +63,8 @@ jobs:
           cache: pnpm
           cache-dependency-path: frontend/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
+      - name: Documentation bundle is up to date
+        run: python ../scripts/build-docs.py --check
       - name: Generated API types are up to date
         run: pnpm gen:api && git diff --exit-code lib/api/schema.d.ts
       - run: pnpm lint

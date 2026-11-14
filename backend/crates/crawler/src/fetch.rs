@@ -137,6 +137,15 @@ pub struct FetchOutcome {
 pub struct Fetcher {
     client: reqwest::Client,
     policy: UrlPolicy,
+    credential: Option<ScopedCredential>,
+}
+
+/// Merchant-supplied Web Bot Auth headers. Never attach to another origin or HTTP.
+#[derive(Clone)]
+pub struct ScopedCredential {
+    pub host: String,
+    pub headers: HeaderMap,
+    pub expires_unix: u64,
 }
 
 impl Fetcher {
@@ -153,7 +162,31 @@ impl Fetcher {
         Ok(Self {
             client,
             policy: cfg.policy,
+            credential: None,
         })
+    }
+
+    pub fn with_credential(mut self, credential: ScopedCredential) -> Self {
+        self.credential = Some(credential);
+        self
+    }
+
+    fn request(&self, url: &Url) -> reqwest::RequestBuilder {
+        let mut request = self.client.get(url.clone());
+        if let Some(c) = &self.credential {
+            let now = std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap_or_default()
+                .as_secs();
+            if url.scheme() == "https"
+                && url.host_str() == Some(c.host.as_str())
+                && url.port_or_known_default() == Some(443)
+                && c.expires_unix > now
+            {
+                request = request.headers(c.headers.clone());
+            }
+        }
+        request
     }
 
     pub fn policy(&self) -> UrlPolicy {
@@ -183,8 +216,7 @@ impl Fetcher {
     ) -> Result<(u16, Option<String>, Vec<u8>), String> {
         self.policy.check_url(url).map_err(|e| e.to_string())?;
         let mut response = self
-            .client
-            .get(url.clone())
+            .request(url)
             .send()
             .await
             .map_err(|_| "ownership check could not reach host".to_string())?;
@@ -252,7 +284,7 @@ impl Fetcher {
                 out.error = Some(e.to_string());
                 break;
             }
-            let resp = match self.client.get(current.clone()).send().await {
+            let resp = match self.request(&current).send().await {
                 Ok(r) => r,
                 Err(e) => {
                     out.class = FetchClass::NetworkError;
@@ -428,6 +460,52 @@ fn describe(e: &reqwest::Error) -> String {
 mod tests {
     use super::*;
     use reqwest::header::HeaderValue;
+
+    #[test]
+    fn signed_headers_are_exact_host_https_and_expiry_bound() {
+        let mut headers = HeaderMap::new();
+        headers.insert("signature", HeaderValue::from_static("sig1=:secret:"));
+        let make = |expires_unix| {
+            Fetcher::new(FetcherConfig::default())
+                .unwrap()
+                .with_credential(ScopedCredential {
+                    host: "store.example.com".into(),
+                    headers: headers.clone(),
+                    expires_unix,
+                })
+        };
+        for url in [
+            "http://store.example.com/",
+            "https://other.example.com/",
+            "https://store.example.com:8443/",
+        ] {
+            assert!(
+                !make(u64::MAX)
+                    .request(&Url::parse(url).unwrap())
+                    .build()
+                    .unwrap()
+                    .headers()
+                    .contains_key("signature")
+            );
+        }
+        let url = Url::parse("https://store.example.com/a").unwrap();
+        assert!(
+            make(u64::MAX)
+                .request(&url)
+                .build()
+                .unwrap()
+                .headers()
+                .contains_key("signature")
+        );
+        assert!(
+            !make(0)
+                .request(&url)
+                .build()
+                .unwrap()
+                .headers()
+                .contains_key("signature")
+        );
+    }
 
     #[test]
     fn parses_link_canonical() {

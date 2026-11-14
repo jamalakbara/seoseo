@@ -12,7 +12,7 @@ Each milestone ends with: tests green, docker compose up works, docs + `03-featu
 | **M5** (implemented; live-cloud acceptance pending) | Competitive + backlinks + AI visibility | DO-01..05/07, BL-01..06, DB-04, AI-01..04, skills (MC-05) | Domain overview of competitor; AI visibility run on 3 engines incl. Ollama |
 | **M6** (implemented; final browser closeout pending) | Local SEO + advanced | LO-01..04/06, KW-10/11, DO-06, BL-07, RT-07, SA-09/12/13, AI-05/06, IN-04 Bing | KW-11, DO-06, BL-07, RT-07, SA-09/12/13, AI-05 and Bing delivered; local scans/maps/competitors, imported city context and AI Overview capture implemented; live/UI checks passed; final export closeout pending |
 | **M7** ✅ | Assistant, alerts, content | AG-01..03, RT-08, SA-16, IN-06, RP-04..06, LO-05, OP-04, WS-07 | Done 2026-11-15: real local Ollama assistant and weekly scheduled SMTP digest passed; alerts/destinations, five reports/PDF, local business records with optional Places preview, backup/restore and seven-day account deletion verified. See M7 acceptance. |
-| **M8** | Polish & extras | Free public tools (FT), MCP widgets, log analyzer, volatility index, i18n, BYOK CPC, telemetry opt-in, docs site | v1.0 release, multi-arch images published |
+| **M8** (implemented; release publication pending) | Polish & extras | Free public tools (FT), MCP widgets, log analyzer, volatility index, i18n, BYOK CPC, telemetry opt-in, docs site | Implementation and local API/browser/Docker checks delivered 2026-11-15; v1.0 tag/GHCR publication and ARM64 execution remain open. See M8 acceptance. |
 
 ## M4 complete
 
@@ -38,3 +38,7 @@ M3 core is shipped. Per user direction on 2026-11-12, retain keyword file import
 GSC operator setup and verification: [Search Console](10-search-console.md). Real Google consent/property access still needs a configured Google Cloud client.
 
 M2 setup and verification: [Browser audits and keyword refresh](09-m2-browser-and-refresh.md).
+
+## M8 implementation delivered; publication pending
+
+[Polish, tools and release acceptance](31-m8-polish-and-release.md) covers all M8 feature rows, eleven anonymous tools, 124 MCP tools with Apps widgets, private log aggregates, measured SERP churn, signed merchant crawler access, explicit Ads BYOK, scoped en/id localization, optional diagnostics, the public documentation site and CI-gated multi-architecture release automation. Unit, API, desktop/mobile and local Docker checks pass. No v1.0 tag, registry publication or ARM64 runtime validation was performed; the release exit criterion remains open. Live Ads/Shopify acceptance is credential-dependent. Prior M3/M5/M6 follow-ups remain open.

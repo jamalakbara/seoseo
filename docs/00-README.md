@@ -1,5 +1,7 @@
 # SeoSeo — Documentation Index
 
+M8 implementation and release gates: [Polish and release acceptance](31-m8-polish-and-release.md). Public tools and documentation are served at `/tools` and `/docs`.
+
 M7 complete: [Operations and acceptance](30-m7-operations-and-acceptance.md) documents alerts, destinations, weekly email, reports/PDF, business records, backup/restore and account deletion. [Assistant and content](28-assistant-and-content.md) and [streaming/reviewed memory](29-assistant-streaming-and-memory.md) cover AG-01..03.
 
 Free, open-source, self-hostable SEO platform. Rust (axum) backend · Next.js 16 frontend · Docker Compose. Reverse-engineered from OpenSEO (every-app/open-seo v0.1.26) and extended.
@@ -22,6 +24,8 @@ Free, open-source, self-hostable SEO platform. Rust (axum) backend · Next.js 16
 | 14 | [Competitive research](14-competitive-research.md) | Project SERP samples, volume-based sample-click estimates, competitors, gaps and RDAP |
 | 15 | [Backlink snapshots](15-backlink-snapshots.md) | Imported evidence, sample diffs, referring domains, pages/anchors, retention and tests |
 | 16 | [AI visibility](16-ai-visibility.md) | Manual model comparisons, durable runs, literal mentions, coverage, setup and tests |
+
+| 31 | [M8 polish and release](31-m8-polish-and-release.md) | Public tools, log aggregates, volatility, crawler credentials, MCP Apps, CPC, localization, telemetry and release gates |
 
 Reference source: `reference/open-seo/` (git-ignored clone; re-clone with `git clone https://github.com/every-app/open-seo reference/open-seo`).
 Upstream design records worth re-reading before building a feature: `reference/open-seo/docs/maintainers/specs/00xx-*.md`.

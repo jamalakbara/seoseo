@@ -1,0 +1,49 @@
+# Isolated M8 acceptance stack. Never uses the normal instance database or volumes.
+name: seoseo-m8check
+services:
+  db:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: seoseo
+      POSTGRES_PASSWORD: disposable-m8-password
+      POSTGRES_DB: seoseo
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U seoseo]
+      interval: 2s
+      retries: 30
+    volumes: [m8data:/var/lib/postgresql]
+  cache:
+    image: valkey/valkey:9-alpine
+  api:
+    image: rust:1.99-slim-bookworm
+    command: [/target/debug/seoseo, serve, --migrate]
+    volumes: [target:/target:ro]
+    ports: ["127.0.0.1:3601:8080"]
+    environment: &env
+      DATABASE_URL: postgres://seoseo:disposable-m8-password@db:5432/seoseo
+      VALKEY_URL: redis://cache:6379
+      WEB_BASE_URL: http://localhost:3600
+      AUTH_MODE: password
+      ALLOW_SIGNUP: "true"
+      APP_ENCRYPTION_KEY: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+    depends_on:
+      db: {condition: service_healthy}
+  worker:
+    image: rust:1.99-slim-bookworm
+    command: [/target/debug/seoseo, worker]
+    volumes: [target:/target:ro]
+    environment: *env
+    depends_on: [api]
+  web:
+    image: seoseo-web:m8check
+    build: ../frontend
+    environment:
+      API_INTERNAL_URL: http://api:8080
+      AUTH_MODE: password
+    ports: ["127.0.0.1:3600:3000"]
+    depends_on: [api]
+volumes:
+  m8data:
+  target:
+    external: true
+    name: seoseo-target

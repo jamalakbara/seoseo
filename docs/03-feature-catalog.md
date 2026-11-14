@@ -40,7 +40,7 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | KW-09 | Saved keywords + tags + refresh + export | saved-keywords | P0 | — | M2 | done (save/manual, tags, CSV, per-keyword SERP refresh and durable bulk refresh with progress; available demand estimates are refreshed through the pageview cache) |
 | KW-10 | Local (city) volume context | spec 0008 | P2 | source-labelled city exports | M6 | done (city/national counts and normalized interest import, dates/source, REST/UI/MCP/export; no fabricated city estimates) |
 | KW-11 | Keyword clustering (SERP overlap) | skill only | P2 | SERP | M6 | done (cached top-ten URL overlap, complete-link groups, provider/market isolation, coverage, REST/UI/CSV/MCP; reviewed page assignments remain manual) |
-| KW-12 | CPC/competition (BYOK only) | google_ads | P3 | BYOK | M8 | todo |
+| KW-12 | CPC/competition (BYOK only) | google_ads | P3 | BYOK | M8 | done (explicit Google Ads BYOK historical CPC/competition, verified account currency, bounded requests; null when unconfigured; live credential gate separate) |
 
 ## Competitive research
 | DO-01 | Domain overview (SR, traffic est., kw count, distribution) | getDomainOverview | P1 | SERP index + CC graph | M5 | done (bounded project SERP sample + SR, volume/CTR sample estimate with coverage; not total traffic) |
@@ -70,7 +70,7 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | RT-06 | Cost/"request budget" estimate (requests not $) | estimateRankCheckCost | P1 | — | M3 | done (requests per run and month, provider, rough duration) |
 | RT-07 | Cannibalization flags | (new) | P2 | — | M6 | done (same-snapshot multi-URL candidates with positions/provider/time, deduplication, coverage, REST/UI/MCP; not proof of ranking harm) |
 | RT-08 | Movement alerts | (new) | P2 | — | M7 | done (comparable completed observations, measured-depth transitions, scoped deduplicated feed) |
-| RT-09 | SERP volatility index | (new) | P3 | own data | M8 | todo |
+| RT-09 | SERP volatility index | (new) | P3 | own data | M8 | done (current-market exact-engine complete top-ten URL churn, evidence pairs, separate comparable rank movement, unknown coverage) |
 
 ## Site audit
 | SA-01 | Start audit (config) | startAudit | P0 | crawler | M1 | done |
@@ -86,8 +86,8 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | SA-11 | Results UI: summary, pages, issues, page detail, export | results/* | P0 | — | M1 | done |
 | SA-12 | Internal link graph + suggestions | (new) | P2 | — | M6 | done (completed-audit graph, full-crawl distinct counts, bounded interactive neighborhood, conservative title/H1 overlap suggestions, REST/UI/JSON/MCP; no automatic page edits) |
 | SA-13 | Audit comparison + scheduled re-audit | (new) | P2 | — | M6 | done (same-start completed-audit observed differences, unknown absences, pagination; revisioned UTC recurring crawls with frozen budgets, atomic worker claims and safe pauses; REST/UI/MCP) |
-| SA-14 | Signed crawler credentials (Shopify web-bot-auth) | crawlerCredentials | P3 | — | M8 | todo |
-| SA-15 | Log-file analyzer | (new) | P3 | upload | M8 | todo |
+| SA-14 | Signed crawler credentials (Shopify web-bot-auth) | crawlerCredentials | P3 | — | M8 | done (encrypted merchant Web Bot Auth headers, exact-host HTTPS/expiry scoping; provider acceptance requires merchant credentials) |
+| SA-15 | Log-file analyzer | (new) | P3 | upload | M8 | done (bounded CLF/combined upload, private aggregate-only summaries, 20/project retention, export/delete) |
 | SA-16 | Change monitoring of key pages | (new) | P2 | crawler | M7 | done (selected URL metadata/indexability changes from comparable completed audits; missing pages unknown) |
 
 ## Local SEO
@@ -131,16 +131,16 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | MC-01 | MCP streamable HTTP + API-key auth | mcp server | P0 | — | M3 | done (stateless Streamable HTTP at /mcp, API-key or session auth, Host allow-list) |
 | MC-02 | MCP OAuth 2.1 (DCR, PKCE, consent, org-bound) | workers-oauth-provider | P1 | — | M4 | done |
 | MC-03 | Tool parity (~90 tools) | mcp/tools | P1 | — | M3–M6 | done (115 tools through M6, including local scans, city context and Google AI Overview observations; later-milestone tools remain in their own scope) |
-| MC-04 | MCP Apps widgets (SERP/GSC views) | widget-tools | P3 | — | M8 | todo |
+| MC-04 | MCP Apps widgets (SERP/GSC views) | widget-tools | P3 | — | M8 | done (authenticated static MCP App resource, SERP/GSC widgets, structured and JSON fallback, sandbox/bridge checks) |
 | MC-05 | Agent skills (12 ported + new) | plugins/seoseo/skills | P1 | — | M5 | done (14 self-contained SeoSeo-prefixed skills, install guide, display metadata and tool validation) |
 | AP-01 | REST API + OpenAPI 3.1 (utoipa) | — | P0 | — | M0 | done |
 
 ## Free public tools
-| FT-01..11 | Keyword generator, SERP simulator, backlink checker, DA checker, domain age, robots tester, sitemap validator, meta checker, schema validator, redirect checker, hreflang checker | web/ free tools | P2 | — | M8 | todo |
+| FT-01..11 | Keyword generator, SERP simulator, backlink checker, DA checker, domain age, robots tester, sitemap validator, meta checker, schema validator, redirect checker, hreflang checker | web/ free tools | P2 | — | M8 | done (eleven bounded public tools; pasted-source/sample/basic-validator limits explicit; no exhaustive index or rich-result eligibility claim) |
 
 ## Ops
 | OP-01 | Docker Compose (api, worker, web, db, valkey, renderer, searxng, [ollama]) | deploy/ | P0 | — | M0 | wip (db, cache, api, worker, web, test overlay, searxng profile, renderer + egress proxy profile; ollama/caddy todo) |
 | OP-02 | Health, Prometheus metrics, JSON logs | /health | P0 | — | M0 | done |
 | OP-03 | Job dashboard (queued/running/failed, retry) | (new) | P1 | — | M3 | wip (status counts, filter, progress, errors; retry from the dashboard todo, re-run from the feature page) |
 | OP-04 | Backup/restore script | (new) | P1 | — | M7 | done (private Postgres/env backup, checksum verification, empty-target transactional restore) |
-| OP-05 | Opt-in telemetry (off by default) | self-host-telemetry | P3 | — | M8 | todo |
+| OP-05 | Opt-in telemetry (off by default) | self-host-telemetry | P3 | — | M8 | done (off by default, instance-admin opt-in, reviewed version-only payload, explicit send to operator receiver; no automatic telemetry) |

@@ -11,6 +11,21 @@ pub enum AuthMode {
 /// Runtime configuration, read from CLI flags or environment variables.
 #[derive(Debug, Clone, Args)]
 pub struct Config {
+    /// Optional operator BYOK Google Ads historical metrics. Never used automatically.
+    #[arg(long, env = "GOOGLE_ADS_DEVELOPER_TOKEN", hide_env_values = true)]
+    pub google_ads_developer_token: Option<String>,
+    #[arg(long, env = "GOOGLE_ADS_CUSTOMER_ID", hide_env_values = true)]
+    pub google_ads_customer_id: Option<String>,
+    #[arg(long, env = "GOOGLE_ADS_LOGIN_CUSTOMER_ID", hide_env_values = true)]
+    pub google_ads_login_customer_id: Option<String>,
+    #[arg(long, env = "GOOGLE_ADS_REFRESH_TOKEN", hide_env_values = true)]
+    pub google_ads_refresh_token: Option<String>,
+    #[arg(long, env = "GOOGLE_ADS_API_VERSION", default_value = "v25")]
+    pub google_ads_api_version: String,
+    /// Optional telemetry receiver. Nothing is sent without both operator configuration
+    /// and an explicit instance-admin request. Never a built-in third-party endpoint.
+    #[arg(long, env = "TELEMETRY_URL")]
+    pub telemetry_url: Option<String>,
     #[arg(long, env = "GOOGLE_PLACES_API_KEY", hide_env_values = true)]
     pub google_places_api_key: Option<String>,
     #[arg(

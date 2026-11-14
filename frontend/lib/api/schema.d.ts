@@ -1250,6 +1250,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/crawler-credential": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_crawler_credential"];
+        put: operations["save_crawler_credential"];
+        post?: never;
+        delete: operations["delete_crawler_credential"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/crux": {
         parameters: {
             query?: never;
@@ -1635,6 +1651,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/keyword-cpc": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["get_cpc_metrics"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/keyword-research": {
         parameters: {
             query?: never;
@@ -1829,6 +1861,38 @@ export interface paths {
         /** Explicit, cached OpenStreetMap business lookup. This is discovery, not a local rank result. */
         post: operations["search_businesses"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/log-analyses": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_log_analyses"];
+        put?: never;
+        post: operations["create_log_analysis"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/log-analyses/{analysis_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["delete_log_analysis"];
         options?: never;
         head?: never;
         patch?: never;
@@ -2418,6 +2482,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/volatility": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_volatility"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/website-research": {
         parameters: {
             query?: never;
@@ -2514,6 +2594,54 @@ export interface paths {
         put?: never;
         /** Make one small live request to check a provider works (admins). */
         post: operations["test_provider"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/public/tools": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["run_public_tool"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/settings/telemetry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_telemetry"];
+        put: operations["save_telemetry"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/settings/telemetry/send": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["send_telemetry"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3357,6 +3485,40 @@ export interface components {
             /** Format: int64 */
             trackers: number;
         };
+        CpcInput: {
+            /** @description Expected account currency, verified with Google before returning measured micros. */
+            currency: string;
+            /** @description Google geo target constant ID, e.g. 2840. Explicit to avoid guessing market. */
+            geo_target_id: string;
+            keywords: string[];
+            /** @description Google language constant ID, e.g. 1000. */
+            language_id: string;
+        };
+        CpcRow: {
+            /** Format: int64 */
+            average_cpc_micros?: number | null;
+            /** Format: int64 */
+            average_monthly_searches?: number | null;
+            competition?: string | null;
+            /** Format: int64 */
+            competition_index?: number | null;
+            keyword: string;
+        };
+        CpcView: {
+            available: boolean;
+            currency: string;
+            note: string;
+            rows: components["schemas"]["CpcRow"][];
+            source: string;
+        };
+        CrawlerCredentialInput: {
+            /** Format: date-time */
+            expires_at: string;
+            host: string;
+            signature: string;
+            signature_agent: string;
+            signature_input: string;
+        };
         CreateAiTrackerInput: {
             brands: string[];
             country?: string | null;
@@ -3438,6 +3600,12 @@ export interface components {
             invitation: components["schemas"]["Invitation"];
             /** @description Secret token for the invite link (`/invite/{token}`). Shown once. */
             token: string;
+        };
+        CredentialView: {
+            configured: boolean;
+            /** Format: date-time */
+            expires_at?: string | null;
+            host?: string | null;
         };
         CruxInput: {
             /** @description PHONE, DESKTOP, TABLET or ALL. */
@@ -4261,6 +4429,18 @@ export interface components {
             /** Format: double */
             spacing_km: number;
         };
+        LogAnalysis: {
+            /** Format: date-time */
+            created_at: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            project_id: string;
+            summary: unknown;
+        };
+        LogInput: {
+            content: string;
+        };
         MeView: {
             memberships: components["schemas"]["Membership"][];
             /** Format: uuid */
@@ -4725,6 +4905,17 @@ export interface components {
             /** Format: date-time */
             updated_at?: string | null;
         };
+        PublicToolInput: {
+            /** @description Seed, HTML, robots.txt, XML, or JSON-LD according to the tool. */
+            content?: string;
+            /**
+             * @description keywords | serp-preview | backlinks | authority | domain-age | robots | sitemap |
+             *     meta | schema | redirects | hreflang
+             */
+            tool: string;
+            /** @description Public URL for resolution, target matching, robots testing or redirect checks. */
+            url?: string | null;
+        };
         RankMover: {
             /** Format: int32 */
             change: number;
@@ -5128,6 +5319,17 @@ export interface components {
             /** @description Keywords for which both the requested domain and this domain were observed. */
             shared_keywords: number;
         };
+        SerpPairView: {
+            /** Format: double */
+            churn?: number | null;
+            /** Format: uuid */
+            current_id?: string | null;
+            current_urls: number;
+            keyword: string;
+            /** Format: uuid */
+            previous_id?: string | null;
+            previous_urls: number;
+        };
         SerpRow: {
             domain: string;
             /** Format: int32 */
@@ -5292,6 +5494,15 @@ export interface components {
             cached: boolean;
             record: components["schemas"]["TechnologyRecord"];
         };
+        TelemetryInput: {
+            enabled: boolean;
+        };
+        TelemetryView: {
+            enabled: boolean;
+            note: string;
+            payload: unknown;
+            receiver_configured: boolean;
+        };
         TopPage: {
             /** Format: int32 */
             best_position: number;
@@ -5354,6 +5565,17 @@ export interface components {
             id: string;
             is_instance_admin: boolean;
             name: string;
+        };
+        Volatility: {
+            comparable_keywords: number;
+            excluded_keywords: number;
+            /** Format: double */
+            index?: number | null;
+            note: string;
+            /** Format: double */
+            rank_movement_index?: number | null;
+            serp_pairs: components["schemas"]["SerpPairView"][];
+            source: string;
         };
         WebsitePage: {
             description?: string | null;
@@ -7978,6 +8200,71 @@ export interface operations {
             };
         };
     };
+    get_crawler_credential: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CredentialView"];
+                };
+            };
+        };
+    };
+    save_crawler_credential: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CrawlerCredentialInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CredentialView"];
+                };
+            };
+        };
+    };
+    delete_crawler_credential: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     get_crux_field_data: {
         parameters: {
             query?: never;
@@ -8645,6 +8932,31 @@ export interface operations {
             };
         };
     };
+    get_cpc_metrics: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CpcInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CpcView"];
+                };
+            };
+        };
+    };
     list_keyword_research: {
         parameters: {
             query?: never;
@@ -9173,6 +9485,72 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["Problem"];
                 };
+            };
+        };
+    };
+    list_log_analyses: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LogAnalysis"][];
+                };
+            };
+        };
+    };
+    create_log_analysis: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["LogInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LogAnalysis"];
+                };
+            };
+        };
+    };
+    delete_log_analysis: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                analysis_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -10485,6 +10863,27 @@ export interface operations {
             };
         };
     };
+    get_volatility: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Volatility"];
+                };
+            };
+        };
+    };
     research_website: {
         parameters: {
             query?: never;
@@ -10670,6 +11069,90 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    run_public_tool: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PublicToolInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": unknown;
+                };
+            };
+        };
+    };
+    get_telemetry: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TelemetryView"];
+                };
+            };
+        };
+    };
+    save_telemetry: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TelemetryInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TelemetryView"];
+                };
+            };
+        };
+    };
+    send_telemetry: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TelemetryView"];
                 };
             };
         };

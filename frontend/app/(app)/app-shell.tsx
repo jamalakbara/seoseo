@@ -1,11 +1,20 @@
 "use client";
 
 import Link from "next/link";
+import { LocalePicker, useLocale } from "@/lib/locale";
 import { usePathname, useRouter } from "next/navigation";
 import { Suspense } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useQueryClient } from "@tanstack/react-query";
-import { Activity, Database, FolderKanban, KeyRound, LogOut, Search, Users } from "lucide-react";
+import {
+  Activity,
+  Database,
+  FolderKanban,
+  KeyRound,
+  LogOut,
+  Search,
+  Users,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -20,6 +29,9 @@ import { useInfo, useMe } from "@/lib/queries";
 import { cn } from "cn";
 
 const NAV = [
+  { href: "/tools", label: "Public tools", icon: Search },
+  { href: "/docs", label: "Documentation", icon: Database },
+  { href: "/settings/diagnostics", label: "Diagnostics", icon: Activity },
   { href: "/projects", label: "Projects", icon: FolderKanban },
   { href: "/settings/team", label: "Team", icon: Users },
   { href: "/settings/providers", label: "Data providers", icon: Database },
@@ -31,8 +43,9 @@ const NAV = [
 
 /** Uses the URL, so it streams in after the static shell (Cache Components). */
 function NavLinks({ active }: { active?: string }) {
+  const { t } = useLocale();
   return (
-    <nav className="order-3 flex w-full min-w-0 items-center gap-1 overflow-x-auto text-sm sm:order-none sm:w-auto">
+    <nav className="order-3 flex w-full min-w-0 items-center gap-1 overflow-x-auto text-sm">
       {NAV.map(({ href, label, icon: Icon }) => (
         <Link
           key={href}
@@ -43,7 +56,7 @@ function NavLinks({ active }: { active?: string }) {
           )}
         >
           <Icon className="size-4" />
-          {label}
+          {t(label)}
         </Link>
       ))}
     </nav>
@@ -73,15 +86,27 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="flex min-h-screen flex-1 flex-col">
       <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur">
         <div className="mx-auto flex min-h-14 max-w-6xl flex-wrap items-center gap-3 px-4 py-2 sm:gap-6">
-          <Link href="/projects" className="flex items-center gap-2 font-semibold">
+          <Link
+            href="/projects"
+            className="flex items-center gap-2 font-semibold"
+          >
             <Search className="size-4" /> SeoSeo
           </Link>
           <Suspense fallback={<NavLinks />}>
             <ActiveNavLinks />
           </Suspense>
-          <div className="ml-auto shrink-0">
+          <div className="ml-auto flex shrink-0 items-center gap-2">
+            <LocalePicker />
             <DropdownMenu>
-              <DropdownMenuTrigger render={<Button variant="ghost" size="sm" className="max-w-40 truncate" />}>
+              <DropdownMenuTrigger
+                render={
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="max-w-40 truncate"
+                  />
+                }
+              >
                 {me.data?.user.name ?? "…"}
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-56">

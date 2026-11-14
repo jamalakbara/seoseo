@@ -4,6 +4,17 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct SerpWidgetParams {
+    pub project_id: String,
+    pub keyword: String,
+}
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct GscWidgetParams {
+    pub project_id: String,
+    pub start_date: String,
+    pub end_date: String,
+}
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct NotificationReadParams {
     pub project_id: String,
     pub limit: Option<i64>,

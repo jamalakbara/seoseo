@@ -1009,6 +1009,7 @@ dependencies = [
  "jobs",
  "lettre",
  "providers",
+ "quick-xml",
  "reqwest",
  "scoring",
  "serde",

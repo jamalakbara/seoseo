@@ -27,3 +27,4 @@ sha2.workspace = true
 futures.workspace = true
 tokio.workspace = true
 lettre = { version = "0.11.23", default-features = false, features = ["builder", "smtp-transport", "tokio1-rustls-tls"] }
+quick-xml.workspace = true

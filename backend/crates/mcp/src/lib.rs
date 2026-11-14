@@ -8,6 +8,7 @@
 //! in the request extensions; tools never see credentials.
 
 mod params;
+mod widgets;
 
 use axum::http::request::Parts;
 use common::{AppError, AppResult};
@@ -92,6 +93,21 @@ fn reply<T: Serialize>(result: AppResult<T>) -> ToolResult {
     })
 }
 
+fn widget_reply<T: Serialize>(result: AppResult<T>) -> ToolResult {
+    match result {
+        Ok(data) => {
+            let value = serde_json::to_value(data)
+                .map_err(|_| ErrorData::internal_error("widget serialization failed", None))?;
+            let mut r = CallToolResult::success(vec![ContentBlock::text(
+                json!({"ok":true,"data":value}).to_string(),
+            )]);
+            r.structured_content = Some(value);
+            Ok(r)
+        }
+        Err(e) => reply::<serde_json::Value>(Err(e)),
+    }
+}
+
 fn id(field: &str, value: &str) -> AppResult<Uuid> {
     Uuid::parse_str(value.trim()).map_err(|_| {
         AppError::Validation(format!(
@@ -120,6 +136,76 @@ fn conv_scoped<T: DeserializeOwned>(params: &impl Serialize) -> AppResult<T> {
 
 #[tool_router]
 impl SeoSeoMcp {
+    #[tool(description="Show a bounded SERP evidence table in an MCP App, with JSON fallback. Uses the project's configured provider and market, cache-first.",meta=widgets::meta())]
+    async fn show_serp_widget(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<SerpWidgetParams>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        let result = async {
+            domain::keywords::serp_analysis(
+                &self.pool,
+                &actor,
+                &self.providers,
+                id("project_id", &p.project_id)?,
+                domain::keywords::SerpAnalysisInput {
+                    keyword: p.keyword,
+                    country: None,
+                    language: None,
+                    refresh: Some(false),
+                },
+            )
+            .await
+        }
+        .await;
+        widget_reply(result)
+    }
+    #[tool(description="Show up to 100 measured Search Console query rows in an MCP App, with JSON fallback. Requires a selected project GSC property. Dates YYYY-MM-DD; recent three days excluded.",meta=widgets::meta())]
+    async fn show_gsc_widget(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<GscWidgetParams>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        let result = async {
+            domain::gsc::performance(
+                &self.pool,
+                &actor,
+                id("project_id", &p.project_id)?,
+                &self.cfg,
+                domain::gsc::PerformanceInput {
+                    start_date: p.start_date,
+                    end_date: p.end_date,
+                    dimensions: vec!["query".into()],
+                    filters: vec![],
+                    search_type: None,
+                    row_limit: Some(100),
+                    start_row: Some(0),
+                },
+            )
+            .await
+        }
+        .await;
+        widget_reply(result)
+    }
+    #[tool(
+        description = "Read the project's own measured rank volatility index, 0–100, latest compatible completed pairs. Null means insufficient evidence; not a web-wide Google index."
+    )]
+    async fn get_serp_volatility(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<ProjectRef>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        reply(
+            async {
+                domain::extras::get_volatility(&self.pool, &actor, id("project_id", &p.project_id)?)
+                    .await
+            }
+            .await,
+        )
+    }
     #[tool(
         description = "Start a durable explicitly budgeted Maps grid scan using enabled SerpApi BYOK. expected_requests must equal selected saved keywords times grid points, max 250. Exact provider target ID required; no fuzzy name matching."
     )]
@@ -2855,9 +2941,36 @@ impl SeoSeoMcp {
 #[tool_handler]
 impl ServerHandler for SeoSeoMcp {
     fn get_info(&self) -> ServerConfig {
-        ServerConfig::new(ServerCapabilities::builder().enable_tools().build())
+        let mut capabilities = ServerCapabilities::builder()
+            .enable_tools()
+            .enable_resources()
+            .build();
+        capabilities.extensions = Some(
+            serde_json::from_value(json!({"io.modelcontextprotocol/ui":{}}))
+                .expect("static extension capabilities"),
+        );
+        ServerConfig::new(capabilities)
             .with_server_info(Implementation::new("seoseo", env!("CARGO_PKG_VERSION")))
             .with_instructions(INSTRUCTIONS)
+    }
+    async fn list_resources(
+        &self,
+        _request: Option<rmcp::model::PaginatedRequestParams>,
+        ctx: RequestContext<RoleServer>,
+    ) -> Result<rmcp::model::ListResourcesResult, ErrorData> {
+        actor(&ctx)?;
+        Ok(serde_json::from_value(json!({"resources":[{"uri":widgets::URI,"name":"SeoSeo evidence table","mimeType":widgets::MIME}]})).expect("static resource list"))
+    }
+    async fn read_resource(
+        &self,
+        request: rmcp::model::ReadResourceRequestParams,
+        ctx: RequestContext<RoleServer>,
+    ) -> Result<rmcp::model::ReadResourceResponse, ErrorData> {
+        actor(&ctx)?;
+        if request.uri != widgets::URI {
+            return Err(ErrorData::invalid_params("unknown widget resource", None));
+        }
+        Ok(serde_json::from_value::<rmcp::model::ReadResourceResult>(json!({"contents":[{"uri":widgets::URI,"mimeType":widgets::MIME,"text":widgets::HTML,"_meta":{"ui":{"csp":{"connectDomains":[],"resourceDomains":[]}}}}]})).expect("static widget resource").into())
     }
 }
 
