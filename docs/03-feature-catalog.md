@@ -2,7 +2,7 @@
 
 Every feature with an ID, OpenSEO parity reference, priority, data source, and milestone.
 Priority: **P0** MVP · **P1** parity · **P2** beyond parity · **P3** later.
-Status column is updated as we build (`todo` / `wip` / `done`). Last update: 2026-11-14 (remaining M6 implementation delivered; browser/live-provider acceptance still open; see docs/27-m6-acceptance.md).
+Status column is updated as we build (`todo` / `wip` / `done`). Last update: 2026-11-14 (M6 live/UI checks passed; final browser export closeout open; see docs/27-m6-acceptance.md).
 
 ## Workspace & identity
 | ID | Feature | OpenSEO ref | Pri | Data | MS | Status |
@@ -81,7 +81,7 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | SA-06 | Extended rules (H1, hreflang, mixed content, orphans, broken links, schema validation, soft-404, …) | (new) | P1 | — | M2 | done (H1, mixed content, JSON-LD, links, sitemap, hreflang syntax/self/reciprocal/indexability, heuristic soft-404, URL hygiene, bounded same-origin asset checks) |
 | SA-07 | JS rendering (headless Chromium) | rendered-page | P1 | renderer | M2 | done (opt-in rendered DOM, isolated browser + guarded egress proxy, static fallback with explicit issue) |
 | SA-08 | Lighthouse (CLI or PSI API) | lighthouse.ts | P1 | renderer/PSI | M2 | done (desktop lab categories, metrics and opportunities stored per page and shown in page detail) |
-| SA-09 | CrUX field data | (new) | P2 | CrUX API | M6 | wip — REST/MCP/UI implemented; browser/live acceptance pending ([guide](23-crux-field-data.md)) |
+| SA-09 | CrUX field data | (new) | P2 | CrUX API | M6 | done — REST/MCP/UI, live scoped no-data response verified; populated metrics fixture-tested ([guide](23-crux-field-data.md)) |
 | SA-10 | Progress (live SSE), history, delete | getCrawlProgress | P0 | — | M1 | done |
 | SA-11 | Results UI: summary, pages, issues, page detail, export | results/* | P0 | — | M1 | done |
 | SA-12 | Internal link graph + suggestions | (new) | P2 | — | M6 | done (completed-audit graph, full-crawl distinct counts, bounded interactive neighborhood, conservative title/H1 overlap suggestions, REST/UI/JSON/MCP; no automatic page edits) |
@@ -92,8 +92,8 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 
 ## Local SEO
 | LO-01 | Business lookup | search_local_businesses | P1 | OSM / Places key | M6 | done (explicit OSM discovery) |
-| LO-02 | Grid tracker + scan workflow | LocalRankWorkflow | P1 | local SERP fetch | M6 | done (frozen durable budgeted BYOK scans and free evidence imports; per-cell recovery, history/status/delete/export; live-provider acceptance open) |
-| LO-03 | Heatmap (MapLibre + OSM tiles), ARP/ATRP/SoLV | local-seo UI | P1 | OSM | M6 | wip (implemented with unknown/failed coverage, numeric fallback and optional attributed map; browser acceptance blocked) |
+| LO-02 | Grid tracker + scan workflow | LocalRankWorkflow | P1 | local SERP fetch | M6 | done (frozen durable budgeted BYOK scans and free evidence imports; per-cell recovery, history/status/delete/export; live nine-cell scan passed; final browser export closeout open) |
+| LO-03 | Heatmap (MapLibre + OSM tiles), ARP/ATRP/SoLV | local-seo UI | P1 | OSM | M6 | done (mobile attributed map, worker loading, keyboard grid selection and partial/unknown coverage verified) |
 | LO-04 | Competitors per point | local_rank_businesses | P1 | — | M6 | done (bounded returned positions and exact identities per point, source/date retained) |
 | LO-05 | Business profile, reviews, Q&A, updates | business tools | P2 | Places key | M7 | todo |
 | LO-06 | Categories list | list_business_categories | P2 | static list | M6 | done (curated REST/MCP list and business-search filter) |
@@ -104,7 +104,7 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | AI-03 | Run workflow (answers, sources, matches) | AiVisibilityWorkflow | P1 | LLM APIs / Ollama | M5 | done (durable compatible/Ollama/Anthropic/Gemini comparisons; Anthropic search/citations; cloud live access unverified) |
 | AI-04 | Results, SoV, trend, sources, answer viewer, export | getAiVisibility* | P1 | — | M5 | done (literal rates, share of tracked mentions, retained-run trends, citations, answer viewer and JSON export) |
 | AI-05 | Brand lookup, prompt explorer (own index) | brand-lookup, prompt-explorer | P2 | own index | M6 | done (current-website retained answer index, literal brand/topic search, frozen market, expected/successful/failed/unchecked coverage, paged prompts/excerpts, REST/UI/MCP) |
-| AI-06 | Google AI Overview capture | google_ai_overview | P2 | SERP | M6 | done (optional BYOK search + bounded continuation, source-labelled free import, presence/absence/incomplete, cache/history/citations/JSON, REST/UI/MCP; live acceptance open) |
+| AI-06 | Google AI Overview capture | google_ai_overview | P2 | SERP | M6 | done (optional BYOK search + bounded continuation, source-labelled free import, presence/absence/incomplete, cache/history/citations/JSON, REST/UI/MCP; live inline capture/cache passed; continuation fixture-tested) |
 
 ## Integrations
 | IN-01 | GSC OAuth + property + performance explorer + export | spec 0003 | P0 | GSC API | M3 | done (project grant, PKCE/state, encrypted tokens, verified property, bounded queries, CSV; live Google client setup required) |

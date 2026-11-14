@@ -15,8 +15,9 @@ export function GridMap({ points, onSelect }: { points: MapPoint[]; onSelect: (r
   useEffect(() => {
     let disposed = false;
     let cleanup = () => {};
-    import("maplibre-gl").then(({ Map, Marker, NavigationControl }) => {
+    import("maplibre-gl").then(({ Map, Marker, NavigationControl, setWorkerUrl, getVersion }) => {
       if (disposed || !container.current || !points.length) return;
+      setWorkerUrl(`/maplibre/maplibre-gl-worker.mjs?v=${getVersion()}`);
       const tile = process.env.NEXT_PUBLIC_MAP_TILE_URL ?? "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
       const map = new Map({ container: container.current, center: [points[Math.floor(points.length / 2)].longitude, points[Math.floor(points.length / 2)].latitude], zoom: 11,
         style: { version: 8, sources: tile === "none" ? {} : { osm: { type: "raster", tiles: [tile], tileSize: 256, maxzoom: 19,
@@ -24,6 +25,7 @@ export function GridMap({ points, onSelect }: { points: MapPoint[]; onSelect: (r
         layers: tile === "none" ? [] : [{ id: "osm", type: "raster", source: "osm" }] },
         attributionControl: { compact: false },
       });
+      map.on("error", () => { if (!disposed) setError("Some map resources could not load. The numeric grid and point details remain available."); });
       map.addControl(new NavigationControl());
       const markers = points.map(p => {
         const button = document.createElement("button");

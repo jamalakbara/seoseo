@@ -4,6 +4,8 @@ Use the project **Local SEO** page to find an OpenStreetMap business, save a tra
 
 ## Rank collection and evidence imports
 
+If discovery has no match, expand **Enter business details manually** and supply a verified name, address and coordinates. This saves an explicitly manual business identity without a lookup or rank request. Supply the separate exact Google provider ID when starting a scan.
+
 Configure **Settings → Data providers → SerpApi (Maps and AI Overviews)** with an encrypted BYOK key and enable it explicitly. Collection is off by default and is separate from organic SERP fallback. Saving a tracker makes no rank requests.
 
 A scan freezes the tracker geometry, selected saved keywords, country/language, exact target provider ID, depth, requester and source. Review the budget before starting: keywords × grid points, at most 250 cells. One scan can be active per tracker, and twenty runs can be retained; delete old inactive runs to free space. A durable worker queries the first Google Maps result page at each point at zoom 14, with the requested search-origin coordinates. This is a provider sample, not an exhaustive list of nearby businesses. See [SerpApi Maps documentation](https://serpapi.com/google-maps-api).
@@ -40,6 +42,8 @@ Select a saved run and keyword. The accessible heatmap and optional MapLibre map
 Failed and unchecked points are excluded from all metric denominators. Always compare coverage and identical grids, keywords, depths and sources. Missing evidence is not a zero score or verified ranking loss.
 
 The geographic map loads only on explicit display. It uses [OpenStreetMap tiles](https://operations.osmfoundation.org/policies/tiles/) with visible attribution, browser caching and referrer, no bulk download or offline prefetch. Set Compose `MAP_TILE_URL` and rebuild web, or set build-time `NEXT_PUBLIC_MAP_TILE_URL`, to choose an approved tile template (`none` disables base tiles for offline browser QA). The numeric grid works without tiles or WebGL.
+
+The frontend dev/build scripts copy the installed MapLibre worker and its shared module into ignored `public/maplibre` assets. The map explicitly uses this same-origin, version-matched worker because bundling relocates MapLibre's entry module.
 
 ## City demand context (KW-10)
 

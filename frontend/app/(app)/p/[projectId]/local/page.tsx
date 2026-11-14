@@ -14,6 +14,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 import { LocalScans } from "@/components/local/scans";
 import { CityDemand } from "@/components/local/city-demand";
+import { ManualBusiness } from "@/components/local/manual-business";
 
 type Business = components["schemas"]["LocalBusiness"];
 
@@ -89,7 +90,7 @@ function LocalWorkspace({ projectId }: { projectId: string }) {
       {search.error && <p role="alert" className="text-sm text-destructive">{search.error.message}</p>}
       {search.data && !search.isPending && <div className="grid gap-3">
         <p className="text-sm text-muted-foreground">{search.data.note}</p>
-        {search.data.businesses.length === 0 && <p>No matches. Try a more specific name and location.</p>}
+        {search.data.businesses.length === 0 && <p>No matches. Try another name and location, or enter verified business details below.</p>}
         {search.data.businesses.map(b => <div className="flex flex-wrap items-center justify-between gap-3 rounded border p-3" key={b.source_id}>
           <div><p className="font-medium">{b.name}</p><p className="text-sm text-muted-foreground">{b.address}</p>
             <a className="text-sm underline" href={b.source_url} target="_blank" rel="noreferrer">View on OpenStreetMap</a></div>
@@ -99,9 +100,10 @@ function LocalWorkspace({ projectId }: { projectId: string }) {
         <p className="text-xs text-muted-foreground"><a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">{search.data.attribution}</a>
           {search.data.cached ? " · Cached" : ""} · Checked {new Date(search.data.checked_at).toLocaleString()}</p>
       </div>}
+      <ManualBusiness onSelect={b => { setBusiness(b); setTrackerName(Array.from(b.name).slice(0, 120).join("")); create.reset(); }} />
     </CardContent></Card>
     {business && <Card><CardHeader><CardTitle>Plan grid for {business.name}</CardTitle>
-      <CardDescription>Up to 50 unique keywords. Saving stores the configuration and makes no rank requests.</CardDescription>
+      <CardDescription>Business details: {business.source === "manual" ? "manual entry" : "OpenStreetMap"}. Up to 50 unique keywords. Saving stores the configuration and makes no rank requests.</CardDescription>
     </CardHeader><CardContent><form className="grid gap-4" onSubmit={e => { e.preventDefault(); create.mutate(); }}>
       <label className="grid gap-2 text-sm">Tracker name<Input required maxLength={120} value={trackerName} onChange={e => setTrackerName(e.target.value)} /></label>
       <div className="grid gap-2"><Label htmlFor="local-keywords">Keywords (one per line or separated by commas)</Label>

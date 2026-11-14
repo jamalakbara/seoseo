@@ -6,9 +6,18 @@ M6 implementation is delivered on `codex/m6-field-and-bing`. **Full milestone ac
 
 On 2026-11-14, the signed-in browser displayed the updated project navigation and the selected verified Bing site. All four Bing report types (queries, pages, crawl and inbound links) completed successfully against the configured live connection. This site currently returned empty samples; the UI correctly retained unknown/absence language instead of claiming measured zeroes.
 
-Browser inspection found four form actions with an implicit Base UI `type="button"`: CrUX lookup, AI Overview capture/import and city demand import. Clicking CrUX produced no submission. All four actions now explicitly use `type="submit"`; frontend type checking, lint and the Docker production build passed. Verification of their corrected runtime behavior is pending recovery of Docker, which stopped answering engine requests while replacing the web container. Restarting Docker Desktop needs operator approval because it interrupts unrelated containers as well.
+Browser inspection found four form actions with an implicit Base UI `type="button"`: CrUX lookup, AI Overview capture/import and city demand import. All now explicitly use `type="submit"`, and all were exercised successfully after the operator-approved Docker Desktop restart. The normal application services and the unrelated OpenWA container recovered. Subsequent production web rebuilds completed normally.
 
-One live SerpApi Maps playground lookup identified an exact public Jakarta test-business ID and coordinates, as authorized by the operator. This was preparatory provider evidence, not a completed SeoSeo grid scan. No live SeoSeo CrUX, AI Overview or nine-cell Maps acceptance pass is claimed yet. The remaining checklist below still applies.
+Live browser results on 2026-11-14:
+
+- CrUX: explicit origin / ALL-device lookup completed with a valid no-data response. LCP, INP and CLS stayed unknown, with no scope fallback. This verifies provider access and the no-coverage UI, not actual p75 values.
+- Google AI Overview: the Indonesian query `apa itu seo` returned overview text and reported citations in one provider request. Repeating the capture reused the cache with zero requests. Live continuation was not returned; continuation remains fixture-tested.
+- Maps: a clearly labelled public Jakarta cafe tracker completed a reviewed 3×3, one-keyword scan with nine requests. Coverage was 9/9; the exact target ID was absent from the first 20 returned results at every point. ARP stayed unknown, ATRP was 21 and SoLV was 0%. Competitor samples and keyboard point selection worked.
+- OSM discovery returned no matches for the tested public business. A new manual business form allowed verified name/address/coordinates to be saved without an external lookup; manual identity remains separate from the exact Google provider ID.
+- Synthetic, explicitly labelled imports verified partial Maps coverage (2/9, ARP 2, ATRP 11.5, SoLV 50%), AI Overview absent/incomplete states, malformed JSON feedback, and city null versus zero with dated source provenance. These are UI fixtures, not live market observations.
+- The optional attributed OSM map rendered at a 390-pixel viewport. A MapLibre worker path error found in production was fixed by serving the installed worker/shared modules from the same origin. After rebuilding, tiles/markers rendered with no new worker errors. The numeric grid remained usable by keyboard.
+
+The browser connection failed during the final JSON-download check and could not reconnect. Download completion, the final return to the live scan, and reset of the temporary viewport override are unverified. This is the remaining browser closeout gate; no further paid provider requests are required. No full milestone acceptance is claimed until it is closed.
 
 ## Implemented scope
 
@@ -46,8 +55,8 @@ The optional worker-container argument deliberately interrupts and resumes that 
 
 ## Open acceptance gates
 
-**Browser QA:** the original host preview was rejected by automatic approval review with “blocked by policy,” and a safer container attempt also failed. The operator later supplied a running updated app, enabling the live checkpoint above. The submit-type fixes need runtime verification after Docker recovers. Remaining checks: discovery/category filtering, tracker creation, imported/live scan selection, point competitors, map display, city imports/history, AIO present/absent/incomplete and CrUX data. Include a narrow viewport and keyboard navigation. Check production tiles through normal interactive use with visible attribution and no prefetch. Do not claim responsive/WebGL/hydration acceptance from the production build alone.
+**Browser closeout:** reconnect browser automation, confirm a saved scan/observation JSON download, restore the real completed scan, and clear the temporary viewport override. The preceding live/UI checks passed as recorded above. The browser connection failed while waiting for the download; the downloaded file was not inspected.
 
-**Real-provider QA:** Bing's selected-site read-only reports passed as described above. Using the now-configured credentials, still confirm a scoped CrUX lookup, a reviewed 3×3 single-keyword Maps scan, and Google AI Overview text/continuation where available. Check coordinate/language/country and exact place ID against returned evidence. Fixture IDs, imports and the preparatory Maps playground lookup do not prove the remaining SeoSeo live flows.
+**Provider coverage limits:** selected-site Bing reports, scoped CrUX access/no-data, the reviewed nine-cell Maps scan, and inline Google AI Overview capture/cache passed. No real CrUX p75 values or live AIO continuation were available in these samples; their data contracts remain covered by fixtures. Public test-business results and synthetic imports do not describe the project's business rankings or market demand.
 
 M3 retained follow-ups and M5's explicit live-three-engine gate remain separate and unchanged. M6 stays “implementation delivered; acceptance pending” until these gates are satisfied.
