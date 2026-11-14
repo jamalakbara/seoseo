@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api, unwrap, type Schemas } from "@/lib/api/client";
@@ -27,13 +27,28 @@ function Assistant({ projectId }: { projectId: string }) {
   const [keyword, setKeyword] = useState("");
   const [content, setContent] = useState("");
   const [score, setScore] = useState<Schemas["ContentScore"] | null>(null);
+  const [connectedTurn, setConnectedTurn] = useState("");
   const path = { project_id: projectId };
   const models = useQuery({ queryKey: ["assistant-models", projectId], queryFn: () => unwrap(api.GET("/api/v1/projects/{project_id}/assistant/models", { params: { path } })) });
   const selectedModel = model || models.data?.models[0] || "";
   const chats = useQuery({ queryKey: ["assistant-chats", projectId], queryFn: () => unwrap(api.GET("/api/v1/projects/{project_id}/assistant/chats", { params: { path } })) });
   const chat = useQuery({ queryKey: ["assistant-chat", projectId, chatId], enabled: !!chatId,
     queryFn: () => unwrap(api.GET("/api/v1/projects/{project_id}/assistant/chats/{chat_id}", { params: { path: { ...path, chat_id: chatId } } })),
-    refetchInterval: (q) => q.state.data?.turns.some((t) => ["queued", "running"].includes(t.status)) ? 1500 : false });
+    refetchInterval: (q) => q.state.data?.turns.some((t) => ["queued", "running"].includes(t.status) && t.id !== connectedTurn) ? 1500 : false });
+  const activeTurn = chat.data?.turns.find((t) => ["queued", "running"].includes(t.status))?.id;
+  useEffect(() => {
+    if (!activeTurn) return;
+    const source = new EventSource(`/api/v1/projects/${projectId}/assistant/chats/${chatId}/turns/${activeTurn}/events`);
+    source.onopen = () => setConnectedTurn(activeTurn);
+    source.onerror = () => { setConnectedTurn(""); qc.invalidateQueries({ queryKey: ["assistant-chat", projectId, chatId] }); };
+    source.addEventListener("turn", (event) => {
+      const turn = JSON.parse((event as MessageEvent).data) as Schemas["AssistantTurn"];
+      if (turn.id !== activeTurn || turn.chat_id !== chatId) return;
+      qc.setQueryData<Schemas["AssistantChatView"]>(["assistant-chat", projectId, chatId], (data) => data && ({ ...data, turns: data.turns.map((old) => old.id === turn.id ? turn : old) }));
+    });
+    source.addEventListener("unavailable", () => { source.close(); setConnectedTurn(""); qc.invalidateQueries({ queryKey: ["assistant-chat", projectId, chatId] }); });
+    return () => { source.onopen = null; source.onerror = null; source.close(); };
+  }, [projectId, chatId, activeTurn, qc]);
   const create = useMutation({ mutationFn: () => unwrap(api.POST("/api/v1/projects/{project_id}/assistant/chats", { params: { path }, body: { title: "SEO conversation" } })),
     onSuccess: (c) => { setChatId(c.id); setMessage(""); qc.invalidateQueries({ queryKey: ["assistant-chats", projectId] }); } });
   const send = useMutation({ mutationFn: () => unwrap(api.POST("/api/v1/projects/{project_id}/assistant/chats/{chat_id}/messages", { params: { path: { ...path, chat_id: chatId } }, body: { model: selectedModel, message } })),
@@ -71,10 +86,12 @@ function Assistant({ projectId }: { projectId: string }) {
             <div><p className="text-xs font-medium text-muted-foreground">You</p><p className="whitespace-pre-wrap break-words text-sm">{t.prompt}</p></div>
             <div><p className="text-xs font-medium text-muted-foreground">{t.model} · {t.status}</p>
               {t.answer && <p className="whitespace-pre-wrap break-words text-sm">{t.answer}</p>}
+              {t.status === "running" && t.draft_answer && <div><p className="text-xs text-muted-foreground">Streaming draft · not complete</p><p data-streaming-draft className="whitespace-pre-wrap break-words text-sm">{t.draft_answer}</p></div>}
               {t.error && <p role="alert" className="text-sm text-destructive">{t.error}</p>}
               {["queued", "running"].includes(t.status) && <p className="text-sm text-muted-foreground">{t.status === "queued" ? "Waiting for the worker…" : "Reading evidence and preparing an answer…"}</p>}
             </div>
             {Array.isArray(t.evidence) && t.evidence.length > 0 && <details><summary className="cursor-pointer text-xs">Evidence and tool activity ({t.evidence.length})</summary><pre className="mt-2 max-h-80 overflow-auto whitespace-pre-wrap break-all rounded bg-muted p-3 text-xs">{JSON.stringify(t.evidence, null, 2)}</pre></details>}
+            {t.status === "completed" && t.memory_note && <MemoryReview key={t.id} projectId={projectId} chatId={chatId} turn={t} canSave={!!me.data && me.data.role !== "member" && !changed && !archived} />}
           </article>)}
           {chat.data?.turns.length === 0 && <p className="text-sm text-muted-foreground">Try “What should I fix first?” or ask for a summary of recent rank movement.</p>}
         </div>
@@ -100,5 +117,31 @@ function Assistant({ projectId }: { projectId: string }) {
           <details><summary className="cursor-pointer text-sm">Reference results ({score.evidence.references.length})</summary><ul className="mt-2 grid gap-2 text-xs">{score.evidence.references.map((r) => <li key={`${r.position}-${r.url}`}>{r.position}. {r.title} — <span className="break-all">{r.url}</span></li>)}</ul></details>
         </div>}
       </CardContent></Card>
+  </div>;
+}
+
+function MemoryReview({ projectId, chatId, turn, canSave }: { projectId: string; chatId: string; turn: Schemas["AssistantTurn"]; canSave: boolean }) {
+  const qc = useQueryClient();
+  const [reviewing, setReviewing] = useState(false);
+  const [note, setNote] = useState(turn.memory_note || "");
+  const context = useQuery({ queryKey: ["assistant-memory-review", projectId, turn.id], enabled: reviewing,
+    queryFn: () => unwrap(api.GET("/api/v1/projects/{project_id}/context", { params: { path: { project_id: projectId } } })) });
+  const save = useMutation({ mutationFn: () => unwrap(api.POST("/api/v1/projects/{project_id}/assistant/chats/{chat_id}/turns/{turn_id}/memory", {
+    params: { path: { project_id: projectId, chat_id: chatId, turn_id: turn.id } }, body: { revision: context.data!.revision, note } })),
+    onSuccess: () => { setReviewing(false); qc.invalidateQueries({ queryKey: ["assistant-chat", projectId, chatId] }); qc.invalidateQueries({ queryKey: ["project-context", projectId] }); } });
+  return <div className="grid gap-3 rounded-md border p-3 text-sm">
+    <p className="font-medium">{turn.memory_applied_revision != null ? "Saved to project memory" : "Proposed memory note"}</p>
+    <p className="whitespace-pre-wrap break-words">{turn.memory_saved_note || turn.memory_note}</p>
+    {turn.memory_applied_revision != null ? <p className="text-xs text-muted-foreground">Memory revision {turn.memory_applied_revision}</p> : <>
+      <p className="text-xs text-muted-foreground">This note has not been saved. An admin can review and edit it before adding it to the shared research log.</p>
+      {!reviewing && <Button className="justify-self-start" variant="outline" disabled={!canSave} onClick={() => setReviewing(true)}>Review memory note</Button>}
+      {reviewing && <form className="grid gap-3" onSubmit={(e) => { e.preventDefault(); save.mutate(); }}>
+        <Label htmlFor={`memory-note-${turn.id}`}>Note to add</Label><Textarea id={`memory-note-${turn.id}`} value={note} maxLength={2000} required onChange={(e) => setNote(e.target.value)} />
+        {context.isError && <p role="alert" className="text-destructive">{context.error.message}</p>}
+        {context.data && <details><summary>Review current memory · revision {context.data.revision}</summary><pre className="max-h-64 overflow-auto whitespace-pre-wrap break-all text-xs">{JSON.stringify({ sections: context.data.sections, recent_notes: context.data.research_log.slice(-5) }, null, 2)}</pre></details>}
+        {save.isError && <div role="alert" className="text-destructive">{save.error.message} <Button type="button" variant="outline" onClick={() => { save.reset(); context.refetch(); }}>Reload memory for review</Button></div>}
+        <div className="flex flex-wrap gap-2"><Button type="submit" disabled={!canSave || !context.data || context.isFetching || save.isPending || !note.trim()}>Save reviewed note</Button><Button variant="outline" onClick={() => setReviewing(false)}>Cancel</Button></div>
+      </form>}
+    </>}
   </div>;
 }

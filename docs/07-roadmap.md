@@ -30,7 +30,7 @@ KW-11 is implemented: [SERP keyword clustering](18-keyword-clustering.md). SA-12
 
 ## M7 started
 
-The first [assistant and content delivery](28-assistant-and-content.md) adds private durable chats, canonical memory reads, bounded evidence tools, cached-SERP briefs and local draft term coverage. AG-01 retains streaming/reviewed memory writes. Other M7 features and the weekly email digest exit gate remain open.
+The [assistant and content delivery](28-assistant-and-content.md) and [streaming/reviewed memory](29-assistant-streaming-and-memory.md) complete AG-01..03: private durable chats, canonical memory, bounded evidence tools, real streamed answers, explicit memory-note approvals, cached-SERP briefs and local draft term coverage. Other M7 features and the weekly email digest exit gate remain open.
 
 ## M3 retained follow-ups
 M3 core is shipped. Per user direction on 2026-11-12, retain keyword file import (RT-02), per-tracker timezones (RT-03), keyword/run matrix (RT-05), and dashboard retry (OP-03) as follow-ups. Device/city/depth controls (RT-01/04) depend on provider support. These rows remain `wip` in the feature catalog; M3 is not marked fully complete.

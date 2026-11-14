@@ -1,6 +1,6 @@
 # M7 assistant and content foundation
 
-The project **Assistant** tab adds private conversations, tool evidence, content briefs and draft term coverage. This is the first M7 delivery. Alerts, monitoring, integrations, reports/PDF, weekly digests, business tools, backup/restore and account deletion remain open. AG-01 also retains token streaming and reviewed memory-write actions: current tools read canonical memory and never change it.
+The project **Assistant** tab adds private conversations, tool evidence, content briefs and draft term coverage. This records the initial M7 delivery. Its streaming and reviewed-memory follow-ups are implemented in [Assistant streaming and reviewed memory](29-assistant-streaming-and-memory.md). Alerts, monitoring, integrations, reports/PDF, weekly digests, business tools, backup/restore and account deletion remain open.
 
 ## Configuration and privacy
 

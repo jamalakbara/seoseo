@@ -228,6 +228,35 @@ impl EngineGateway {
             .answer_json(model, prompt, country, language)
             .await
     }
+    pub async fn answer_json_stream<F, Fut>(
+        &self,
+        model: &str,
+        prompt: &str,
+        country: &str,
+        language: &str,
+        update: F,
+    ) -> Result<String, ProviderError>
+    where
+        F: FnMut(String) -> Fut + Send,
+        Fut: std::future::Future<Output = Result<(), ProviderError>> + Send,
+    {
+        if let Some(e) = self.native.iter().find(|e| e.id == model) {
+            return match &e.ollama {
+                Some(g) => {
+                    g.answer_json_stream(&e.model, prompt, country, language, update)
+                        .await
+                }
+                None => Err(ProviderError::NotConfigured(
+                    "Assistant requires an Ollama or compatible model".into(),
+                )),
+            };
+        }
+        self.compatible
+            .as_ref()
+            .ok_or_else(|| ProviderError::NotConfigured("Assistant model is unavailable".into()))?
+            .answer_json_stream(model, prompt, country, language, update)
+            .await
+    }
     pub async fn answer(
         &self,
         model: &str,

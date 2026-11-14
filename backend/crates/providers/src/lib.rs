@@ -8,6 +8,7 @@
 
 pub mod ai_engines;
 pub mod ai_visibility;
+pub mod assistant_stream;
 pub mod catalog;
 pub mod commoncrawl;
 mod http;

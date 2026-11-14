@@ -711,6 +711,38 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/assistant/chats/{chat_id}/turns/{turn_id}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["assistant_turn_events"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/assistant/chats/{chat_id}/turns/{turn_id}/memory": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["approve_assistant_memory_note"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/assistant/models": {
         parameters: {
             query?: never;
@@ -2523,6 +2555,11 @@ export interface components {
             /** Format: uuid */
             user_id: string;
         };
+        ApproveMemoryNoteInput: {
+            note: string;
+            /** Format: int64 */
+            revision: number;
+        };
         AssistantChat: {
             country: string;
             /** Format: date-time */
@@ -2551,6 +2588,7 @@ export interface components {
             chat_id: string;
             /** Format: date-time */
             created_at: string;
+            draft_answer: string;
             error?: string | null;
             evidence: unknown;
             /** Format: date-time */
@@ -2559,6 +2597,10 @@ export interface components {
             id: string;
             /** Format: uuid */
             job_id: string;
+            /** Format: int64 */
+            memory_applied_revision?: number | null;
+            memory_note?: string | null;
+            memory_saved_note?: string | null;
             model: string;
             prompt: string;
             request_started: boolean;
@@ -6198,6 +6240,56 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AssistantTurn"];
+                };
+            };
+        };
+    };
+    assistant_turn_events: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                chat_id: string;
+                turn_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/event-stream": string;
+                };
+            };
+        };
+    };
+    approve_assistant_memory_note: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                chat_id: string;
+                turn_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ApproveMemoryNoteInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectContext"];
                 };
             };
         };

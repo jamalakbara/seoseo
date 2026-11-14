@@ -158,6 +158,17 @@ pub async fn update_for_domain(
     input: UpdateProjectContextInput,
     expected_domain: Option<&str>,
 ) -> AppResult<ProjectContext> {
+    update_reviewed(pool, actor, project_id, input, expected_domain, None).await
+}
+
+pub(crate) async fn update_reviewed(
+    pool: &PgPool,
+    actor: &Actor,
+    project_id: Uuid,
+    input: UpdateProjectContextInput,
+    expected_domain: Option<&str>,
+    assistant_approval: Option<db::memory::AssistantMemoryApproval>,
+) -> AppResult<ProjectContext> {
     actor.require(Role::Admin)?;
     if input.revision < 0 {
         return Err(AppError::Validation("revision cannot be negative".into()));
@@ -168,7 +179,7 @@ pub async fn update_for_domain(
 
     let who = author(actor).to_string();
     let mut section_keys = HashSet::new();
-    let sections = input
+    let mut sections = input
         .sections
         .into_iter()
         .map(|s| {
@@ -247,6 +258,17 @@ pub async fn update_for_domain(
         .collect::<AppResult<Vec<_>>>()?;
 
     let current = get(pool, actor, project_id).await?;
+    if assistant_approval.is_some() {
+        for section in &mut sections {
+            if let Some(old) = current.sections.iter().find(|old| {
+                old.key == section.key
+                    && old.title == section.title
+                    && old.content == section.content
+            }) {
+                section.updated_by = old.updated_by.clone();
+            }
+        }
+    }
     if current.revision != input.revision {
         return Err(AppError::Conflict(
             "project memory changed since it was loaded; reload it and apply the edit again".into(),
@@ -270,6 +292,7 @@ pub async fn update_for_domain(
         actor.org_id,
         project_id,
         db::memory::ContextUpdate {
+            assistant_approval,
             expected_revision: input.revision,
             expected_domain: expected_domain.map(str::to_string),
             sections: serde_json::to_value(sections).map_err(AppError::internal)?,

@@ -98,7 +98,7 @@ CRUD /projects/{pid}/report-templates · POST …/{rid}/pdf → job
 
 ### Assistant
 ```
-GET /projects/{pid}/assistant/models · GET/POST /projects/{pid}/assistant/chats · GET/DELETE …/{chat_id} · POST …/{chat_id}/messages (202, durable job; UI polls). Streaming and reviewed memory writes remain follow-ups. POST /projects/{pid}/content/brief · POST …/content/score. See [Assistant and content](28-assistant-and-content.md).
+GET /projects/{pid}/assistant/models · GET/POST /projects/{pid}/assistant/chats · GET/DELETE …/{chat_id} · POST …/{chat_id}/messages (202, durable job). GET …/{chat_id}/turns/{turn_id}/events streams private turn/draft snapshots; POST …/{chat_id}/turns/{turn_id}/memory explicitly approves a reviewed canonical-memory note with revision checks. POST /projects/{pid}/content/brief · POST …/content/score. See [Streaming and reviewed memory](29-assistant-streaming-and-memory.md).
 ```
 
 ### Public free tools (no auth, rate-limited)

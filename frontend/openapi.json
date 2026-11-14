@@ -2260,6 +2260,128 @@
         ]
       }
     },
+    "/api/v1/projects/{project_id}/assistant/chats/{chat_id}/turns/{turn_id}/events": {
+      "get": {
+        "tags": [
+          "assistant"
+        ],
+        "operationId": "assistant_turn_events",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "chat_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "turn_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "text/event-stream": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/assistant/chats/{chat_id}/turns/{turn_id}/memory": {
+      "post": {
+        "tags": [
+          "assistant"
+        ],
+        "operationId": "approve_assistant_memory_note",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "chat_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "turn_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ApproveMemoryNoteInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectContext"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/projects/{project_id}/assistant/models": {
       "get": {
         "tags": [
@@ -9860,6 +9982,23 @@
           }
         }
       },
+      "ApproveMemoryNoteInput": {
+        "type": "object",
+        "required": [
+          "revision",
+          "note"
+        ],
+        "properties": {
+          "note": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer",
+            "format": "int64"
+          }
+        },
+        "additionalProperties": false
+      },
       "AssistantChat": {
         "type": "object",
         "required": [
@@ -9950,6 +10089,7 @@
           "model",
           "prompt",
           "status",
+          "draft_answer",
           "evidence",
           "request_started",
           "created_at"
@@ -9968,6 +10108,9 @@
           "created_at": {
             "type": "string",
             "format": "date-time"
+          },
+          "draft_answer": {
+            "type": "string"
           },
           "error": {
             "type": [
@@ -9990,6 +10133,25 @@
           "job_id": {
             "type": "string",
             "format": "uuid"
+          },
+          "memory_applied_revision": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "memory_note": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "memory_saved_note": {
+            "type": [
+              "string",
+              "null"
+            ]
           },
           "model": {
             "type": "string"

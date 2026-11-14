@@ -29,6 +29,10 @@ pub struct AssistantTurn {
     pub prompt: String,
     pub status: String,
     pub answer: Option<String>,
+    pub draft_answer: String,
+    pub memory_note: Option<String>,
+    pub memory_applied_revision: Option<i64>,
+    pub memory_saved_note: Option<String>,
     pub error: Option<String>,
     pub evidence: Value,
     pub request_started: bool,
@@ -93,7 +97,7 @@ pub async fn turns(
 ) -> AppResult<Vec<AssistantTurn>> {
     chat(pool, org, pid, user, id).await?;
     // A crashed single-attempt job must leave an actionable terminal turn.
-    sqlx::query("UPDATE assistant_turns t SET status='failed',error='Worker stopped before the answer was saved. Send a new message to try again.',finished_at=now() FROM jobs j WHERE t.chat_id=$1 AND t.job_id=j.id AND t.status IN ('queued','running') AND j.status='failed'")
+    sqlx::query("UPDATE assistant_turns t SET status='failed',draft_answer='',error='Worker stopped before the answer was saved. Send a new message to try again.',finished_at=now() FROM jobs j WHERE t.chat_id=$1 AND t.job_id=j.id AND t.status IN ('queued','running') AND j.status='failed'")
         .bind(id).execute(pool).await.map_err(internal)?;
     sqlx::query_as("SELECT * FROM assistant_turns WHERE chat_id=$1 ORDER BY created_at,id LIMIT 40")
         .bind(id)
@@ -119,7 +123,7 @@ pub async fn start(pool: &PgPool, input: NewTurn<'_>) -> AppResult<AssistantTurn
         .execute(&mut *tx)
         .await
         .map_err(internal)?;
-    sqlx::query("UPDATE assistant_turns t SET status='failed',error='Worker stopped before the answer was saved. Send a new message to try again.',finished_at=now() FROM jobs j,assistant_chats c,projects p WHERE t.job_id=j.id AND t.chat_id=c.id AND c.project_id=p.id AND p.organization_id=$1 AND t.status IN ('queued','running') AND j.status='failed'")
+    sqlx::query("UPDATE assistant_turns t SET status='failed',draft_answer='',error='Worker stopped before the answer was saved. Send a new message to try again.',finished_at=now() FROM jobs j,assistant_chats c,projects p WHERE t.job_id=j.id AND t.chat_id=c.id AND c.project_id=p.id AND p.organization_id=$1 AND t.status IN ('queued','running') AND j.status='failed'")
         .bind(input.org).execute(&mut *tx).await.map_err(internal)?;
     // Match lock order used by project edits, then serialize every chat write.
     let p: Project=sqlx::query_as("SELECT * FROM projects WHERE organization_id=$1 AND id=$2 AND archived_at IS NULL FOR UPDATE")
@@ -190,7 +194,45 @@ pub async fn finish(pool: &PgPool, id: Uuid, result: Result<String, String>) -> 
         Ok(s) => ("completed", Some(s), None),
         Err(e) => ("failed", None, Some(e)),
     };
-    sqlx::query("UPDATE assistant_turns SET status=$2,answer=$3,error=$4,finished_at=now() WHERE id=$1 AND status IN ('queued','running')")
+    sqlx::query("UPDATE assistant_turns SET status=$2,answer=$3,error=$4,draft_answer='',finished_at=now() WHERE id=$1 AND status IN ('queued','running')")
         .bind(id).bind(status).bind(answer).bind(error).execute(pool).await.map_err(internal)?;
     Ok(())
+}
+
+pub async fn draft(pool: &PgPool, id: Uuid, text: &str) -> AppResult<()> {
+    sqlx::query("UPDATE assistant_turns SET draft_answer=$2 WHERE id=$1 AND status='running'")
+        .bind(id)
+        .bind(text)
+        .execute(pool)
+        .await
+        .map_err(internal)?;
+    Ok(())
+}
+pub async fn propose_note(pool: &PgPool, id: Uuid, note: Option<&str>) -> AppResult<()> {
+    sqlx::query("UPDATE assistant_turns SET memory_note=$2 WHERE id=$1 AND status='running'")
+        .bind(id)
+        .bind(note)
+        .execute(pool)
+        .await
+        .map_err(internal)?;
+    Ok(())
+}
+pub async fn turn(
+    pool: &PgPool,
+    org: Uuid,
+    pid: Uuid,
+    user: Uuid,
+    chat_id: Uuid,
+    id: Uuid,
+) -> AppResult<AssistantTurn> {
+    chat(pool, org, pid, user, chat_id).await?;
+    sqlx::query("UPDATE assistant_turns t SET status='failed',draft_answer='',error='Worker stopped before the answer was saved. Send a new message to try again.',finished_at=now() FROM jobs j WHERE t.id=$1 AND t.chat_id=$2 AND t.job_id=j.id AND t.status IN ('queued','running') AND j.status='failed'")
+        .bind(id).bind(chat_id).execute(pool).await.map_err(internal)?;
+    sqlx::query_as("SELECT * FROM assistant_turns WHERE id=$1 AND chat_id=$2")
+        .bind(id)
+        .bind(chat_id)
+        .fetch_optional(pool)
+        .await
+        .map_err(internal)?
+        .ok_or(AppError::NotFound("assistant turn"))
 }

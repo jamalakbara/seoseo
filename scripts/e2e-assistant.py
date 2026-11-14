@@ -105,7 +105,53 @@ for message in ("RATE_LIMIT", "MALFORMED", "FORGE_SCOPE", "LOOP"):
 send("UNKNOWN_TOOL")
 turn = finish()
 assert turn["status"] == "completed" and "error" in turn["evidence"][1]["data"]
-assert api(root + "/context")["revision"] == 1, "Assistant must not edit project memory"
+original_context = api(root + "/context")
+assert original_context["revision"] == 1, "Assistant must not edit project memory"
+send("STREAM REMEMBER Focus on technical SEO audits")
+proposal = finish()
+assert proposal["memory_note"] and proposal["memory_applied_revision"] is None
+assert api(root + "/context")["revision"] == 1, "Proposal must not auto-save"
+approval_path = path + "/turns/" + proposal["id"] + "/memory"
+api(approval_path, "POST", {"revision": 1, "note": "reviewed"}, 404, outsider)
+api(approval_path, "POST", {"revision": 1, "note": "reviewed"}, 403, member)
+api(approval_path, "POST", {"revision": 0, "note": "stale"}, 409)
+assert api(root + "/context")["revision"] == 1
+saved = api(approval_path, "POST", {"revision": 1, "note": "Edited and reviewed: prioritize technical SEO audits."})
+assert saved["revision"] == 2 and len(saved["research_log"]) == 1
+assert saved["sections"] == original_context["sections"]
+api(approval_path, "POST", {"revision": 2, "note": "duplicate"}, 409)
+assert len(api(root + "/context")["research_log"]) == 1
+assert api(path)["turns"][-1]["memory_saved_note"].startswith("Edited and reviewed")
+# Actual partial text is observable before final completion over the private SSE path.
+queued = send("STREAM REMEMBER another proposed note")
+stream_path = path + "/turns/" + queued["id"] + "/events"
+api(stream_path, status=404, client=outsider)
+api(stream_path, status=404, client=member)
+request = urllib.request.Request(origin + "/api/v1" + stream_path)
+frames = []
+with owner.open(request, timeout=30) as response:
+    assert response.headers["Content-Type"].startswith("text/event-stream")
+    assert "no-store" in response.headers["Cache-Control"] and "no-transform" in response.headers["Cache-Control"]
+    for line in response:
+        if line.startswith(b"data: "):
+            frames.append(json.loads(line[6:]))
+assert any(f["status"] == "running" and f["draft_answer"] and f["answer"] is None for f in frames), frames
+assert frames[-1]["status"] == "completed" and frames[-1]["draft_answer"] == ""
+send("STREAM REMEMBER INTERRUPT")
+failed = finish()
+assert failed["status"] == "failed" and failed["answer"] is None and failed["draft_answer"] == ""
+# Two approvals at the same revision append exactly one note atomically.
+proposal = api(path)["turns"][-2]
+approval_path = path + "/turns/" + proposal["id"] + "/memory"
+def approve_race(_):
+    try:
+        return api(approval_path, "POST", {"revision": 2, "note": "Concurrent reviewed note"})
+    except AssertionError as error:
+        assert error.args[0][1] == 409, error
+        return None
+with concurrent.futures.ThreadPoolExecutor(2) as executor:
+    assert sum(v is not None for v in executor.map(approve_race, range(2))) == 1
+assert api(root + "/context")["revision"] == 3 and len(api(root + "/context")["research_log"]) == 2
 missing = f"missing-{uuid.uuid4().hex}"
 score = api(root + "/content/score", "POST", {"keyword": missing, "content": "SEO audits help."})
 assert score["coverage_score"] is None and score["evidence"]["references"] == []
@@ -130,8 +176,12 @@ interrupted = send("SLOW interruption test", chat_path=crash_path)
 sql(f"UPDATE assistant_turns SET status='running',request_started=true WHERE id='{interrupted['id']}'; UPDATE jobs SET status='failed' WHERE id='{interrupted['job_id']}';")
 assert api(crash_path)["turns"][-1]["status"] == "failed"
 # Changing the market preserves old chat history but disallows continuation.
+send("REMEMBER keep this as a proposal")
+scope_proposal = finish()
 api(root, "PATCH", {"country_code": "ID"})
 api(path + "/messages", "POST", {"model": "fixture", "message": "new market"}, 409)
+api(path + "/turns/" + scope_proposal["id"] + "/memory", "POST", {"revision": 3, "note": "wrong market"}, 409)
+assert api(root + "/context")["revision"] == 3
 assert api(root + "/content/score", "POST", {"keyword": "seo audits", "content": "draft"})["coverage_score"] is None
 api(root, "PATCH", {"country_code": "US"})
 # In-flight jobs still consume capacity after their chats have been deleted.
@@ -181,4 +231,4 @@ api(path, "DELETE", status=204)
 api(path, status=404)
 assert sql(f"SELECT count(*) FROM assistant_turns WHERE chat_id='{c['id']}'") == "0"
 api("/api-keys/" + key["key"]["id"], "DELETE", status=204)
-print("PASS: assistant tools/history, private ownership and tenant isolation, strict inputs, budget, no writes, provider failure/no retry, interrupted work, cached content briefs/coverage, market isolation, concurrent quotas and deletion")
+print("PASS: assistant tools/history, private ownership and tenant isolation, strict inputs, durable partial/SSE streaming, reviewed exactly-once memory writes, provider failure/no retry, interrupted work, cached content briefs/coverage, market isolation, concurrent quotas and deletion")

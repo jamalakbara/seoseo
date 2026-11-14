@@ -2,7 +2,7 @@
 
 Free, open-source, self-hostable SEO platform — an alternative to Semrush, Ahrefs and OpenSEO that works **without paid API keys**.
 
-> Status: **M7 development started**. Private assistant chats, cached-SERP content briefs and local draft term coverage join the earlier milestones, with 118 MCP tools. Assistant streaming/memory writes and the other M7 features remain open. M6's final export closeout and M5's live-cloud gate remain pending. See [Assistant and content](docs/28-assistant-and-content.md), [M6 acceptance](docs/27-m6-acceptance.md), [M5 acceptance](docs/17-m5-acceptance.md) and the [roadmap](docs/07-roadmap.md).
+> Status: **M7 in progress**. The assistant now supports real streamed answers and reviewed memory notes, alongside content briefs and local draft term coverage, with 118 MCP tools. Alerts, digests and other M7 features remain open. M6's final export closeout and M5's live-cloud gate remain pending. See [Assistant streaming and memory](docs/29-assistant-streaming-and-memory.md), [M6 acceptance](docs/27-m6-acceptance.md), [M5 acceptance](docs/17-m5-acceptance.md) and the [roadmap](docs/07-roadmap.md).
 
 M5 guides: [competitive research](docs/14-competitive-research.md), [backlinks](docs/15-backlink-snapshots.md), [AI visibility setup](docs/16-ai-visibility.md), [agent skills](plugins/seoseo/README.md). Domain/backlink coverage is a bounded sample, and traffic estimates require eligible monthly search counts. Unknown metrics stay null.
 

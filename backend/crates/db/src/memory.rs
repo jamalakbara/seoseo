@@ -44,12 +44,20 @@ pub async fn get(
 }
 
 pub struct ContextUpdate {
+    pub assistant_approval: Option<AssistantMemoryApproval>,
     pub expected_revision: i64,
     pub expected_domain: Option<String>,
     pub sections: Value,
     pub competitors: Value,
     pub key_pages: Value,
     pub research_log: Value,
+}
+
+pub struct AssistantMemoryApproval {
+    pub chat_id: Uuid,
+    pub turn_id: Uuid,
+    pub user_id: Uuid,
+    pub note: String,
 }
 
 /// Replace the context document with compare-and-swap semantics. Revision 0 creates it.
@@ -94,7 +102,14 @@ pub async fn put(
             "project memory changed since it was loaded; reload it and apply the edit again".into(),
         ));
     }
-    let row = sqlx::query_as(
+    if let Some(approval) = &input.assistant_approval {
+        let valid:Option<Uuid>=sqlx::query_scalar("SELECT t.id FROM assistant_turns t JOIN assistant_chats c ON c.id=t.chat_id WHERE t.id=$1 AND c.id=$2 AND c.user_id=$3 AND c.project_id=$4 AND t.status='completed' AND t.memory_note IS NOT NULL AND t.memory_applied_revision IS NULL AND c.domain IS NOT DISTINCT FROM $5::text AND c.country=$6 AND c.language=$7 FOR UPDATE OF t")
+            .bind(approval.turn_id).bind(approval.chat_id).bind(approval.user_id).bind(project_id).bind(&project.domain).bind(&project.country_code).bind(&project.language_code).fetch_optional(&mut *tx).await.map_err(internal)?;
+        if valid.is_none() {
+            return Err(AppError::Conflict("Memory proposal was already saved, removed, or belongs to a previous website/market. Reload the chat.".into()));
+        }
+    }
+    let row = sqlx::query_as::<_, ProjectContextRow>(
         "INSERT INTO project_contexts
              (project_id, revision, sections, competitors, key_pages, research_log)
          SELECT p.id, 1, $4, $5, $6, $7
@@ -121,6 +136,10 @@ pub async fn put(
     .await
     .map_err(internal)?;
     if let Some(row) = row {
+        if let Some(approval) = input.assistant_approval {
+            sqlx::query("UPDATE assistant_turns SET memory_applied_revision=$2,memory_saved_note=$3 WHERE id=$1")
+                .bind(approval.turn_id).bind(row.revision).bind(approval.note).execute(&mut *tx).await.map_err(internal)?;
+        }
         tx.commit().await.map_err(internal)?;
         return Ok(row);
     }

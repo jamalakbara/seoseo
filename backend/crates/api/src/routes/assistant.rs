@@ -1,4 +1,5 @@
 use crate::{auth::Auth, error::ApiResult, state::AppState};
+use axum::response::sse::{Event, KeepAlive, Sse};
 use axum::{
     Json,
     extract::{Path, State},
@@ -6,6 +7,8 @@ use axum::{
 };
 use db::assistant::{AssistantChat, AssistantTurn};
 use domain::assistant as svc;
+use futures::Stream;
+use std::{convert::Infallible, time::Duration};
 use utoipa_axum::{router::OpenApiRouter, routes};
 use uuid::Uuid;
 
@@ -15,6 +18,53 @@ pub fn router() -> OpenApiRouter<AppState> {
         .routes(routes!(list_assistant_chats, create_assistant_chat))
         .routes(routes!(get_assistant_chat, delete_assistant_chat))
         .routes(routes!(send_assistant_message))
+        .routes(routes!(assistant_turn_events))
+        .routes(routes!(approve_assistant_memory_note))
+}
+
+#[utoipa::path(post,path="/projects/{project_id}/assistant/chats/{chat_id}/turns/{turn_id}/memory",tag="assistant",params(("project_id"=Uuid,Path),("chat_id"=Uuid,Path),("turn_id"=Uuid,Path)),request_body=svc::ApproveMemoryNoteInput,responses((status=OK,body=domain::memory::ProjectContext)),security(("session"=[]),("bearer"=[])))]
+async fn approve_assistant_memory_note(
+    State(s): State<AppState>,
+    Auth(a): Auth,
+    Path((pid, cid, tid)): Path<(Uuid, Uuid, Uuid)>,
+    Json(input): Json<svc::ApproveMemoryNoteInput>,
+) -> ApiResult<Json<domain::memory::ProjectContext>> {
+    Ok(Json(
+        svc::approve_memory_note(&s.pool, &a, pid, cid, tid, input).await?,
+    ))
+}
+
+#[utoipa::path(get,path="/projects/{project_id}/assistant/chats/{chat_id}/turns/{turn_id}/events",tag="assistant",params(("project_id"=Uuid,Path),("chat_id"=Uuid,Path),("turn_id"=Uuid,Path)),responses((status=OK,content_type="text/event-stream",body=String)),security(("session"=[]),("bearer"=[])))]
+async fn assistant_turn_events(
+    State(s): State<AppState>,
+    Auth(a): Auth,
+    Path((pid, cid, tid)): Path<(Uuid, Uuid, Uuid)>,
+) -> ApiResult<(
+    [(&'static str, &'static str); 2],
+    Sse<impl Stream<Item = Result<Event, Infallible>>>,
+)> {
+    svc::turn(&s.pool, &a, pid, cid, tid).await?;
+    let stream = async_stream::stream! {
+        let mut last=String::new();
+        // Close before the HTTP timeout; EventSource reconnects without restarting inference.
+        for _ in 0..180 {
+            let turn=match svc::turn(&s.pool,&a,pid,cid,tid).await {
+                Ok(t)=>t,Err(_)=>{yield Ok(Event::default().event("unavailable").data("Conversation unavailable"));break;}
+            };
+            let terminal=!matches!(turn.status.as_str(),"queued"|"running");
+            let body=serde_json::to_string(&turn).unwrap_or_default();
+            if body!=last {yield Ok(Event::default().event("turn").data(body.clone()));last=body;}
+            if terminal {break;}
+            tokio::time::sleep(Duration::from_millis(250)).await;
+        }
+    };
+    Ok((
+        [
+            ("Cache-Control", "no-store, no-transform"),
+            ("X-Accel-Buffering", "no"),
+        ],
+        Sse::new(stream).keep_alive(KeepAlive::default()),
+    ))
 }
 
 #[utoipa::path(get,path="/projects/{project_id}/assistant/models",tag="assistant",params(("project_id"=Uuid,Path)),responses((status=OK,body=svc::AssistantModels)),security(("session"=[]),("bearer"=[])))]

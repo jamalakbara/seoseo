@@ -123,7 +123,7 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | RP-06 | Scheduled email digests | (new) | P2 | SMTP | M7 | todo |
 
 ## AI assistant & content
-| AG-01 | In-app chat agent w/ tools + memory | SAM | P1 | Ollama/OpenAI-compat | M7 | wip (private durable chat, read tools and canonical memory; streaming and reviewed memory writes remain) |
+| AG-01 | In-app chat agent w/ tools + memory | SAM | P1 | Ollama/OpenAI-compat | M7 | done (private durable chat, real streamed answers, bounded read tools and explicitly reviewed canonical-memory notes; no automatic writes) |
 | AG-02 | Content brief generator | (new) | P2 | SERP + LLM | M7 | done (cached-SERP briefs in private durable chats, explicit evidence gaps; editorial review required) |
 | AG-03 | On-page optimizer score | (new) | P2 | SERP terms | M7 | done (local sampled title/snippet term coverage, nullable score, source-labelled references; not a ranking prediction) |
 

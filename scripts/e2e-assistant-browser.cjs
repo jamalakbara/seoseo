@@ -14,6 +14,7 @@ const { randomUUID } = require("node:crypto");
   try {
     const page = await browser.newPage();
     const errors = [];
+    page.on("response", r => { if (r.url().endsWith("/events")) console.log("SSE response", { encoding: r.headers()["content-encoding"], cache: r.headers()["cache-control"] }); });
     page.on("pageerror", e => errors.push(String(e)));
     await page.setViewport({ width: 1440, height: 1000 });
     async function button(text) {
@@ -52,6 +53,21 @@ const { randomUUID } = require("node:crypto");
     await page.type("#assistant-message", "SLOW What should I fix first?");
     await button("Send message");
     await contains("Fixture answer");
+    await page.type("#assistant-message", "STREAM REMEMBER prioritize technical SEO audits");
+    await button("Send message");
+    await page.waitForSelector("[data-streaming-draft]", { timeout: 60000 });
+    await screenshots("assistant-streaming-draft");
+    await contains("Proposed memory note");
+    const beforeReview = await page.evaluate(async (pid) => (await (await fetch(`/api/v1/projects/${pid}/context`)).json()).revision, project.id);
+    if (beforeReview !== 1) throw new Error("Memory changed without approval");
+    await button("Review memory note");
+    await page.waitForSelector('textarea[id^="memory-note-"]');
+    await text('textarea[id^="memory-note-"]', "Reviewed in the browser: focus on small business technical SEO audits.");
+    await button("Save reviewed note");
+    await contains("Saved to project memory");
+    const afterReview = await page.evaluate(async (pid) => (await (await fetch(`/api/v1/projects/${pid}/context`)).json()), project.id);
+    if (afterReview.revision !== 2 || afterReview.research_log.length !== 1 || !afterReview.research_log[0].summary.startsWith("Reviewed in the browser")) throw new Error("Reviewed note was not appended once");
+    await screenshots("assistant-reviewed-memory");
     await page.reload({ waitUntil: "networkidle0" });
     // Refresh preserves the chat list; select the private conversation to restore history.
     await page.waitForFunction(() => document.querySelector("#assistant-chat")?.options.length > 1);

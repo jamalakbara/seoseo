@@ -8,9 +8,9 @@ use utoipa::ToSchema;
 
 #[derive(Clone)]
 pub struct ModelGateway {
-    endpoint: url::Url,
-    key: Option<String>,
-    models: Vec<String>,
+    pub(crate) endpoint: url::Url,
+    pub(crate) key: Option<String>,
+    pub(crate) models: Vec<String>,
 }
 
 impl ModelGateway {
@@ -163,7 +163,10 @@ impl ModelGateway {
     }
 }
 
-fn assistant_messages(context: &str, prompt: &str) -> Result<serde_json::Value, ProviderError> {
+pub(crate) fn assistant_messages(
+    context: &str,
+    prompt: &str,
+) -> Result<serde_json::Value, ProviderError> {
     // The domain service builds this envelope: policy is server-owned; everything
     // following the first delimiter is serialized, untrusted conversation/evidence data.
     let (policy, data) = prompt.split_once("\nINPUT JSON: ").ok_or_else(|| {
