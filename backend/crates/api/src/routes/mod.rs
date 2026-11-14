@@ -1,10 +1,12 @@
 mod ai_visibility;
 mod api_keys;
+mod assistant;
 mod audits;
 mod auth;
 mod backlinks;
 mod bing;
 mod competitive;
+mod content;
 mod dashboard;
 mod ga4;
 mod gsc;
@@ -33,6 +35,7 @@ pub fn v1() -> OpenApiRouter<AppState> {
         .merge(auth::router())
         .merge(api_keys::router())
         .merge(ai_visibility::router())
+        .merge(assistant::router())
         .merge(projects::router())
         .merge(jobs::router())
         .merge(audits::router())
@@ -45,6 +48,7 @@ pub fn v1() -> OpenApiRouter<AppState> {
         .merge(local::router())
         .merge(m6::router())
         .merge(competitive::router())
+        .merge(content::router())
         .merge(memory::router())
         .merge(rank::router())
         .merge(reports::router())

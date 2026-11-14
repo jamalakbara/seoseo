@@ -2032,6 +2032,272 @@
         ]
       }
     },
+    "/api/v1/projects/{project_id}/assistant/chats": {
+      "get": {
+        "tags": [
+          "assistant"
+        ],
+        "operationId": "list_assistant_chats",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AssistantChat"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "assistant"
+        ],
+        "operationId": "create_assistant_chat",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateChatInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssistantChat"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/assistant/chats/{chat_id}": {
+      "get": {
+        "tags": [
+          "assistant"
+        ],
+        "operationId": "get_assistant_chat",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "chat_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssistantChatView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "assistant"
+        ],
+        "operationId": "delete_assistant_chat",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "chat_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {}
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/assistant/chats/{chat_id}/messages": {
+      "post": {
+        "tags": [
+          "assistant"
+        ],
+        "operationId": "send_assistant_message",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "chat_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendAssistantInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssistantTurn"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/assistant/models": {
+      "get": {
+        "tags": [
+          "assistant"
+        ],
+        "operationId": "assistant_models",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssistantModels"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/projects/{project_id}/audit-schedule": {
       "get": {
         "tags": [
@@ -3823,6 +4089,102 @@
             "content": {
               "application/json": {
                 "schema": {}
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/content/brief": {
+      "post": {
+        "tags": [
+          "assistant"
+        ],
+        "operationId": "generate_content_brief",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ContentBriefInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AssistantChatView"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/content/score": {
+      "post": {
+        "tags": [
+          "assistant"
+        ],
+        "operationId": "score_content",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OptimizeContentInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ContentScore"
+                }
               }
             }
           }
@@ -9498,6 +9860,151 @@
           }
         }
       },
+      "AssistantChat": {
+        "type": "object",
+        "required": [
+          "id",
+          "project_id",
+          "user_id",
+          "title",
+          "country",
+          "language",
+          "created_at"
+        ],
+        "properties": {
+          "country": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "domain": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "language": {
+            "type": "string"
+          },
+          "project_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "user_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "AssistantChatView": {
+        "type": "object",
+        "required": [
+          "chat",
+          "turns"
+        ],
+        "properties": {
+          "chat": {
+            "$ref": "#/components/schemas/AssistantChat"
+          },
+          "turns": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AssistantTurn"
+            }
+          }
+        }
+      },
+      "AssistantModels": {
+        "type": "object",
+        "required": [
+          "models",
+          "note"
+        ],
+        "properties": {
+          "models": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      },
+      "AssistantTurn": {
+        "type": "object",
+        "required": [
+          "id",
+          "chat_id",
+          "job_id",
+          "model",
+          "prompt",
+          "status",
+          "evidence",
+          "request_started",
+          "created_at"
+        ],
+        "properties": {
+          "answer": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "chat_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "error": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "evidence": {},
+          "finished_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "job_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "model": {
+            "type": "string"
+          },
+          "prompt": {
+            "type": "string"
+          },
+          "request_started": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "string"
+          }
+        }
+      },
       "Audit": {
         "type": "object",
         "required": [
@@ -10833,6 +11340,124 @@
           }
         }
       },
+      "ContentBriefInput": {
+        "type": "object",
+        "required": [
+          "keyword",
+          "model"
+        ],
+        "properties": {
+          "keyword": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ContentEvidence": {
+        "type": "object",
+        "required": [
+          "keyword",
+          "country",
+          "language",
+          "references",
+          "terms"
+        ],
+        "properties": {
+          "country": {
+            "type": "string"
+          },
+          "exact": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "fetched_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "keyword": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          },
+          "provider": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "references": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SnapshotItem"
+            }
+          },
+          "snapshot_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "terms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ContentScore": {
+        "type": "object",
+        "required": [
+          "matched_terms",
+          "missing_terms",
+          "word_count",
+          "evidence",
+          "note"
+        ],
+        "properties": {
+          "coverage_score": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Percentage of sampled reference terms present, not a ranking or quality prediction.",
+            "minimum": 0
+          },
+          "evidence": {
+            "$ref": "#/components/schemas/ContentEvidence"
+          },
+          "matched_terms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "missing_terms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "note": {
+            "type": "string"
+          },
+          "word_count": {
+            "type": "integer",
+            "minimum": 0
+          }
+        }
+      },
       "ContextSection": {
         "type": "object",
         "required": [
@@ -10960,6 +11585,18 @@
             "type": "string"
           }
         }
+      },
+      "CreateChatInput": {
+        "type": "object",
+        "required": [
+          "title"
+        ],
+        "properties": {
+          "title": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
       },
       "CreateLocalTrackerInput": {
         "type": "object",
@@ -13964,6 +14601,22 @@
           }
         }
       },
+      "OptimizeContentInput": {
+        "type": "object",
+        "required": [
+          "keyword",
+          "content"
+        ],
+        "properties": {
+          "content": {
+            "type": "string"
+          },
+          "keyword": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "OverviewCapture": {
         "type": "object",
         "required": [
@@ -16254,6 +16907,22 @@
           }
         }
       },
+      "SendAssistantInput": {
+        "type": "object",
+        "required": [
+          "model",
+          "message"
+        ],
+        "properties": {
+          "message": {
+            "type": "string"
+          },
+          "model": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
       "SerpAnalysis": {
         "type": "object",
         "required": [
@@ -16605,6 +17274,37 @@
         ],
         "properties": {
           "site_url": {
+            "type": "string"
+          }
+        }
+      },
+      "SnapshotItem": {
+        "type": "object",
+        "required": [
+          "position",
+          "url",
+          "domain",
+          "title"
+        ],
+        "properties": {
+          "domain": {
+            "type": "string",
+            "description": "Registrable domain of the result."
+          },
+          "position": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "snippet": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "title": {
+            "type": "string"
+          },
+          "url": {
             "type": "string"
           }
         }

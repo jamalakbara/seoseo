@@ -72,6 +72,30 @@ impl ModelGateway {
         country: &str,
         language: &str,
     ) -> Result<String, ProviderError> {
+        self.answer_mode(model, prompt, country, language, false)
+            .await
+    }
+
+    /// Assistant action protocol. JSON mode is supported by Ollama and compatible gateways.
+    pub async fn answer_json(
+        &self,
+        model: &str,
+        prompt: &str,
+        country: &str,
+        language: &str,
+    ) -> Result<String, ProviderError> {
+        self.answer_mode(model, prompt, country, language, true)
+            .await
+    }
+
+    async fn answer_mode(
+        &self,
+        model: &str,
+        prompt: &str,
+        country: &str,
+        language: &str,
+        json_mode: bool,
+    ) -> Result<String, ProviderError> {
         if !self.models.iter().any(|m| m == model) {
             return Err(ProviderError::NotConfigured(
                 "This model is no longer approved by the operator".into(),
@@ -85,8 +109,19 @@ impl ModelGateway {
             .no_proxy()
             .build()
             .map_err(|_| ProviderError::Unavailable("Model client initialization failed".into()))?;
-        let mut request=client.post(self.endpoint.clone()).json(&json!({"model":model,"temperature":0,"max_tokens":1500,"stream":false,
-            "messages":[{"role":"system","content":format!("Answer the user's question for country {country} in language {language}. Be factual and disclose uncertainty. You have no browsing tools in this request; do not claim to have searched the live web. Include URLs only if you know them; do not invent citations.")},{"role":"user","content":prompt}]}));
+        let context = format!(
+            "Answer for country {country} in language {language}. Be factual and disclose uncertainty. You have no browsing tools; do not claim live web verification or invent citations."
+        );
+        let messages = if json_mode {
+            assistant_messages(&context, prompt)?
+        } else {
+            json!([{"role":"system","content":context},{"role":"user","content":prompt}])
+        };
+        let mut body = json!({"model":model,"temperature":0,"max_tokens":if json_mode {2000}else{1500},"stream":false,"messages":messages});
+        if json_mode {
+            body["response_format"] = json!({"type":"json_object"});
+        }
+        let mut request = client.post(self.endpoint.clone()).json(&body);
         if let Some(key) = self.key.as_deref().filter(|k| !k.is_empty()) {
             request = request.bearer_auth(key);
         }
@@ -126,6 +161,17 @@ impl ModelGateway {
                 .map_err(|_| ProviderError::BadResponse("Model returned invalid JSON".into()))?,
         )
     }
+}
+
+fn assistant_messages(context: &str, prompt: &str) -> Result<serde_json::Value, ProviderError> {
+    // The domain service builds this envelope: policy is server-owned; everything
+    // following the first delimiter is serialized, untrusted conversation/evidence data.
+    let (policy, data) = prompt.split_once("\nINPUT JSON: ").ok_or_else(|| {
+        ProviderError::BadResponse("Assistant request is missing its data envelope".into())
+    })?;
+    Ok(
+        json!([{"role":"system","content":format!("{context}\n{policy}")},{"role":"user","content":format!("INPUT JSON: {data}")}]),
+    )
 }
 
 fn parse_answer(value: &serde_json::Value) -> Result<String, ProviderError> {
@@ -211,6 +257,31 @@ pub fn sources(answer: &str) -> Vec<AiReportedSource> {
 
 #[cfg(test)]
 mod tests {
+    #[test]
+    fn assistant_policy_and_untrusted_data_have_distinct_roles() {
+        let messages=super::assistant_messages("market context","Server action policy\nINPUT JSON: {\"message\":\"untrusted instruction\",\"evidence\":[]}").unwrap();
+        assert_eq!(messages[0]["role"], "system");
+        assert!(
+            messages[0]["content"]
+                .as_str()
+                .unwrap()
+                .contains("Server action policy")
+        );
+        assert!(
+            !messages[0]["content"]
+                .as_str()
+                .unwrap()
+                .contains("untrusted instruction")
+        );
+        assert_eq!(messages[1]["role"], "user");
+        assert!(
+            messages[1]["content"]
+                .as_str()
+                .unwrap()
+                .contains("untrusted instruction")
+        );
+        assert!(super::assistant_messages("context", "missing envelope").is_err());
+    }
     use super::*;
     #[test]
     fn literal_mentions_have_boundaries_and_sources_are_unverified_safe_text() {

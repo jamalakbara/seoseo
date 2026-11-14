@@ -28,6 +28,10 @@ Acceptance evidence and reproducible commands: [M5 acceptance](17-m5-acceptance.
 
 KW-11 is implemented: [SERP keyword clustering](18-keyword-clustering.md). SA-12 adds [internal link graphs and suggestions](19-internal-links.md). SA-13 adds [audit comparison and scheduled re-audits](20-audit-comparison-and-schedules.md). RT-07 and AI-05 add [multi-URL candidates and the own AI prompt/brand index](21-cannibalization-and-ai-index.md). DO-06 and BL-07 add [homepage technology hints and sampled link-intersect prospects](22-technology-and-link-prospects.md). SA-09 adds [CrUX field data](23-crux-field-data.md), and IN-04 adds [Bing Webmaster Tools](24-bing-webmaster.md). The server now exposes 115 MCP tools. [Local SEO](25-local-seo.md) adds explicit OSM lookup, saved trackers, durable budgeted Maps scans, source-labelled free evidence imports, measured/unknown heatmaps and competitor samples, plus city demand context imports. [Google AI Overviews](26-google-ai-overviews.md) adds optional BYOK capture/continuation, source-labelled imports and scoped history/citations. Live Bing, scoped CrUX no-data, nine-cell Maps and inline AI Overview checks passed with configured credentials; mobile maps, keyboard selection and labelled imports passed. Final browser export closeout remains pending after the browser connection failed. [M6 acceptance](27-m6-acceptance.md) records the exact validation and open gates. M3 follow-ups remain below.
 
+## M7 started
+
+The first [assistant and content delivery](28-assistant-and-content.md) adds private durable chats, canonical memory reads, bounded evidence tools, cached-SERP briefs and local draft term coverage. AG-01 retains streaming/reviewed memory writes. Other M7 features and the weekly email digest exit gate remain open.
+
 ## M3 retained follow-ups
 M3 core is shipped. Per user direction on 2026-11-12, retain keyword file import (RT-02), per-tracker timezones (RT-03), keyword/run matrix (RT-05), and dashboard retry (OP-03) as follow-ups. Device/city/depth controls (RT-01/04) depend on provider support. These rows remain `wip` in the feature catalog; M3 is not marked fully complete.
 

@@ -98,7 +98,7 @@ CRUD /projects/{pid}/report-templates · POST …/{rid}/pdf → job
 
 ### Assistant
 ```
-GET/POST /projects/{pid}/assistant/sessions · POST …/{sid}/messages (SSE stream) · DELETE …/{sid}
+GET /projects/{pid}/assistant/models · GET/POST /projects/{pid}/assistant/chats · GET/DELETE …/{chat_id} · POST …/{chat_id}/messages (202, durable job; UI polls). Streaming and reviewed memory writes remain follow-ups. POST /projects/{pid}/content/brief · POST …/content/score. See [Assistant and content](28-assistant-and-content.md).
 ```
 
 ### Public free tools (no auth, rate-limited)
@@ -125,7 +125,7 @@ Transport: Streamable HTTP at `/mcp`. Each tool: zod-like JSON Schema input, dis
 | GA4 | `list_google_analytics_properties`, `set_google_analytics_property`, `get_google_analytics_{organic_overview,organic_landing_pages,page_performance,traffic_acquisition,key_events,ecommerce_performance,site_search,audience_breakdown,measurement_health}` |
 | Reports | `save_report`, `get_report`, `list_reports`, `delete_report`, `save_report_template`, `list_report_templates`, `delete_report_template`, `set_report_sharing` |
 | Indexing | `submit_indexnow_urls` |
-| Content* | `create_content_brief`*, `score_page_content`* |
+| Content | `create_content_brief`, `score_page_content`, `get_assistant_chat` (private ownership; poll queued turns) |
 
 `*` = new beyond OpenSEO. Cost-estimate tools return request counts & provider quota impact instead of credits.
 

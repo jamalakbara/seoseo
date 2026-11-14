@@ -663,6 +663,70 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/assistant/chats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_assistant_chats"];
+        put?: never;
+        post: operations["create_assistant_chat"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/assistant/chats/{chat_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_assistant_chat"];
+        put?: never;
+        post?: never;
+        delete: operations["delete_assistant_chat"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/assistant/chats/{chat_id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["send_assistant_message"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/assistant/models": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["assistant_models"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/audit-schedule": {
         parameters: {
             query?: never;
@@ -1020,6 +1084,38 @@ export interface paths {
         get?: never;
         put?: never;
         post: operations["import_competitive_volumes"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/content/brief": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["generate_content_brief"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/content/score": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["score_content"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2427,6 +2523,47 @@ export interface components {
             /** Format: uuid */
             user_id: string;
         };
+        AssistantChat: {
+            country: string;
+            /** Format: date-time */
+            created_at: string;
+            domain?: string | null;
+            /** Format: uuid */
+            id: string;
+            language: string;
+            /** Format: uuid */
+            project_id: string;
+            title: string;
+            /** Format: uuid */
+            user_id: string;
+        };
+        AssistantChatView: {
+            chat: components["schemas"]["AssistantChat"];
+            turns: components["schemas"]["AssistantTurn"][];
+        };
+        AssistantModels: {
+            models: string[];
+            note: string;
+        };
+        AssistantTurn: {
+            answer?: string | null;
+            /** Format: uuid */
+            chat_id: string;
+            /** Format: date-time */
+            created_at: string;
+            error?: string | null;
+            evidence: unknown;
+            /** Format: date-time */
+            finished_at?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            job_id: string;
+            model: string;
+            prompt: string;
+            request_started: boolean;
+            status: string;
+        };
         Audit: {
             config: unknown;
             /** Format: date-time */
@@ -2808,6 +2945,35 @@ export interface components {
             resource: string;
             scope: string;
         };
+        ContentBriefInput: {
+            keyword: string;
+            model: string;
+        };
+        ContentEvidence: {
+            country: string;
+            exact?: boolean | null;
+            /** Format: date-time */
+            fetched_at?: string | null;
+            keyword: string;
+            language: string;
+            provider?: string | null;
+            references: components["schemas"]["SnapshotItem"][];
+            /** Format: uuid */
+            snapshot_id?: string | null;
+            terms: string[];
+        };
+        ContentScore: {
+            /**
+             * Format: int32
+             * @description Percentage of sampled reference terms present, not a ranking or quality prediction.
+             */
+            coverage_score?: number | null;
+            evidence: components["schemas"]["ContentEvidence"];
+            matched_terms: string[];
+            missing_terms: string[];
+            note: string;
+            word_count: number;
+        };
         ContextSection: {
             content: string;
             key: string;
@@ -2839,6 +3005,9 @@ export interface components {
         };
         CreateApiKeyInput: {
             name: string;
+        };
+        CreateChatInput: {
+            title: string;
         };
         CreateLocalTrackerInput: {
             address: string;
@@ -3699,6 +3868,10 @@ export interface components {
             organization_name: string;
             role: string;
         };
+        OptimizeContentInput: {
+            content: string;
+            keyword: string;
+        };
         OverviewCapture: {
             cached: boolean;
             observation: components["schemas"]["ResearchObservation"];
@@ -4404,6 +4577,10 @@ export interface components {
             target_business_id: string;
             tracker: components["schemas"]["LocalTracker"];
         };
+        SendAssistantInput: {
+            message: string;
+            model: string;
+        };
         SerpAnalysis: {
             /** @description False until the Common Crawl ranks were imported (KD needs them). */
             authority_loaded: boolean;
@@ -4515,6 +4692,15 @@ export interface components {
         };
         SiteInput: {
             site_url: string;
+        };
+        SnapshotItem: {
+            /** @description Registrable domain of the result. */
+            domain: string;
+            /** Format: int32 */
+            position: number;
+            snippet?: string | null;
+            title: string;
+            url: string;
         };
         StartAiRunInput: {
             expected_domain: string;
@@ -5902,6 +6088,141 @@ export interface operations {
             };
         };
     };
+    list_assistant_chats: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantChat"][];
+                };
+            };
+        };
+    };
+    create_assistant_chat: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateChatInput"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantChat"];
+                };
+            };
+        };
+    };
+    get_assistant_chat: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                chat_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantChatView"];
+                };
+            };
+        };
+    };
+    delete_assistant_chat: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                chat_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    send_assistant_message: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                chat_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SendAssistantInput"];
+            };
+        };
+        responses: {
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantTurn"];
+                };
+            };
+        };
+    };
+    assistant_models: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantModels"];
+                };
+            };
+        };
+    };
     get_audit_schedule: {
         parameters: {
             query?: never;
@@ -6779,6 +7100,56 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+        };
+    };
+    generate_content_brief: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ContentBriefInput"];
+            };
+        };
+        responses: {
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AssistantChatView"];
+                };
+            };
+        };
+    };
+    score_content: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OptimizeContentInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ContentScore"];
                 };
             };
         };

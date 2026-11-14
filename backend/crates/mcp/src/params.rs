@@ -5,6 +5,25 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ContentBriefParams {
+    pub project_id: String,
+    pub keyword: String,
+    /// Operator-approved Ollama or compatible model ID.
+    pub model: String,
+}
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct ContentScoreParams {
+    pub project_id: String,
+    pub keyword: String,
+    pub content: String,
+}
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct AssistantChatParams {
+    pub project_id: String,
+    pub chat_id: String,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct CruxParams {
     pub project_id: String,
     pub url: String,

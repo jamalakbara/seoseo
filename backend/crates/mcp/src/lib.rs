@@ -661,6 +661,79 @@ impl SeoSeoMcp {
         )
     }
     #[tool(
+        description = "Queue a content brief using an approved Ollama/compatible model and cached top-ten SERP titles/snippets within seven days in the project market. Creates a private assistant chat; poll get_assistant_chat for the result and evidence. No live search or automatic memory/report writes. Missing cached results are an error."
+    )]
+    async fn create_content_brief(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<ContentBriefParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::content::brief(
+                    &self.pool,
+                    &a,
+                    id("project_id", &p.project_id)?,
+                    &self.cfg,
+                    domain::content::ContentBriefInput {
+                        keyword: p.keyword,
+                        model: p.model,
+                    },
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Score draft term coverage against repeated terms in up to ten cached SERP titles/snippets from the last seven days in the project market. Returns source, timestamp, references, matched/missing terms and a nullable score. This is a local lexical overlap hint, not a ranking/quality prediction. Does not send the draft to a model or fetch pages."
+    )]
+    async fn score_page_content(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<ContentScoreParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::content::optimize(
+                    &self.pool,
+                    &a,
+                    id("project_id", &p.project_id)?,
+                    domain::content::OptimizeContentInput {
+                        keyword: p.keyword,
+                        content: p.content,
+                    },
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Read your own private assistant conversation and its queued/running/completed/failed turns, answers and evidence. Chat ownership is bound to the authenticated user, including API keys. Poll until the final turn is completed or failed; provider failures are not retried automatically."
+    )]
+    async fn get_assistant_chat(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<AssistantChatParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::assistant::get(
+                    &self.pool,
+                    &a,
+                    id("project_id", &p.project_id)?,
+                    id("chat_id", &p.chat_id)?,
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
         description = "List accessible GA4 properties with pagination. Needs admin and a separate Analytics grant; pass next_page_token as page_token."
     )]
     async fn list_google_analytics_properties(
@@ -2778,6 +2851,9 @@ mod tests {
             "whoami",
             "research_keywords",
             "cluster_keywords",
+            "create_content_brief",
+            "score_page_content",
+            "get_assistant_chat",
             "list_local_categories",
             "search_local_businesses",
             "create_local_tracker",

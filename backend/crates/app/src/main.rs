@@ -125,6 +125,7 @@ async fn main() -> anyhow::Result<()> {
                 }
             });
             let registry = domain::local_scans::register(registry, cfg.clone());
+            let registry = domain::assistant::register(registry, cfg.clone());
             let registry = domain::dashboard::register(registry, cfg);
             let result = jobs::run_worker(pool, registry, concurrency, rx).await;
             scheduler.abort();

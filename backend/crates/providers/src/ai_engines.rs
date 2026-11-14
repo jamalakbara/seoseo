@@ -206,6 +206,28 @@ impl EngineGateway {
             .find(|e| e.id == model)
             .map_or("compatible", |e| e.kind)
     }
+    /// JSON actions are deliberately limited to text-only local/compatible engines.
+    pub async fn answer_json(
+        &self,
+        model: &str,
+        prompt: &str,
+        country: &str,
+        language: &str,
+    ) -> Result<String, ProviderError> {
+        if let Some(e) = self.native.iter().find(|e| e.id == model) {
+            return match &e.ollama {
+                Some(g) => g.answer_json(&e.model, prompt, country, language).await,
+                None => Err(ProviderError::NotConfigured(
+                    "Assistant requires an Ollama or compatible model".into(),
+                )),
+            };
+        }
+        self.compatible
+            .as_ref()
+            .ok_or_else(|| ProviderError::NotConfigured("Assistant model is unavailable".into()))?
+            .answer_json(model, prompt, country, language)
+            .await
+    }
     pub async fn answer(
         &self,
         model: &str,

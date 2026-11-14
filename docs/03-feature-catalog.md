@@ -123,9 +123,9 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | RP-06 | Scheduled email digests | (new) | P2 | SMTP | M7 | todo |
 
 ## AI assistant & content
-| AG-01 | In-app chat agent w/ tools + memory | SAM | P1 | Ollama/OpenAI-compat | M7 | todo |
-| AG-02 | Content brief generator | (new) | P2 | SERP + LLM | M7 | todo |
-| AG-03 | On-page optimizer score | (new) | P2 | SERP terms | M7 | todo |
+| AG-01 | In-app chat agent w/ tools + memory | SAM | P1 | Ollama/OpenAI-compat | M7 | wip (private durable chat, read tools and canonical memory; streaming and reviewed memory writes remain) |
+| AG-02 | Content brief generator | (new) | P2 | SERP + LLM | M7 | done (cached-SERP briefs in private durable chats, explicit evidence gaps; editorial review required) |
+| AG-03 | On-page optimizer score | (new) | P2 | SERP terms | M7 | done (local sampled title/snippet term coverage, nullable score, source-labelled references; not a ranking prediction) |
 
 ## MCP / API / skills
 | MC-01 | MCP streamable HTTP + API-key auth | mcp server | P0 | — | M3 | done (stateless Streamable HTTP at /mcp, API-key or session auth, Host allow-list) |

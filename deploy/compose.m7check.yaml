@@ -1,0 +1,71 @@
+# Disposable M7 regression stack using the debug binary built in seoseo-target.
+# docker exec seoseo-m7-builder bash -c 'CARGO_BUILD_JOBS=1 cargo build -p app'
+# docker compose -p seoseo-m7check -f deploy/compose.m7check.yaml up -d
+name: seoseo-m7check
+services:
+  db:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: seoseo
+      POSTGRES_PASSWORD: disposable-m7-password
+      POSTGRES_DB: seoseo
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U seoseo]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    volumes: [m7data:/var/lib/postgresql]
+  cache:
+    image: valkey/valkey:9-alpine
+  fixture:
+    image: python:3.12-alpine
+    command: [python, /fixture.py]
+    ports: ["127.0.0.1:3502:8080"]
+    volumes: [../scripts/assistant-model-fixture.py:/fixture.py:ro]
+  api:
+    image: rust:1.99-slim-bookworm
+    command: [/target/debug/seoseo, serve, --migrate]
+    volumes: [target:/target:ro]
+    ports: ["127.0.0.1:3501:8080"]
+    environment: &env
+      DATABASE_URL: postgres://seoseo:disposable-m7-password@db:5432/seoseo
+      VALKEY_URL: redis://cache:6379
+      WEB_BASE_URL: http://localhost:3500
+      AUTH_MODE: password
+      ALLOW_SIGNUP: "true"
+      OPENAI_COMPAT_BASE_URL: http://fixture:8080/v1
+      AI_VISIBILITY_MODELS: fixture
+      AI_OLLAMA_URL: http://ollama:11434/v1
+      AI_OLLAMA_MODELS: ${M7_OLLAMA_MODELS:-}
+      RUST_LOG: info
+    depends_on:
+      db: {condition: service_healthy}
+  worker:
+    image: rust:1.99-slim-bookworm
+    command: [/target/debug/seoseo, worker]
+    volumes: [target:/target:ro]
+    environment: *env
+    depends_on: [api]
+  web:
+    build: ../frontend
+    image: seoseo-web:m7check
+    environment:
+      API_INTERNAL_URL: http://api:8080
+      AUTH_MODE: password
+    ports: ["127.0.0.1:3500:3000"]
+    depends_on: [api]
+  ollama:
+    image: ollama/ollama:latest
+    profiles: [ollama]
+    environment:
+      OLLAMA_CONTEXT_LENGTH: "16384"
+    volumes: [ollama:/root/.ollama]
+    ports: ["127.0.0.1:3503:11434"]
+volumes:
+  m7data:
+  target:
+    external: true
+    name: seoseo-target
+  ollama:
+    external: true
+    name: seoseo-m5-ollama-models

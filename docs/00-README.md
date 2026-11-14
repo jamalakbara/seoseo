@@ -1,5 +1,7 @@
 # SeoSeo — Documentation Index
 
+M7 development: [Assistant and content](28-assistant-and-content.md) documents private chats, model setup, tools, content briefs, term coverage and acceptance.
+
 Free, open-source, self-hostable SEO platform. Rust (axum) backend · Next.js 16 frontend · Docker Compose. Reverse-engineered from OpenSEO (every-app/open-seo v0.1.26) and extended.
 
 | # | Doc | What it answers |

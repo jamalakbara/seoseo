@@ -4,6 +4,7 @@
 pub mod ai_index;
 pub mod ai_visibility;
 pub mod api_keys;
+pub mod assistant;
 pub mod audit_compare;
 pub mod audit_schedule;
 pub mod audits;
