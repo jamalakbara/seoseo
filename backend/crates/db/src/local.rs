@@ -52,12 +52,40 @@ macro_rules! columns {
     };
 }
 
-pub async fn insert(pool: &PgPool, t: &NewLocalTracker<'_>) -> AppResult<LocalTracker> {
+pub async fn insert(
+    pool: &PgPool,
+    t: &NewLocalTracker<'_>,
+    keywords: &[String],
+    max_trackers: i64,
+) -> AppResult<LocalTracker> {
+    let mut tx = pool.begin().await.map_err(internal)?;
+    sqlx::query("SELECT id FROM projects WHERE id=$1 FOR UPDATE")
+        .bind(t.project_id)
+        .execute(&mut *tx)
+        .await
+        .map_err(internal)?;
+    let count: i64 = sqlx::query_scalar("SELECT count(*) FROM local_trackers WHERE project_id=$1")
+        .bind(t.project_id)
+        .fetch_one(&mut *tx)
+        .await
+        .map_err(internal)?;
+    if count >= max_trackers {
+        return Err(AppError::Conflict(format!(
+            "a project can have {max_trackers} local trackers"
+        )));
+    }
     sqlx::query("INSERT INTO local_trackers(id,project_id,name,business_source,business_id,business_name,address,latitude,longitude,category,grid_size,spacing_km,language,created_by) VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14)")
         .bind(t.id).bind(t.project_id).bind(t.name).bind(t.business_source).bind(t.business_id)
         .bind(t.business_name).bind(t.address).bind(t.latitude).bind(t.longitude).bind(t.category)
         .bind(t.grid_size).bind(t.spacing_km).bind(t.language).bind(t.created_by)
-        .execute(pool).await.map_err(|e| crate::map_err(e, "a local tracker with that name already exists"))?;
+        .execute(&mut *tx).await.map_err(|e| crate::map_err(e, "a local tracker with that name already exists"))?;
+    let mut q: QueryBuilder<Postgres> =
+        QueryBuilder::new("INSERT INTO local_tracker_keywords(tracker_id,keyword) ");
+    q.push_values(keywords, |mut b, keyword| {
+        b.push_bind(t.id).push_bind(keyword);
+    });
+    q.build().execute(&mut *tx).await.map_err(internal)?;
+    tx.commit().await.map_err(internal)?;
     get(pool, t.project_id, t.id).await
 }
 
@@ -85,28 +113,6 @@ pub async fn get(pool: &PgPool, project_id: Uuid, id: Uuid) -> AppResult<LocalTr
     .await
     .map_err(internal)?
     .ok_or(AppError::NotFound("local tracker"))
-}
-
-pub async fn count(pool: &PgPool, project_id: Uuid) -> AppResult<i64> {
-    sqlx::query_scalar("SELECT count(*) FROM local_trackers WHERE project_id=$1")
-        .bind(project_id)
-        .fetch_one(pool)
-        .await
-        .map_err(internal)
-}
-
-pub async fn add_keywords(pool: &PgPool, tracker_id: Uuid, keywords: &[String]) -> AppResult<()> {
-    if keywords.is_empty() {
-        return Ok(());
-    }
-    let mut q: QueryBuilder<Postgres> =
-        QueryBuilder::new("INSERT INTO local_tracker_keywords(tracker_id,keyword) ");
-    q.push_values(keywords, |mut b, keyword| {
-        b.push_bind(tracker_id).push_bind(keyword);
-    });
-    q.push(" ON CONFLICT DO NOTHING");
-    q.build().execute(pool).await.map_err(internal)?;
-    Ok(())
 }
 
 pub async fn keywords(pool: &PgPool, tracker_id: Uuid) -> AppResult<Vec<String>> {

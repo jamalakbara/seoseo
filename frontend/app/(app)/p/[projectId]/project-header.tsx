@@ -16,6 +16,7 @@ export function ProjectHeader() {
     { href: base, label: "Overview", exact: true },
     { href: `${base}/keywords`, label: "Keywords" },
     { href: `${base}/rank`, label: "Rank tracking" },
+    { href: `${base}/local`, label: "Local SEO" },
     { href: `${base}/competitive`, label: "Competitive" },
     { href: `${base}/backlinks`, label: "Backlinks" },
     { href: `${base}/ai`, label: "AI visibility" },

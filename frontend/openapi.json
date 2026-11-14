@@ -773,6 +773,36 @@
         ]
       }
     },
+    "/api/v1/local/categories": {
+      "get": {
+        "tags": [
+          "local-seo"
+        ],
+        "operationId": "list_categories",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/BusinessCategory"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/me": {
       "get": {
         "tags": [
@@ -5575,6 +5605,234 @@
         ]
       }
     },
+    "/api/v1/projects/{project_id}/local-trackers": {
+      "get": {
+        "tags": [
+          "local-seo"
+        ],
+        "operationId": "list_trackers",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/LocalTracker"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "local-seo"
+        ],
+        "operationId": "create_tracker",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLocalTrackerInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocalTracker"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/local-trackers/{tracker_id}/grid": {
+      "get": {
+        "tags": [
+          "local-seo"
+        ],
+        "operationId": "grid_preview",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tracker_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocalGridPreview"
+                }
+              }
+            }
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
+    "/api/v1/projects/{project_id}/local/businesses/search": {
+      "post": {
+        "tags": [
+          "local-seo"
+        ],
+        "summary": "Explicit, cached OpenStreetMap business lookup. This is discovery, not a local rank result.",
+        "operationId": "search_businesses",
+        "parameters": [
+          {
+            "name": "project_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BusinessSearchInput"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BusinessSearchResult"
+                }
+              }
+            }
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Problem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          },
+          {
+            "bearer": []
+          }
+        ]
+      }
+    },
     "/api/v1/projects/{project_id}/rank-trackers": {
       "get": {
         "tags": [
@@ -9568,6 +9826,85 @@
           }
         }
       },
+      "BusinessCategory": {
+        "type": "object",
+        "required": [
+          "id",
+          "label"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          }
+        }
+      },
+      "BusinessSearchInput": {
+        "type": "object",
+        "required": [
+          "query",
+          "near"
+        ],
+        "properties": {
+          "category": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Optional category id from `GET /local/categories`."
+          },
+          "limit": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "1-10 results; defaults to 5.",
+            "minimum": 0
+          },
+          "near": {
+            "type": "string",
+            "description": "City, district or address context."
+          },
+          "query": {
+            "type": "string",
+            "description": "Business name or distinguishing phrase. Search only runs on explicit submission."
+          }
+        }
+      },
+      "BusinessSearchResult": {
+        "type": "object",
+        "required": [
+          "businesses",
+          "cached",
+          "attribution",
+          "note",
+          "checked_at"
+        ],
+        "properties": {
+          "attribution": {
+            "type": "string"
+          },
+          "businesses": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LocalBusiness"
+            }
+          },
+          "cached": {
+            "type": "boolean"
+          },
+          "checked_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "note": {
+            "type": "string"
+          }
+        }
+      },
       "CannibalizationCandidate": {
         "type": "object",
         "required": [
@@ -10075,6 +10412,74 @@
         "properties": {
           "name": {
             "type": "string"
+          }
+        }
+      },
+      "CreateLocalTrackerInput": {
+        "type": "object",
+        "required": [
+          "business_source",
+          "business_id",
+          "business_name",
+          "address",
+          "latitude",
+          "longitude",
+          "keywords"
+        ],
+        "properties": {
+          "address": {
+            "type": "string"
+          },
+          "business_id": {
+            "type": "string"
+          },
+          "business_name": {
+            "type": "string"
+          },
+          "business_source": {
+            "type": "string"
+          },
+          "category": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "grid_size": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32",
+            "description": "Odd grid dimension: 3, 5, 7 or 9."
+          },
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "latitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "longitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "name": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "spacing_km": {
+            "type": [
+              "number",
+              "null"
+            ],
+            "format": "double",
+            "description": "Distance between adjacent points, 0.1-10 km."
           }
         }
       },
@@ -10915,6 +11320,44 @@
           },
           "name": {
             "type": "string"
+          }
+        }
+      },
+      "GridPoint": {
+        "type": "object",
+        "required": [
+          "row",
+          "column",
+          "latitude",
+          "longitude",
+          "measured"
+        ],
+        "properties": {
+          "column": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "latitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "longitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "measured": {
+            "type": "boolean"
+          },
+          "rank": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int32"
+          },
+          "row": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -12413,6 +12856,165 @@
           },
           "url": {
             "type": "string"
+          }
+        }
+      },
+      "LocalBusiness": {
+        "type": "object",
+        "required": [
+          "source",
+          "source_id",
+          "name",
+          "address",
+          "latitude",
+          "longitude",
+          "source_url"
+        ],
+        "properties": {
+          "address": {
+            "type": "string"
+          },
+          "category": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "latitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "longitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "name": {
+            "type": "string"
+          },
+          "source": {
+            "type": "string"
+          },
+          "source_id": {
+            "type": "string"
+          },
+          "source_url": {
+            "type": "string"
+          },
+          "website": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        }
+      },
+      "LocalGridPreview": {
+        "type": "object",
+        "required": [
+          "tracker",
+          "keywords",
+          "points",
+          "status",
+          "note"
+        ],
+        "properties": {
+          "keywords": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "note": {
+            "type": "string"
+          },
+          "points": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GridPoint"
+            }
+          },
+          "status": {
+            "type": "string"
+          },
+          "tracker": {
+            "$ref": "#/components/schemas/LocalTracker"
+          }
+        }
+      },
+      "LocalTracker": {
+        "type": "object",
+        "required": [
+          "id",
+          "project_id",
+          "name",
+          "business_source",
+          "business_id",
+          "business_name",
+          "address",
+          "latitude",
+          "longitude",
+          "grid_size",
+          "spacing_km",
+          "language",
+          "created_at",
+          "keyword_count"
+        ],
+        "properties": {
+          "address": {
+            "type": "string"
+          },
+          "business_id": {
+            "type": "string"
+          },
+          "business_name": {
+            "type": "string"
+          },
+          "business_source": {
+            "type": "string"
+          },
+          "category": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "grid_size": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "keyword_count": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "language": {
+            "type": "string"
+          },
+          "latitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "longitude": {
+            "type": "number",
+            "format": "double"
+          },
+          "name": {
+            "type": "string"
+          },
+          "project_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "spacing_km": {
+            "type": "number",
+            "format": "double"
           }
         }
       },
@@ -15716,6 +16318,10 @@
     {
       "name": "rank-tracking",
       "description": "Rank trackers, scheduled checks and position history"
+    },
+    {
+      "name": "local-seo",
+      "description": "OpenStreetMap business discovery and provider-neutral local grid configuration"
     },
     {
       "name": "reports",

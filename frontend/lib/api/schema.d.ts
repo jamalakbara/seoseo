@@ -340,6 +340,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/local/categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_categories"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me": {
         parameters: {
             query?: never;
@@ -1465,6 +1481,55 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/local-trackers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_trackers"];
+        put?: never;
+        post: operations["create_tracker"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/local-trackers/{tracker_id}/grid": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["grid_preview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/local/businesses/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Explicit, cached OpenStreetMap business lookup. This is discovery, not a local rank result. */
+        post: operations["search_businesses"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/rank-trackers": {
         parameters: {
             query?: never;
@@ -2497,6 +2562,31 @@ export interface components {
             url: string;
             verified: boolean;
         };
+        BusinessCategory: {
+            id: string;
+            label: string;
+        };
+        BusinessSearchInput: {
+            /** @description Optional category id from `GET /local/categories`. */
+            category?: string | null;
+            /**
+             * Format: int32
+             * @description 1-10 results; defaults to 5.
+             */
+            limit?: number | null;
+            /** @description City, district or address context. */
+            near: string;
+            /** @description Business name or distinguishing phrase. Search only runs on explicit submission. */
+            query: string;
+        };
+        BusinessSearchResult: {
+            attribution: string;
+            businesses: components["schemas"]["LocalBusiness"][];
+            cached: boolean;
+            /** Format: date-time */
+            checked_at: string;
+            note: string;
+        };
         CannibalizationCandidate: {
             exact: boolean;
             /** Format: date-time */
@@ -2629,6 +2719,29 @@ export interface components {
         };
         CreateApiKeyInput: {
             name: string;
+        };
+        CreateLocalTrackerInput: {
+            address: string;
+            business_id: string;
+            business_name: string;
+            business_source: string;
+            category?: string | null;
+            /**
+             * Format: int32
+             * @description Odd grid dimension: 3, 5, 7 or 9.
+             */
+            grid_size?: number | null;
+            keywords: string[];
+            /** Format: double */
+            latitude: number;
+            /** Format: double */
+            longitude: number;
+            name?: string | null;
+            /**
+             * Format: double
+             * @description Distance between adjacent points, 0.1-10 km.
+             */
+            spacing_km?: number | null;
         };
         CreateProjectInput: {
             brand_name?: string | null;
@@ -2857,6 +2970,19 @@ export interface components {
             /** Format: uuid */
             id: string;
             name: string;
+        };
+        GridPoint: {
+            /** Format: int32 */
+            column: number;
+            /** Format: double */
+            latitude: number;
+            /** Format: double */
+            longitude: number;
+            measured: boolean;
+            /** Format: int32 */
+            rank?: number | null;
+            /** Format: int32 */
+            row: number;
         };
         ImportAuthorityInput: {
             /**
@@ -3296,6 +3422,51 @@ export interface components {
             /** Format: int32 */
             status_code?: number | null;
             url: string;
+        };
+        LocalBusiness: {
+            address: string;
+            category?: string | null;
+            /** Format: double */
+            latitude: number;
+            /** Format: double */
+            longitude: number;
+            name: string;
+            source: string;
+            source_id: string;
+            source_url: string;
+            website?: string | null;
+        };
+        LocalGridPreview: {
+            keywords: string[];
+            note: string;
+            points: components["schemas"]["GridPoint"][];
+            status: string;
+            tracker: components["schemas"]["LocalTracker"];
+        };
+        LocalTracker: {
+            address: string;
+            business_id: string;
+            business_name: string;
+            business_source: string;
+            category?: string | null;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: int32 */
+            grid_size: number;
+            /** Format: uuid */
+            id: string;
+            /** Format: int64 */
+            keyword_count: number;
+            language: string;
+            /** Format: double */
+            latitude: number;
+            /** Format: double */
+            longitude: number;
+            name: string;
+            /** Format: uuid */
+            project_id: string;
+            /** Format: double */
+            spacing_km: number;
         };
         MeView: {
             memberships: components["schemas"]["Membership"][];
@@ -4794,6 +4965,25 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    list_categories: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BusinessCategory"][];
                 };
             };
         };
@@ -7242,6 +7432,139 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["LinkObservation"];
+                };
+            };
+        };
+    };
+    list_trackers: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LocalTracker"][];
+                };
+            };
+        };
+    };
+    create_tracker: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateLocalTrackerInput"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LocalTracker"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    grid_preview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                tracker_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LocalGridPreview"];
+                };
+            };
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    search_businesses: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BusinessSearchInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BusinessSearchResult"];
+                };
+            };
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
+                };
+            };
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Problem"];
                 };
             };
         };

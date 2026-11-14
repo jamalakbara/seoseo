@@ -91,8 +91,8 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | SA-16 | Change monitoring of key pages | (new) | P2 | crawler | M7 | todo |
 
 ## Local SEO
-| LO-01 | Business lookup | search_local_businesses | P1 | OSM / Places key | M6 | todo |
-| LO-02 | Grid tracker + scan workflow | LocalRankWorkflow | P1 | local SERP fetch | M6 | todo |
+| LO-01 | Business lookup | search_local_businesses | P1 | OSM / Places key | M6 | done (explicit OSM discovery) |
+| LO-02 | Grid tracker + scan workflow | LocalRankWorkflow | P1 | local SERP fetch | M6 | wip (saved trackers + unmeasured grid preview; scans pending) |
 | LO-03 | Heatmap (MapLibre + OSM tiles), ARP/ATRP/SoLV | local-seo UI | P1 | OSM | M6 | todo |
 | LO-04 | Competitors per point | local_rank_businesses | P1 | — | M6 | todo |
 | LO-05 | Business profile, reviews, Q&A, updates | business tools | P2 | Places key | M7 | todo |

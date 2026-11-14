@@ -110,6 +110,102 @@ fn conv<T: DeserializeOwned>(params: &impl Serialize) -> AppResult<T> {
 #[tool_router]
 impl SeoSeoMcp {
     #[tool(
+        description = "List curated local business categories for explicit OpenStreetMap business discovery."
+    )]
+    async fn list_local_categories(&self, ctx: RequestContext<RoleServer>) -> ToolResult {
+        let _actor = actor(&ctx)?;
+        reply(Ok(domain::local::categories()))
+    }
+
+    #[tool(
+        description = "Explicit cached OpenStreetMap business discovery by name and location. Member role. Results are discovery matches, never local rankings. Do not use for autocomplete or grid scans."
+    )]
+    async fn search_local_businesses(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<LocalBusinessSearch>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        reply(
+            async {
+                domain::local::search_businesses(
+                    &self.pool,
+                    &actor,
+                    id("project_id", &p.project_id)?,
+                    &self.cfg,
+                    conv(&p)?,
+                )
+                .await
+            }
+            .await,
+        )
+    }
+
+    #[tool(
+        description = "Save a project local tracker with 1-50 keywords and a 3/5/7/9 geometry grid. Member role. This does not run a rank scan."
+    )]
+    async fn create_local_tracker(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<CreateLocalTracker>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        reply(
+            async {
+                domain::local::create_tracker(
+                    &self.pool,
+                    &actor,
+                    id("project_id", &p.project_id)?,
+                    conv(&p)?,
+                )
+                .await
+            }
+            .await,
+        )
+    }
+
+    #[tool(
+        description = "List saved local business trackers in an accessible project. Grid configurations do not imply measured rankings."
+    )]
+    async fn list_local_trackers(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<ProjectRef>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        reply(
+            async {
+                domain::local::list_trackers(&self.pool, &actor, id("project_id", &p.project_id)?)
+                    .await
+            }
+            .await,
+        )
+    }
+
+    #[tool(
+        description = "Preview saved local tracker geometry and keywords. All ranks are unknown and measured is false; no provider requests or rank scans occur."
+    )]
+    async fn get_local_grid_preview(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<TrackerRef>,
+    ) -> ToolResult {
+        let actor = actor(&ctx)?;
+        reply(
+            async {
+                domain::local::grid_preview(
+                    &self.pool,
+                    &actor,
+                    id("project_id", &p.project_id)?,
+                    id("tracker_id", &p.tracker_id)?,
+                )
+                .await
+            }
+            .await,
+        )
+    }
+
+    #[tool(
         description = "Look up Chrome UX Report real-user field p75 metrics for a project page or origin. Requires operator CRUX_API_KEY; not configured or insufficient coverage stays unknown. Explicit scope url/origin and device PHONE/DESKTOP/TABLET/ALL; no silent origin fallback. Cached 24 hours, uncached lookups paced per project/target. Does not start a crawl or change audit health/Lighthouse scores."
     )]
     async fn get_crux_field_data(
@@ -2461,6 +2557,11 @@ mod tests {
             "whoami",
             "research_keywords",
             "cluster_keywords",
+            "list_local_categories",
+            "search_local_businesses",
+            "create_local_tracker",
+            "list_local_trackers",
+            "get_local_grid_preview",
             "get_internal_link_graph",
             "compare_site_audits",
             "get_audit_schedule",

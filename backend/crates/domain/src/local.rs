@@ -272,7 +272,15 @@ pub async fn search_businesses(
                 .extratags
                 .as_ref()
                 .and_then(|t| t.get("website").or_else(|| t.get("contact:website")))
-                .filter(|s| s.len() <= 2048 && url::Url::parse(s).is_ok())
+                .filter(|s| {
+                    s.len() <= 2048
+                        && url::Url::parse(s).is_ok_and(|u| {
+                            matches!(u.scheme(), "http" | "https")
+                                && u.host_str().is_some()
+                                && u.username().is_empty()
+                                && u.password().is_none()
+                        })
+                })
                 .cloned();
             let prefix = match r.osm_type.as_str() {
                 "node" => "node",
@@ -358,11 +366,6 @@ pub async fn create_tracker(
 ) -> AppResult<LocalTracker> {
     actor.require(Role::Member)?;
     let project = db::projects::get(pool, actor.org_id, project_id).await?;
-    if local::count(pool, project_id).await? >= MAX_TRACKERS_PER_PROJECT {
-        return Err(AppError::Conflict(format!(
-            "a project can have {MAX_TRACKERS_PER_PROJECT} local trackers"
-        )));
-    }
     if !["openstreetmap", "manual"].contains(&input.business_source.as_str()) {
         return Err(AppError::Validation(
             "business_source must be openstreetmap or manual".into(),
@@ -412,9 +415,10 @@ pub async fn create_tracker(
             language: &project.language_code,
             created_by: actor.user_id,
         },
+        &keywords,
+        MAX_TRACKERS_PER_PROJECT,
     )
     .await?;
-    local::add_keywords(pool, id, &keywords).await?;
     local::get(pool, project_id, id).await
 }
 
@@ -457,7 +461,14 @@ fn points(t: &LocalTracker) -> Vec<GridPoint> {
                 row,
                 column,
                 latitude: t.latitude + f64::from(half - row) * lat_step,
-                longitude: t.longitude + f64::from(column - half) * lon_step,
+                longitude: {
+                    let lon = t.longitude + f64::from(column - half) * lon_step;
+                    if (-180.0..=180.0).contains(&lon) {
+                        lon
+                    } else {
+                        (lon + 180.0).rem_euclid(360.0) - 180.0
+                    }
+                },
                 rank: None,
                 measured: false,
             });

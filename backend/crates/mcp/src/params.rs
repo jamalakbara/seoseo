@@ -615,3 +615,28 @@ pub struct LinkObservationInput {
     pub target_url: String,
     pub state: String,
 }
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct LocalBusinessSearch {
+    pub project_id: String,
+    pub query: String,
+    pub near: String,
+    pub category: Option<String>,
+    pub limit: Option<u8>,
+}
+
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct CreateLocalTracker {
+    pub project_id: String,
+    pub name: Option<String>,
+    pub business_source: String,
+    pub business_id: String,
+    pub business_name: String,
+    pub address: String,
+    pub latitude: f64,
+    pub longitude: f64,
+    pub category: Option<String>,
+    pub grid_size: Option<i16>,
+    pub spacing_km: Option<f64>,
+    pub keywords: Vec<String>,
+}
