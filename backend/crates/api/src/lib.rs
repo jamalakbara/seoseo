@@ -48,6 +48,7 @@ use utoipa_scalar::{Scalar, Servable};
         (name = "bing-webmaster", description = "Read-only Bing Webmaster query, page, crawl and link data"),
         (name = "ai-visibility", description = "Manual model API answer comparisons and literal brand mentions"),
         (name = "rank-tracking", description = "Rank trackers, scheduled checks and position history"),
+        (name = "local-seo", description = "OpenStreetMap business discovery and provider-neutral local grid configuration"),
         (name = "reports", description = "Stored HTML reports, templates and public sharing")
     )
 )]

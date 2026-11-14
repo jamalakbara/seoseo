@@ -71,9 +71,28 @@ pub async fn upsert_setting(
 /// A short durable cooldown, shared across API processes. It does not hold a database
 /// connection during an external request; crashed lookups expire naturally.
 pub async fn claim_lookup(pool: &PgPool, kind: &str, key: &str) -> AppResult<bool> {
-    let claimed:Option<bool>=sqlx::query_scalar("INSERT INTO provider_cache(kind,cache_key,payload,fetched_at) VALUES($1,$2,'{}',clock_timestamp())
-     ON CONFLICT(kind,cache_key) DO UPDATE SET fetched_at=excluded.fetched_at WHERE provider_cache.fetched_at<clock_timestamp()-interval '1 minute' RETURNING true")
-        .bind(kind).bind(key).fetch_optional(pool).await.map_err(internal)?;
+    claim_lookup_seconds(pool, kind, key, 60).await
+}
+
+/// Claim an external lookup after a caller-selected durable cooldown.
+pub async fn claim_lookup_seconds(
+    pool: &PgPool,
+    kind: &str,
+    key: &str,
+    seconds: i32,
+) -> AppResult<bool> {
+    let claimed: Option<bool> = sqlx::query_scalar(
+        "INSERT INTO provider_cache(kind,cache_key,payload,fetched_at) VALUES($1,$2,'{}',clock_timestamp())
+         ON CONFLICT(kind,cache_key) DO UPDATE SET fetched_at=excluded.fetched_at
+         WHERE provider_cache.fetched_at < clock_timestamp() - make_interval(secs => $3)
+         RETURNING true",
+    )
+    .bind(kind)
+    .bind(key)
+    .bind(seconds.max(1))
+    .fetch_optional(pool)
+    .await
+    .map_err(internal)?;
     Ok(claimed.unwrap_or(false))
 }
 

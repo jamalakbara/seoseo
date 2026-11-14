@@ -20,6 +20,7 @@ pub mod gsc;
 pub mod internal_links;
 pub mod keywords;
 pub mod link_intersect;
+pub mod local;
 pub mod memory;
 pub mod onboarding;
 pub mod projects;

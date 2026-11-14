@@ -11,6 +11,7 @@ mod gsc;
 mod integrations;
 mod jobs;
 mod keywords;
+mod local;
 mod memory;
 mod projects;
 mod providers;
@@ -40,6 +41,7 @@ pub fn v1() -> OpenApiRouter<AppState> {
         .merge(team::router())
         .merge(providers::router())
         .merge(keywords::router())
+        .merge(local::router())
         .merge(competitive::router())
         .merge(memory::router())
         .merge(rank::router())
