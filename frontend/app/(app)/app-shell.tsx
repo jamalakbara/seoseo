@@ -26,6 +26,7 @@ const NAV = [
   { href: "/settings/jobs", label: "Jobs", icon: Activity },
   { href: "/settings/connected-apps", label: "Connected apps", icon: KeyRound },
   { href: "/settings/api-keys", label: "API keys", icon: KeyRound },
+  { href: "/settings/account", label: "Account", icon: Users },
 ];
 
 /** Uses the URL, so it streams in after the static shell (Cache Components). */

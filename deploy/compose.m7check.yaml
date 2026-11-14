@@ -38,6 +38,15 @@ services:
       AI_OLLAMA_URL: http://ollama:11434/v1
       AI_OLLAMA_MODELS: ${M7_OLLAMA_MODELS:-}
       RUST_LOG: info
+      APP_ENCRYPTION_KEY: AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=
+      NOTIFY_ALLOW_PRIVATE: "true"
+      SMTP_HOST: mailpit
+      SMTP_PORT: "1025"
+      SMTP_FROM: seoseo@example.invalid
+      SMTP_SECURITY: none
+      GOOGLE_PLACES_API_KEY: fixture-places-key
+      PLACES_API_URL: http://receiver:8080/places
+      RENDERER_URL: http://renderer:8080
     depends_on:
       db: {condition: service_healthy}
   worker:
@@ -61,6 +70,22 @@ services:
       OLLAMA_CONTEXT_LENGTH: "16384"
     volumes: [ollama:/root/.ollama]
     ports: ["127.0.0.1:3503:11434"]
+  receiver:
+    image: python:3.12-alpine
+    command: [python, /fixture.py]
+    volumes: [../scripts/notification-fixture.py:/fixture.py:ro]
+    ports: ["127.0.0.1:3504:8080"]
+  mailpit:
+    image: axllent/mailpit:latest
+    ports: ["127.0.0.1:3505:8025"]
+  renderer:
+    build: ../renderer
+    image: seoseo-renderer:m7check
+    shm_size: 256mb
+    mem_limit: 2g
+    pids_limit: 256
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
 volumes:
   m7data:
   target:

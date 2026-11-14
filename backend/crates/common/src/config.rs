@@ -11,6 +11,29 @@ pub enum AuthMode {
 /// Runtime configuration, read from CLI flags or environment variables.
 #[derive(Debug, Clone, Args)]
 pub struct Config {
+    #[arg(long, env = "GOOGLE_PLACES_API_KEY", hide_env_values = true)]
+    pub google_places_api_key: Option<String>,
+    #[arg(
+        long,
+        env = "PLACES_API_URL",
+        default_value = "https://places.googleapis.com/v1/places"
+    )]
+    pub places_api_url: String,
+    #[arg(long, env = "SMTP_HOST")]
+    pub smtp_host: Option<String>,
+    #[arg(long, env = "SMTP_PORT", default_value_t = 587)]
+    pub smtp_port: u16,
+    #[arg(long, env = "SMTP_FROM")]
+    pub smtp_from: Option<String>,
+    #[arg(long, env = "SMTP_USERNAME", hide_env_values = true)]
+    pub smtp_username: Option<String>,
+    #[arg(long, env = "SMTP_PASSWORD", hide_env_values = true)]
+    pub smtp_password: Option<String>,
+    #[arg(long, env = "SMTP_SECURITY", default_value = "starttls")]
+    pub smtp_security: String,
+    /// Test fixtures only; independent of the crawler private-network setting.
+    #[arg(long, env = "NOTIFY_ALLOW_PRIVATE", default_value_t = false)]
+    pub notify_allow_private: bool,
     /// Operator-only SerpApi endpoint override for an approved proxy or offline fixtures.
     #[arg(
         long,

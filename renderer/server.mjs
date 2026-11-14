@@ -89,12 +89,31 @@ async function run(input) {
 
 http.createServer(async (req, res) => {
   if (req.url === '/health' && req.method === 'GET') return send(res, 200, {ok:true});
-  if (req.url !== '/render' || req.method !== 'POST') return send(res, 404, {error:'Not found'});
+  if (!['/render', '/pdf'].includes(req.url) || req.method !== 'POST') return send(res, 404, {error:'Not found'});
   if (busy) return send(res, 429, {error:'Renderer busy'});
   busy = true;
   try {
     let body = '';
-    for await (const chunk of req) { body += chunk; if (body.length > 16384) throw Error('Request too large'); }
+    for await (const chunk of req) { body += chunk; if (Buffer.byteLength(body) > (req.url === '/pdf' ? 1024 * 1024 : 16384)) throw Error('Request too large'); }
+    if (req.url === '/pdf') {
+      const input = JSON.parse(body);
+      if (typeof input.html !== 'string' || Buffer.byteLength(input.html) > 500 * 1024) throw Error('Invalid report HTML');
+      const browser = await puppeteer.launch({executablePath: process.env.CHROME_PATH || '/usr/bin/chromium', headless: true, args: ['--no-sandbox', '--disable-dev-shm-usage', '--disable-background-networking', '--disable-quic', '--host-resolver-rules=MAP * ~NOTFOUND']});
+      const deadline = setTimeout(() => browser.close().catch(() => {}), 30000);
+      let pdf;
+      try {
+        const page = await browser.newPage();
+        await page.setJavaScriptEnabled(false);
+        await page.setBypassServiceWorker(true);
+        await page.setRequestInterception(true);
+        page.on('request', r => (r.url().startsWith('data:') || r.url() === 'about:blank' ? r.continue() : r.abort()).catch(() => {}));
+        await page.setContent('<meta http-equiv="Content-Security-Policy" content="default-src \'none\'; style-src \'unsafe-inline\'; img-src data:">' + input.html, {waitUntil: 'domcontentloaded', timeout: 10000});
+        pdf = await page.pdf({format: 'A4', printBackground: true, margin: {top: '18mm', bottom: '18mm', left: '14mm', right: '14mm'}, timeout: 20000});
+        if (pdf.byteLength > 16 * 1024 * 1024) throw Error('PDF exceeds 16 MiB');
+      } finally { clearTimeout(deadline); await browser.close(); }
+      res.writeHead(200, {'content-type': 'application/pdf', 'cache-control': 'no-store'}); res.end(Buffer.from(pdf));
+      return;
+    }
     const result = await run(JSON.parse(body));
     send(res, 200, result);
   } catch (e) { send(res, 502, {error:e.message}); }

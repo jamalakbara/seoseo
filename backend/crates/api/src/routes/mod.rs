@@ -15,6 +15,7 @@ mod jobs;
 mod keywords;
 mod local;
 mod m6;
+mod m7;
 mod memory;
 mod projects;
 mod providers;
@@ -47,6 +48,7 @@ pub fn v1() -> OpenApiRouter<AppState> {
         .merge(keywords::router())
         .merge(local::router())
         .merge(m6::router())
+        .merge(m7::router())
         .merge(competitive::router())
         .merge(content::router())
         .merge(memory::router())

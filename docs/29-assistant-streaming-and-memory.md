@@ -1,6 +1,6 @@
 # Assistant streaming and reviewed memory
 
-This completes AG-01's streaming and reviewed memory follow-ups from the [initial assistant delivery](28-assistant-and-content.md). Other M7 features, including alerts and weekly digests, remain open.
+This completes AG-01's streaming and reviewed memory follow-ups from the [initial assistant delivery](28-assistant-and-content.md). Subsequent alerts, weekly digests and the remaining milestone features are complete; see [M7 operations and acceptance](30-m7-operations-and-acceptance.md).
 
 ## Streamed answers
 
@@ -33,4 +33,4 @@ Verified 2026-11-15 (Asia/Jakarta):
 - Desktop and 390px mobile browser checks passed streaming through the real Next proxy, proposal review/edit/explicit save, no automatic memory write, unchanged original sections, history reload, content coverage/briefs, visible model errors and no page errors/overflow. Screenshots were visually reviewed.
 - Real `ollama/qwen2.5:1.5b` completed a streamed in-app answer using canonical memory that included the newly reviewed note. Fixture tests establish failure contracts; the Ollama check separately establishes actual local model access.
 
-QA artifacts: `C:/Users/jamal/AppData/Local/Temp/seoseo-m7-browser/qa-stream-memory-verified`. The normal local stack has not been rebuilt with this feature branch. M7 is not complete: alerts, monitoring, integrations, report generation/PDF, weekly digests, business tools, backup/restore and account deletion remain open.
+QA artifacts for this delivery: `C:/Users/jamal/AppData/Local/Temp/seoseo-m7-browser/qa-stream-memory-verified`. The normal local stack was not rebuilt during that acceptance. Subsequent milestone completion and deployment-specific limits are recorded in [M7 operations and acceptance](30-m7-operations-and-acceptance.md).

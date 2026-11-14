@@ -687,6 +687,75 @@ impl SeoSeoMcp {
         )
     }
     #[tool(
+        description = "Read stored project rank-movement and key-page alerts. Events identify source observations, market, baseline, comparable coverage and bounded changes. No provider calls or outbound sends."
+    )]
+    async fn list_alerts(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<NotificationReadParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::notifications::events(
+                    &self.pool,
+                    &a,
+                    id("project_id", &p.project_id)?,
+                    domain::notifications::AlertQuery {
+                        limit: p.limit,
+                        offset: p.offset,
+                    },
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Read the project's source-bound alert thresholds and monitored URLs; null means no settings. Does not enable alerts or send messages."
+    )]
+    async fn get_alert_settings(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<NotificationReadParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::notifications::settings(&self.pool, &a, id("project_id", &p.project_id)?)
+                    .await
+            }
+            .await,
+        )
+    }
+    #[tool(
+        description = "Generate and save a built-in HTML evidence report. Kind is audit, rank, keywords, links or ai. Uses bounded stored evidence and preserves unknowns; no fresh provider requests, public sharing, email or model inference. Admin required. Optional byline and six-digit hex accent support branding."
+    )]
+    async fn generate_report(
+        &self,
+        ctx: RequestContext<RoleServer>,
+        Parameters(p): Parameters<BuiltinReportParams>,
+    ) -> ToolResult {
+        let a = actor(&ctx)?;
+        reply(
+            async {
+                domain::operations::generate_report(
+                    &self.pool,
+                    &a,
+                    id("project_id", &p.project_id)?,
+                    domain::operations::GenerateReportInput {
+                        kind: p.kind,
+                        title: p.title,
+                        byline: p.byline,
+                        accent: p.accent,
+                    },
+                )
+                .await
+            }
+            .await,
+        )
+    }
+    #[tool(
         description = "Score draft term coverage against repeated terms in up to ten cached SERP titles/snippets from the last seven days in the project market. Returns source, timestamp, references, matched/missing terms and a nullable score. This is a local lexical overlap hint, not a ranking/quality prediction. Does not send the draft to a model or fetch pages."
     )]
     async fn score_page_content(

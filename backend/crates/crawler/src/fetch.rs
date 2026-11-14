@@ -40,6 +40,21 @@ struct GuardedResolver {
     policy: UrlPolicy,
 }
 
+/// Public guarded client for user-configured webhook destinations. No redirects/proxies.
+pub fn guarded_client(
+    policy: UrlPolicy,
+    timeout: Duration,
+) -> Result<reqwest::Client, reqwest::Error> {
+    reqwest::Client::builder()
+        .user_agent(crate::DEFAULT_USER_AGENT)
+        .redirect(reqwest::redirect::Policy::none())
+        .no_proxy()
+        .timeout(timeout)
+        .connect_timeout(Duration::from_secs(5))
+        .dns_resolver(Arc::new(GuardedResolver { policy }))
+        .build()
+}
+
 impl Resolve for GuardedResolver {
     fn resolve(&self, name: Name) -> Resolving {
         let policy = self.policy;

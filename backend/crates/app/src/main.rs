@@ -121,11 +121,18 @@ async fn main() -> anyhow::Result<()> {
                     {
                         tracing::error!(%error,"audit scheduler failed");
                     }
+                    if let Err(error) = domain::notifications::tick(&sched_pool, &sched_cfg).await {
+                        tracing::error!(%error,"notification scheduler failed");
+                    }
+                    if let Err(error) = db::operations::purge_due(&sched_pool).await {
+                        tracing::error!(%error,"account lifecycle worker failed");
+                    }
                     tokio::select! {_=tokio::time::sleep(std::time::Duration::from_secs(60))=>{},_=sched_rx.changed()=>break,}
                 }
             });
             let registry = domain::local_scans::register(registry, cfg.clone());
             let registry = domain::assistant::register(registry, cfg.clone());
+            let registry = domain::notifications::register(registry, cfg.clone());
             let registry = domain::dashboard::register(registry, cfg);
             let result = jobs::run_worker(pool, registry, concurrency, rx).await;
             scheduler.abort();

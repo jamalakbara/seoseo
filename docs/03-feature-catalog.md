@@ -2,7 +2,7 @@
 
 Every feature with an ID, OpenSEO parity reference, priority, data source, and milestone.
 Priority: **P0** MVP · **P1** parity · **P2** beyond parity · **P3** later.
-Status column is updated as we build (`todo` / `wip` / `done`). Last update: 2026-11-14 (M6 live/UI checks passed; final browser export closeout open; see docs/27-m6-acceptance.md).
+Status column is updated as we build (`todo` / `wip` / `done`). Last update: 2026-11-15 (M7 complete; see docs/30-m7-operations-and-acceptance.md. Prior M5/M6 acceptance gates remain open).
 
 ## Workspace & identity
 | ID | Feature | OpenSEO ref | Pri | Data | MS | Status |
@@ -13,7 +13,7 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | WS-04 | Organizations, roles owner/admin/member | spec 0011 | P1 | — | M1 | done |
 | WS-05 | Invitations via link/email | accept-invitation | P1 | — | M1 | done (link-based; email delivery needs SMTP, WS-03) |
 | WS-06 | API keys (org-bound) | @better-auth/api-key, spec 0017 | P0 | — | M0 | done |
-| WS-07 | Account deletion w/ grace period | account-deletion | P2 | — | M7 | todo |
+| WS-07 | Account deletion w/ grace period | account-deletion | P2 | — | M7 | done (password-session confirmation, seven-day cancellation, ownership-safe worker purge) |
 | WS-08 | Projects CRUD, archive/restore | projects.ts | P0 | — | M0 | done |
 | WS-09 | Project market (country/lang/city) | projects.location_code | P0 | GeoNames | M0 | wip (country+lang done; city picker M3) |
 | WS-10 | Project memory (sections, competitors, key pages, research log) | spec 0010 | P1 | — | M4 | done (bounded revisioned document; REST/UI/MCP; append-only research log) |
@@ -69,7 +69,7 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | RT-05 | Latest table + deltas, history chart, trend, matrix | getRank* | P0 | — | M3 | wip (latest table with change/best, keyword history chart, per-run trend; keyword x run matrix todo) |
 | RT-06 | Cost/"request budget" estimate (requests not $) | estimateRankCheckCost | P1 | — | M3 | done (requests per run and month, provider, rough duration) |
 | RT-07 | Cannibalization flags | (new) | P2 | — | M6 | done (same-snapshot multi-URL candidates with positions/provider/time, deduplication, coverage, REST/UI/MCP; not proof of ranking harm) |
-| RT-08 | Movement alerts | (new) | P2 | — | M7 | todo |
+| RT-08 | Movement alerts | (new) | P2 | — | M7 | done (comparable completed observations, measured-depth transitions, scoped deduplicated feed) |
 | RT-09 | SERP volatility index | (new) | P3 | own data | M8 | todo |
 
 ## Site audit
@@ -88,14 +88,14 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | SA-13 | Audit comparison + scheduled re-audit | (new) | P2 | — | M6 | done (same-start completed-audit observed differences, unknown absences, pagination; revisioned UTC recurring crawls with frozen budgets, atomic worker claims and safe pauses; REST/UI/MCP) |
 | SA-14 | Signed crawler credentials (Shopify web-bot-auth) | crawlerCredentials | P3 | — | M8 | todo |
 | SA-15 | Log-file analyzer | (new) | P3 | upload | M8 | todo |
-| SA-16 | Change monitoring of key pages | (new) | P2 | crawler | M7 | todo |
+| SA-16 | Change monitoring of key pages | (new) | P2 | crawler | M7 | done (selected URL metadata/indexability changes from comparable completed audits; missing pages unknown) |
 
 ## Local SEO
 | LO-01 | Business lookup | search_local_businesses | P1 | OSM / Places key | M6 | done (explicit OSM discovery) |
 | LO-02 | Grid tracker + scan workflow | LocalRankWorkflow | P1 | local SERP fetch | M6 | done (frozen durable budgeted BYOK scans and free evidence imports; per-cell recovery, history/status/delete/export; live nine-cell scan passed; final browser export closeout open) |
 | LO-03 | Heatmap (MapLibre + OSM tiles), ARP/ATRP/SoLV | local-seo UI | P1 | OSM | M6 | done (mobile attributed map, worker loading, keyboard grid selection and partial/unknown coverage verified) |
 | LO-04 | Competitors per point | local_rank_businesses | P1 | — | M6 | done (bounded returned positions and exact identities per point, source/date retained) |
-| LO-05 | Business profile, reviews, Q&A, updates | business tools | P2 | Places key | M7 | todo |
+| LO-05 | Business profile, reviews, Q&A, updates | business tools | P2 | optional Places key | M7 | done (source-labelled local profile/records/reply and update drafts; optional transient read-only Places preview; no external publishing) |
 | LO-06 | Categories list | list_business_categories | P2 | static list | M6 | done (curated REST/MCP list and business-search filter) |
 
 ## AI visibility
@@ -112,15 +112,15 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | IN-03 | GA4 connection + 9 reports | spec 0007 | P1 | GA4 Data API | M4 | done |
 | IN-04 | Bing Webmaster Tools | (new) | P2 | Bing API | M6 | done (project-bound encrypted API key, verified-site selection, query/page/crawl/inbound-link REST + MCP reports) |
 | IN-05 | IndexNow setup/verify/submit | spec 0016 | P1 | IndexNow | M4 | done |
-| IN-06 | Webhooks / Slack / Discord | (new) | P2 | — | M7 | todo |
+| IN-06 | Webhooks / Slack / Discord | (new) | P2 | — | M7 | done (encrypted incoming-webhook destinations, public HTTPS, single-attempt delivery/status and tests) |
 
 ## Reports
 | RP-01 | Report store + sandboxed viewer | spec 0012 | P1 | — | M4 | done (500 KiB self-contained HTML; REST/UI/MCP; CSP + iframe sandbox) |
 | RP-02 | Templates (≤10/project, branding) | spec 0013 | P1 | — | M4 | done (CRUD instruction briefs, maximum 10/project; branding encoded in template instructions) |
 | RP-03 | Public share links | spec 0014 | P1 | — | M4 | done (192-bit hashed revocable tokens; editing revokes; noindex public viewer) |
-| RP-04 | Built-in report generators (audit, rank, kw, links, AI) | (new) | P2 | — | M7 | todo |
-| RP-05 | PDF export (headless Chromium) | print | P2 | renderer | M7 | todo |
-| RP-06 | Scheduled email digests | (new) | P2 | SMTP | M7 | todo |
+| RP-04 | Built-in report generators (audit, rank, kw, links, AI) | (new) | P2 | — | M7 | done (five stored-evidence generators, optional title/byline/accent, source/sample/null labels) |
+| RP-05 | PDF export (headless Chromium) | print | P2 | renderer | M7 | done (isolated Chromium, scripts/external requests blocked, bounded download) |
+| RP-06 | Scheduled email digests | (new) | P2 | SMTP | M7 | done (own-email weekly UTC subscription, durable claims, stored evidence, actual local SMTP acceptance) |
 
 ## AI assistant & content
 | AG-01 | In-app chat agent w/ tools + memory | SAM | P1 | Ollama/OpenAI-compat | M7 | done (private durable chat, real streamed answers, bounded read tools and explicitly reviewed canonical-memory notes; no automatic writes) |
@@ -142,5 +142,5 @@ Status column is updated as we build (`todo` / `wip` / `done`). Last update: 202
 | OP-01 | Docker Compose (api, worker, web, db, valkey, renderer, searxng, [ollama]) | deploy/ | P0 | — | M0 | wip (db, cache, api, worker, web, test overlay, searxng profile, renderer + egress proxy profile; ollama/caddy todo) |
 | OP-02 | Health, Prometheus metrics, JSON logs | /health | P0 | — | M0 | done |
 | OP-03 | Job dashboard (queued/running/failed, retry) | (new) | P1 | — | M3 | wip (status counts, filter, progress, errors; retry from the dashboard todo, re-run from the feature page) |
-| OP-04 | Backup/restore script | (new) | P1 | — | M7 | todo |
+| OP-04 | Backup/restore script | (new) | P1 | — | M7 | done (private Postgres/env backup, checksum verification, empty-target transactional restore) |
 | OP-05 | Opt-in telemetry (off by default) | self-host-telemetry | P3 | — | M8 | todo |

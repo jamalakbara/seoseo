@@ -64,7 +64,7 @@ fn hash_password(password: &str) -> AppResult<String> {
         .map_err(|e| AppError::internal(anyhow::anyhow!("hash password: {e}")))
 }
 
-fn verify_password(password: &str, hash: &str) -> bool {
+pub(crate) fn verify_password(password: &str, hash: &str) -> bool {
     PasswordHash::new(hash)
         .map(|parsed| {
             Argon2::default()

@@ -1,6 +1,6 @@
 # M7 assistant and content foundation
 
-The project **Assistant** tab adds private conversations, tool evidence, content briefs and draft term coverage. This records the initial M7 delivery. Its streaming and reviewed-memory follow-ups are implemented in [Assistant streaming and reviewed memory](29-assistant-streaming-and-memory.md). Alerts, monitoring, integrations, reports/PDF, weekly digests, business tools, backup/restore and account deletion remain open.
+The project **Assistant** tab adds private conversations, tool evidence, content briefs and draft term coverage. This records the initial M7 delivery. Its streaming and reviewed-memory follow-ups are implemented in [Assistant streaming and reviewed memory](29-assistant-streaming-and-memory.md). The remaining milestone features are completed in [M7 operations and acceptance](30-m7-operations-and-acceptance.md).
 
 ## Configuration and privacy
 
@@ -64,4 +64,4 @@ Verified 2026-11-14 (Asia/Jakarta):
 
 Browser command: `PUPPETEER_MODULE=PATH_TO_TEMP_INSTALL/node_modules/puppeteer-core node scripts/e2e-assistant-browser.cjs http://127.0.0.1:3500 seoseo-m7check-db-1 OUTPUT_DIRECTORY ollama/qwen2.5:1.5b`. `CHROME_PATH` optionally selects Chrome. QA artifacts for this run remain outside the repository at `C:/Users/jamal/AppData/Local/Temp/seoseo-m7-browser/qa-verified`.
 
-This delivery is implemented on `codex/m7-assistant-content`; the normal local stack has not been rebuilt with it. M7's weekly email digest exit criterion is not met. AG-01's streaming and reviewed memory writes remain tracked above, along with the other M7 catalog rows.
+This records the initial delivery on `codex/m7-assistant-content`. Subsequent streaming/reviewed memory and the completed weekly digest exit criterion are documented in the linked follow-up guides.

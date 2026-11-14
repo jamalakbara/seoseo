@@ -24,6 +24,8 @@ export function ProjectHeader() {
     { href: `${base}/audit`, label: "Site audit" },
     { href: `${base}/memory`, label: "Memory" },
     { href: `${base}/assistant`, label: "Assistant" },
+    { href: `${base}/notifications`, label: "Alerts" },
+    { href: `${base}/business`, label: "Business" },
     { href: `${base}/reports`, label: "Reports" },
     { href: `${base}/integrations`, label: "Integrations" },
     { href: `${base}/settings`, label: "Settings" },

@@ -1,6 +1,7 @@
 "use client";
 
 import { useParams, useRouter } from "next/navigation";
+import { PdfExport } from "@/components/builtin-reports";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Copy, ExternalLink, Share2, Trash2, Unlink } from "lucide-react";
 import { toast } from "sonner";
@@ -64,6 +65,7 @@ export default function ReportPage() {
               <CardDescription>{report.data.summary ?? "No summary"}</CardDescription>
             </div>
             <div className="flex flex-wrap gap-2">
+              <PdfExport projectId={projectId} reportId={reportId}/>
               <Button variant="outline" render={<a href={`/api/v1/projects/${projectId}/reports/${reportId}/raw`} target="_blank" rel="noreferrer" />}>
                 <ExternalLink /> Open raw
               </Button>

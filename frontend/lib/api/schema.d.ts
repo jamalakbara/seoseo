@@ -4,6 +4,22 @@
  */
 
 export interface paths {
+    "/api/v1/account/deletion": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_account_deletion"];
+        put?: never;
+        post: operations["request_account_deletion"];
+        delete: operations["cancel_account_deletion"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/ai-visibility/models": {
         parameters: {
             query?: never;
@@ -1074,6 +1090,70 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/business/entries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_business_records"];
+        put: operations["save_business_record"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/business/entries/{entry_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["delete_business_record"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/business/places": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["get_live_places_details"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/business/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_business_profile"];
+        put: operations["save_business_profile"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/cannibalization": {
         parameters: {
             query?: never;
@@ -1754,6 +1834,150 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/notifications/deliveries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_notification_deliveries"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/notifications/digest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_digest_subscription"];
+        put: operations["save_digest_subscription"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/notifications/endpoints": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_notification_endpoints"];
+        put?: never;
+        post: operations["create_notification_endpoint"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/notifications/endpoints/{endpoint_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete: operations["delete_notification_endpoint"];
+        options?: never;
+        head?: never;
+        patch: operations["toggle_notification_endpoint"];
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/notifications/endpoints/{endpoint_id}/test": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["test_notification_endpoint"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/notifications/evaluate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["evaluate_notification_events"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/notifications/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["list_notification_events"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/notifications/events/{event_id}/acknowledge": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["acknowledge_notification_event"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/notifications/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["get_alert_settings"];
+        put: operations["save_alert_settings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/rank-trackers": {
         parameters: {
             query?: never;
@@ -1963,6 +2187,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/projects/{project_id}/reports/generate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post: operations["generate_builtin_report"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/projects/{project_id}/reports/{report_id}": {
         parameters: {
             query?: never;
@@ -1974,6 +2214,22 @@ export interface paths {
         put: operations["update_report"];
         post?: never;
         delete: operations["delete_report"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/projects/{project_id}/reports/{report_id}/pdf": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["export_report_pdf"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -2373,6 +2629,15 @@ export interface components {
             /** Format: uuid */
             organization_id: string;
         };
+        AccountDeletion: {
+            blocked_reason?: string | null;
+            /** Format: date-time */
+            delete_after: string;
+            /** Format: date-time */
+            requested_at: string;
+            /** Format: uuid */
+            user_id: string;
+        };
         /** @enum {string} */
         ActorVia: "session" | "api_key" | "o_auth" | "no_auth";
         AddKeywordsInput: {
@@ -2539,6 +2804,17 @@ export interface components {
             schedule_error?: string | null;
             /** Format: int32 */
             weekday: number;
+        };
+        AlertSettingsInput: {
+            expected_domain: string;
+            include_depth_changes: boolean;
+            key_urls: string[];
+            /** Format: int32 */
+            min_change: number;
+            page_enabled: boolean;
+            rank_enabled: boolean;
+            /** Format: int64 */
+            revision: number;
         };
         ApiKey: {
             /** Format: date-time */
@@ -2840,6 +3116,51 @@ export interface components {
         BusinessCategory: {
             id: string;
             label: string;
+        };
+        BusinessEntry: {
+            /** Format: date-time */
+            created_at: string;
+            data: unknown;
+            /** Format: uuid */
+            id: string;
+            kind: string;
+            /** Format: uuid */
+            project_id: string;
+            /** Format: int64 */
+            revision: number;
+        };
+        BusinessEntryInput: {
+            /** Format: uuid */
+            id?: string | null;
+            kind: string;
+            /** Format: int32 */
+            rating?: number | null;
+            response?: string | null;
+            /** Format: int64 */
+            revision: number;
+            source_label: string;
+            source_url?: string | null;
+            text: string;
+        };
+        BusinessProfile: {
+            data: unknown;
+            /** Format: uuid */
+            project_id: string;
+            /** Format: int64 */
+            revision: number;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        BusinessProfileInput: {
+            address: string;
+            description?: string | null;
+            hours?: string | null;
+            name: string;
+            phone?: string | null;
+            /** Format: int64 */
+            revision: number;
+            source_label: string;
+            website?: string | null;
         };
         BusinessSearchInput: {
             /** @description Optional category id from `GET /local/categories`. */
@@ -3166,6 +3487,10 @@ export interface components {
             link_activity: components["schemas"]["LinkObservation"][];
             rank_movers: components["schemas"]["RankMover"][];
         };
+        DeleteAccountInput: {
+            confirmation: string;
+            password: string;
+        };
         DeleteSavedInput: {
             ids: string[];
         };
@@ -3177,6 +3502,39 @@ export interface components {
             category: string;
             name: string;
             signals: string[];
+        };
+        DigestInput: {
+            enabled: boolean;
+            /** Format: int32 */
+            hour_utc: number;
+            /** Format: int64 */
+            revision: number;
+            /** Format: int32 */
+            weekday: number;
+        };
+        DigestSubscription: {
+            country: string;
+            domain: string;
+            enabled: boolean;
+            /** Format: int32 */
+            hour_utc: number;
+            language: string;
+            last_error?: string | null;
+            /** Format: date-time */
+            next_run_at?: string | null;
+            /** Format: uuid */
+            project_id: string;
+            /** Format: int64 */
+            revision: number;
+            /** Format: uuid */
+            user_id: string;
+            /** Format: int32 */
+            weekday: number;
+        };
+        DigestView: {
+            note: string;
+            smtp_ready: boolean;
+            subscription?: components["schemas"]["DigestSubscription"] | null;
         };
         DiscoveryConfig: {
             country: string;
@@ -3257,6 +3615,16 @@ export interface components {
             traffic_method: string;
             warnings: string[];
         };
+        EndpointInput: {
+            kind: string;
+            name: string;
+            url: string;
+        };
+        EndpointToggle: {
+            enabled: boolean;
+            /** Format: int64 */
+            revision: number;
+        };
         Ga4ConnectUrl: {
             url: string;
         };
@@ -3294,6 +3662,12 @@ export interface components {
             note: string;
             property_id: string;
             report: components["schemas"]["Ga4ReportKind"];
+        };
+        GenerateReportInput: {
+            accent?: string | null;
+            byline?: string | null;
+            kind: string;
+            title?: string | null;
         };
         GrantView: {
             /** Format: date-time */
@@ -3910,6 +4284,84 @@ export interface components {
             organization_name: string;
             role: string;
         };
+        NotificationDelivery: {
+            /** Format: date-time */
+            attempted_at?: string | null;
+            country: string;
+            /** Format: date-time */
+            created_at: string;
+            dedupe_key: string;
+            domain: string;
+            /** Format: uuid */
+            endpoint_id?: string | null;
+            /** Format: int64 */
+            endpoint_revision?: number | null;
+            error?: string | null;
+            /** Format: uuid */
+            event_id?: string | null;
+            /** Format: date-time */
+            finished_at?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            job_id?: string | null;
+            kind: string;
+            language: string;
+            payload: unknown;
+            /** Format: uuid */
+            project_id: string;
+            status: string;
+            /** Format: uuid */
+            user_id?: string | null;
+        };
+        NotificationEndpoint: {
+            /** Format: date-time */
+            created_at: string;
+            enabled: boolean;
+            host: string;
+            /** Format: uuid */
+            id: string;
+            kind: string;
+            name: string;
+            /** Format: uuid */
+            project_id: string;
+            /** Format: int64 */
+            revision: number;
+        };
+        NotificationEvent: {
+            /** Format: date-time */
+            acknowledged_at?: string | null;
+            country: string;
+            /** Format: date-time */
+            created_at: string;
+            data: unknown;
+            domain: string;
+            /** Format: uuid */
+            id: string;
+            kind: string;
+            language: string;
+            /** Format: uuid */
+            project_id: string;
+            /** Format: uuid */
+            source_id: string;
+        };
+        NotificationSettings: {
+            country: string;
+            domain: string;
+            /** Format: date-time */
+            enabled_at: string;
+            include_depth_changes: boolean;
+            key_urls: string[];
+            language: string;
+            /** Format: int32 */
+            min_change: number;
+            page_enabled: boolean;
+            /** Format: uuid */
+            project_id: string;
+            rank_enabled: boolean;
+            /** Format: int64 */
+            revision: number;
+        };
         OptimizeContentInput: {
             content: string;
             keyword: string;
@@ -4173,6 +4625,17 @@ export interface components {
             ids: string[];
             /** @description Pinned keywords are listed first. Default true. */
             pinned?: boolean | null;
+        };
+        PlacesDetailsInput: {
+            include_reviews: boolean;
+            place_id: string;
+        };
+        PlacesDetailsView: {
+            data: unknown;
+            note: string;
+            /** Format: date-time */
+            observed_at: string;
+            place_id: string;
         };
         PositionDistribution: {
             positions_11_20: number;
@@ -4933,6 +5396,65 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    get_account_deletion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccountDeletion"] | null;
+                };
+            };
+        };
+    };
+    request_account_deletion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DeleteAccountInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AccountDeletion"];
+                };
+            };
+        };
+    };
+    cancel_account_deletion: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     ai_visibility_models: {
         parameters: {
             query?: never;
@@ -7083,6 +7605,146 @@ export interface operations {
             };
         };
     };
+    list_business_records: {
+        parameters: {
+            query?: {
+                limit?: number | null;
+                offset?: number | null;
+            };
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BusinessEntry"][];
+                };
+            };
+        };
+    };
+    save_business_record: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BusinessEntryInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BusinessEntry"];
+                };
+            };
+        };
+    };
+    delete_business_record: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                entry_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    get_live_places_details: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PlacesDetailsInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PlacesDetailsView"];
+                };
+            };
+        };
+    };
+    get_business_profile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BusinessProfile"] | null;
+                };
+            };
+        };
+    };
+    save_business_profile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["BusinessProfileInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BusinessProfile"];
+                };
+            };
+        };
+    };
     get_cannibalization_flags: {
         parameters: {
             query?: {
@@ -8514,6 +9176,296 @@ export interface operations {
             };
         };
     };
+    list_notification_deliveries: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationDelivery"][];
+                };
+            };
+        };
+    };
+    get_digest_subscription: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DigestView"];
+                };
+            };
+        };
+    };
+    save_digest_subscription: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DigestInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DigestView"];
+                };
+            };
+        };
+    };
+    list_notification_endpoints: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationEndpoint"][];
+                };
+            };
+        };
+    };
+    create_notification_endpoint: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EndpointInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationEndpoint"];
+                };
+            };
+        };
+    };
+    delete_notification_endpoint: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                endpoint_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    toggle_notification_endpoint: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                endpoint_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EndpointToggle"];
+            };
+        };
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    test_notification_endpoint: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                endpoint_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/plain": string;
+                };
+            };
+        };
+    };
+    evaluate_notification_events: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/plain": number;
+                };
+            };
+        };
+    };
+    list_notification_events: {
+        parameters: {
+            query?: {
+                limit?: number | null;
+                offset?: number | null;
+            };
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationEvent"][];
+                };
+            };
+        };
+    };
+    acknowledge_notification_event: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                event_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
+    get_alert_settings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationSettings"] | null;
+                };
+            };
+        };
+    };
+    save_alert_settings: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AlertSettingsInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationSettings"];
+                };
+            };
+        };
+    };
     list_rank_trackers: {
         parameters: {
             query?: never;
@@ -9012,6 +9964,31 @@ export interface operations {
             };
         };
     };
+    generate_builtin_report: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenerateReportInput"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Report"];
+                };
+            };
+        };
+    };
     get_report: {
         parameters: {
             query?: never;
@@ -9100,6 +10077,28 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Problem"];
+                };
+            };
+        };
+    };
+    export_report_pdf: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                project_id: string;
+                report_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/pdf": number[];
                 };
             };
         };

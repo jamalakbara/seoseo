@@ -1,6 +1,6 @@
 # SeoSeo — Documentation Index
 
-M7 development: [Assistant and content](28-assistant-and-content.md) documents the initial delivery; [Assistant streaming and reviewed memory](29-assistant-streaming-and-memory.md) completes AG-01 with real streamed answers and explicit canonical-memory approvals.
+M7 complete: [Operations and acceptance](30-m7-operations-and-acceptance.md) documents alerts, destinations, weekly email, reports/PDF, business records, backup/restore and account deletion. [Assistant and content](28-assistant-and-content.md) and [streaming/reviewed memory](29-assistant-streaming-and-memory.md) cover AG-01..03.
 
 Free, open-source, self-hostable SEO platform. Rust (axum) backend · Next.js 16 frontend · Docker Compose. Reverse-engineered from OpenSEO (every-app/open-seo v0.1.26) and extended.
 

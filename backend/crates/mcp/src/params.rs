@@ -3,6 +3,20 @@
 
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct NotificationReadParams {
+    pub project_id: String,
+    pub limit: Option<i64>,
+    pub offset: Option<i64>,
+}
+#[derive(Debug, Serialize, Deserialize, JsonSchema)]
+pub struct BuiltinReportParams {
+    pub project_id: String,
+    pub kind: String,
+    pub title: Option<String>,
+    pub byline: Option<String>,
+    pub accent: Option<String>,
+}
 
 #[derive(Debug, Serialize, Deserialize, JsonSchema)]
 pub struct ContentBriefParams {
