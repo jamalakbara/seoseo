@@ -1,6 +1,14 @@
 # M6 acceptance — 2026-11-14
 
-M6 implementation is delivered on `codex/m6-field-and-bing`. **Full milestone acceptance is still pending**: browser verification was blocked by automatic approval review, and real CrUX/Bing/SerpApi credentials were unavailable. No deployment, merge or push was performed in this session.
+M6 implementation is delivered on `codex/m6-field-and-bing`. **Full milestone acceptance is still pending.** The original implementation session used offline fixtures because preview execution and credentials were unavailable. The operator has since configured live credentials and started the current app. Live/browser acceptance is now in progress, with the checkpoint below distinguishing verified results from remaining work. No merge or push has been performed.
+
+## Live acceptance checkpoint
+
+On 2026-11-14, the signed-in browser displayed the updated project navigation and the selected verified Bing site. All four Bing report types (queries, pages, crawl and inbound links) completed successfully against the configured live connection. This site currently returned empty samples; the UI correctly retained unknown/absence language instead of claiming measured zeroes.
+
+Browser inspection found four form actions with an implicit Base UI `type="button"`: CrUX lookup, AI Overview capture/import and city demand import. Clicking CrUX produced no submission. All four actions now explicitly use `type="submit"`; frontend type checking, lint and the Docker production build passed. Verification of their corrected runtime behavior is pending recovery of Docker, which stopped answering engine requests while replacing the web container. Restarting Docker Desktop needs operator approval because it interrupts unrelated containers as well.
+
+One live SerpApi Maps playground lookup identified an exact public Jakarta test-business ID and coordinates, as authorized by the operator. This was preparatory provider evidence, not a completed SeoSeo grid scan. No live SeoSeo CrUX, AI Overview or nine-cell Maps acceptance pass is claimed yet. The remaining checklist below still applies.
 
 ## Implemented scope
 
@@ -38,8 +46,8 @@ The optional worker-container argument deliberately interrupts and resumes that 
 
 ## Open acceptance gates
 
-**Browser QA:** automatic approval review rejected the host production preview with “blocked by policy.” A safer read-only, unprivileged container attempt hit a missing read-only mountpoint; automatic approval review also rejected its follow-up startup. No browser, responsive-layout, WebGL, hydration or screenshot acceptance is claimed. The production build passed. When preview execution is available, check discovery/category filtering, tracker creation, imported/live scan selection, point competitors, map display with tiles disabled, city imports/history, AIO present/absent/incomplete and CrUX data. Include a narrow viewport and keyboard navigation. Check production tiles through normal interactive use with visible attribution and no prefetch.
+**Browser QA:** the original host preview was rejected by automatic approval review with “blocked by policy,” and a safer container attempt also failed. The operator later supplied a running updated app, enabling the live checkpoint above. The submit-type fixes need runtime verification after Docker recovers. Remaining checks: discovery/category filtering, tracker creation, imported/live scan selection, point competitors, map display, city imports/history, AIO present/absent/incomplete and CrUX data. Include a narrow viewport and keyboard navigation. Check production tiles through normal interactive use with visible attribution and no prefetch. Do not claim responsive/WebGL/hydration acceptance from the production build alone.
 
-**Real-provider QA:** use operator-owned CrUX/Bing/optional SerpApi credentials. Confirm a scoped CrUX lookup, one verified Bing site's read-only reports, a reviewed 3×3 single-keyword Maps scan, and Google AI Overview text/continuation where available. Check coordinate/language/country and exact place ID against returned evidence. Fixture IDs and imports do not prove live provider access.
+**Real-provider QA:** Bing's selected-site read-only reports passed as described above. Using the now-configured credentials, still confirm a scoped CrUX lookup, a reviewed 3×3 single-keyword Maps scan, and Google AI Overview text/continuation where available. Check coordinate/language/country and exact place ID against returned evidence. Fixture IDs, imports and the preparatory Maps playground lookup do not prove the remaining SeoSeo live flows.
 
 M3 retained follow-ups and M5's explicit live-three-engine gate remain separate and unchanged. M6 stays “implementation delivered; acceptance pending” until these gates are satisfied.

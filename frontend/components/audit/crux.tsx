@@ -22,7 +22,7 @@ export function CruxCard({ projectId, domain }: { projectId: string; domain: str
       <div className="flex flex-wrap items-end gap-3">
         <label className="grid gap-1 text-sm">Scope<select aria-label="CrUX scope" className="rounded border bg-background p-2" value={scope} onChange={e => setScope(e.target.value)}><option value="url">Exact page</option><option value="origin">Origin (root URL)</option></select></label>
         <label className="grid gap-1 text-sm">Device<select aria-label="CrUX device" className="rounded border bg-background p-2" value={device} onChange={e => setDevice(e.target.value)}><option value="PHONE">Phone</option><option value="DESKTOP">Desktop</option><option value="TABLET">Tablet</option><option value="ALL">All devices</option></select></label>
-        <Button disabled={lookup.isPending || !domain}>{lookup.isPending ? "Looking up…" : "Look up field data"}</Button>
+        <Button type="submit" disabled={lookup.isPending || !domain}>{lookup.isPending ? "Looking up…" : "Look up field data"}</Button>
       </div>
     </form>
     {lookup.error && <p role="alert" className="text-sm text-destructive">{lookup.error.message}</p>}

@@ -38,7 +38,7 @@ export function CityDemand({ projectId }: { projectId: string }) {
       <label className="grid gap-1 text-sm">Keyword rows (JSON array)<Textarea required rows={5} value={rows} onChange={e => setRows(e.target.value)}
         placeholder={'[{"keyword":"coffee","monthly_searches":null,"national_monthly_searches":null,"relative_interest":75}]'} /></label>
       <p className="text-xs text-muted-foreground">Up to 500 unique keywords. monthly_searches and national_monthly_searches are explicit source figures; relative_interest is 0–100 within that source export, not searches/month.</p>
-      <Button disabled={upload.isPending}>{upload.isPending ? "Saving…" : "Save city context"}</Button>
+      <Button type="submit" disabled={upload.isPending}>{upload.isPending ? "Saving…" : "Save city context"}</Button>
       {upload.error && <p role="alert" className="text-destructive">{upload.error.message}</p>}
     </form>
     {history.isPending && <p>Loading city context…</p>}

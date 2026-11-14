@@ -2,11 +2,11 @@
 
 Free, open-source, self-hostable SEO platform — an alternative to Semrush, Ahrefs and OpenSEO that works **without paid API keys**.
 
-> Status: **M6 in progress; M5 live-cloud acceptance pending**. Clustering, internal links, audit comparison/scheduling, cannibalization candidates, an own AI index, homepage technology hints and sampled link prospects accompany M0–M5, with 97 MCP tools. The three-live-engine gate still needs direct Anthropic/Gemini credentials. See [M6 technology/prospects](docs/22-technology-and-link-prospects.md), [M5 acceptance](docs/17-m5-acceptance.md) and the [roadmap](docs/07-roadmap.md).
+> Status: **M6 implementation delivered; acceptance in progress**. Local scans/maps/competitors, city demand imports, Google AI Overview observations, CrUX and Bing accompany clustering, audit comparison/scheduling and the earlier milestones, with 115 MCP tools. M5's three-live-engine gate still needs direct Anthropic/Gemini credentials. See [M6 acceptance](docs/27-m6-acceptance.md), [M5 acceptance](docs/17-m5-acceptance.md) and the [roadmap](docs/07-roadmap.md).
 
 M5 guides: [competitive research](docs/14-competitive-research.md), [backlinks](docs/15-backlink-snapshots.md), [AI visibility setup](docs/16-ai-visibility.md), [agent skills](plugins/seoseo/README.md). Domain/backlink coverage is a bounded sample, and traffic estimates require eligible monthly search counts. Unknown metrics stay null.
 
-Latest development checkpoint: [CrUX field performance](docs/23-crux-field-data.md) adds REST/MCP/UI support (98 tools total); browser and real-provider acceptance remain pending.
+Latest guides: [Local SEO and city context](docs/25-local-seo.md), [Google AI Overviews](docs/26-google-ai-overviews.md), [CrUX field performance](docs/23-crux-field-data.md) and [Bing Webmaster Tools](docs/24-bing-webmaster.md). Live collections are explicit and bounded; source-labelled imports work without paid keys.
 
 ## Quick start (Docker)
 

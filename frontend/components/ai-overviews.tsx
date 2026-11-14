@@ -36,7 +36,7 @@ export function AiOverviews({ projectId }: { projectId: string }) {
       <label className="grid gap-1 text-sm">Search keyword<Input required maxLength={120} value={keyword} onChange={e => setKeyword(e.target.value)} /></label>
       <label className="grid gap-1 text-sm">Search location (optional)<Input maxLength={160} value={location} onChange={e => setLocation(e.target.value)} /></label>
       <p className="text-sm text-muted-foreground">Maximum two provider requests (search plus one continuation); provider charges may apply. A capture from the last 24 hours is reused.</p>
-      <Button disabled={capture.isPending}>{capture.isPending ? "Capturing…" : "Capture overview · up to 2 requests"}</Button>
+      <Button type="submit" disabled={capture.isPending}>{capture.isPending ? "Capturing…" : "Capture overview · up to 2 requests"}</Button>
       {capture.data && <p role="status" className="text-sm">{capture.data.cached ? "Reused cached capture" : "Capture saved"} · {capture.data.requests} requests</p>}
       {capture.error && <p role="alert" className="text-destructive">{capture.error.message}</p>}
     </form>
@@ -44,7 +44,7 @@ export function AiOverviews({ projectId }: { projectId: string }) {
       <form className="mt-3 grid gap-3" onSubmit={e => { e.preventDefault(); upload.mutate(); }}>
         <p className="text-sm text-muted-foreground">Include keyword, location, observed_at, source_note and response (a SerpApi-format Google search response). Only normalized text and safe citations are retained.</p>
         <label className="grid gap-1 text-sm">Google search evidence JSON<Textarea required rows={8} value={raw} onChange={e => setRaw(e.target.value)} /></label>
-        <Button disabled={upload.isPending}>Import overview</Button>
+        <Button type="submit" disabled={upload.isPending}>Import overview</Button>
         {upload.error && <p role="alert" className="text-destructive">{upload.error.message}</p>}
       </form>
     </details>
