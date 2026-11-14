@@ -11,7 +11,7 @@ Project: `seoseo` · mode: solo · sync: none
 
 ## Counts
 - decision: 35 (proposed 33, superseded 2)
-- memory: 15 (active 15)
+- memory: 16 (active 16)
 - handoff: 43 (final 43)
 
 ## Recent handoffs
